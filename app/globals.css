@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --midnight: #0d1628;
+  --navy: #162236;
+  --peach: #f8c8a8;
+  --coral: #ee9b78;
+  --cream: #fffaf5;
+  --sage: #a2c8a2;
+  --lavender: #beb2d7;
+  --gold: #dab478;
+}
+
+html,
+body {
+  background: var(--midnight);
+  color: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  min-height: 100svh;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.text-gradient-peach {
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.stars span {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 9999px;
+  background: #fffaf5;
+  opacity: 0.4;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+.messages-mask {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+}
+
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 16px);
+}
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 16px);
+}
