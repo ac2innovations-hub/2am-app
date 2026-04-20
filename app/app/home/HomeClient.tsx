@@ -127,9 +127,13 @@ export default function HomeClient() {
     <main className="relative min-h-svh bg-midnight pb-10">
       {/* Header */}
       <header className="safe-top flex items-center justify-between px-5 pb-3">
-        <div className="text-gradient-peach font-display text-2xl font-black">
+        <Link
+          href="/app/home"
+          aria-label="home"
+          className="text-gradient-peach font-display text-2xl font-black rounded-md -ml-2 px-2 py-1 transition hover:opacity-80 active:scale-95"
+        >
           2am
-        </div>
+        </Link>
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-semibold text-midnight">
           {initial}
         </div>

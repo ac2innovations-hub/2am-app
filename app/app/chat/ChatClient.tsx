@@ -124,13 +124,18 @@ export default function ChatClient() {
   // sentinel ref so every render that changes `messages` or toggles `sending`
   // re-anchors the scroll. First pass snaps instantly to avoid animating
   // through already-rendered history on initial mount; subsequent scrolls
-  // are smooth so new turns feel gentle.
+  // are smooth so new turns feel gentle. rAF ensures layout has settled
+  // (heights computed) before we call scrollIntoView — otherwise the scroll
+  // can overshoot or miss on the first paint.
   useEffect(() => {
     const el = bottomRef.current;
     if (!el) return;
     const behavior: ScrollBehavior = hasAutoScrolled.current ? "smooth" : "auto";
-    el.scrollIntoView({ behavior, block: "end" });
+    const raf = requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior, block: "end" });
+    });
     hasAutoScrolled.current = true;
+    return () => cancelAnimationFrame(raf);
   }, [messages, sending]);
 
   // Handle ?q= prefill and ?mood= one-shot
@@ -372,9 +377,13 @@ export default function ChatClient() {
             </div>
           </div>
         </div>
-        <div className="text-gradient-peach font-display text-lg font-black">
+        <Link
+          href="/app/home"
+          aria-label="home"
+          className="text-gradient-peach font-display text-lg font-black rounded-md px-2 py-1 -mr-2 transition hover:opacity-80 active:scale-95"
+        >
           2am
-        </div>
+        </Link>
       </header>
 
       {/* Disclaimer */}
@@ -386,7 +395,7 @@ export default function ChatClient() {
       </div>
 
       {/* Messages */}
-      <div className="messages-mask flex-1 overflow-y-auto px-4 pt-4 pb-4">
+      <div className="messages-mask flex-1 overflow-y-auto px-4 pt-4 pb-10">
         <div className="flex flex-col gap-5">
           {messages.map((m, i) => (
             <ChatMessage key={i} role={m.role} content={m.content} />
@@ -411,9 +420,10 @@ export default function ChatClient() {
               </p>
             </div>
           )}
-          {/* Scroll anchor — always sits at the end of the list so
-              scrollIntoView keeps the newest turn (or typing dots) visible. */}
-          <div ref={bottomRef} aria-hidden className="h-0" />
+          {/* Scroll anchor — real-height spacer so scrollIntoView lifts the
+              last real message well clear of the sticky input bar and the
+              bottom fade mask. */}
+          <div ref={bottomRef} aria-hidden className="h-6 w-full shrink-0" />
         </div>
       </div>
 
