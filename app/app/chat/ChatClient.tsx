@@ -87,7 +87,8 @@ export default function ChatClient() {
   const [sending, setSending] = useState(false);
   const [onboarding, setOnboarding] = useState<OnboardingStep>("done");
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolled = useRef(false);
   const appliedPrefill = useRef(false);
 
   // Hydrate profile + conversation on mount
@@ -119,11 +120,17 @@ export default function ChatClient() {
     }
   }, []);
 
-  // Auto-scroll to bottom on new messages
+  // Keep the newest message (or the typing dots) in view. Uses a bottom
+  // sentinel ref so every render that changes `messages` or toggles `sending`
+  // re-anchors the scroll. First pass snaps instantly to avoid animating
+  // through already-rendered history on initial mount; subsequent scrolls
+  // are smooth so new turns feel gentle.
   useEffect(() => {
-    const el = scrollRef.current;
+    const el = bottomRef.current;
     if (!el) return;
-    el.scrollTop = el.scrollHeight;
+    const behavior: ScrollBehavior = hasAutoScrolled.current ? "smooth" : "auto";
+    el.scrollIntoView({ behavior, block: "end" });
+    hasAutoScrolled.current = true;
   }, [messages, sending]);
 
   // Handle ?q= prefill and ?mood= one-shot
@@ -401,10 +408,7 @@ export default function ChatClient() {
       </div>
 
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="messages-mask flex-1 overflow-y-auto px-4 pt-4 pb-4"
-      >
+      <div className="messages-mask flex-1 overflow-y-auto px-4 pt-4 pb-4">
         <div className="flex flex-col gap-5">
           {messages.map((m, i) => (
             <ChatMessage key={i} role={m.role} content={m.content} />
@@ -429,6 +433,9 @@ export default function ChatClient() {
               </p>
             </div>
           )}
+          {/* Scroll anchor — always sits at the end of the list so
+              scrollIntoView keeps the newest turn (or typing dots) visible. */}
+          <div ref={bottomRef} aria-hidden className="h-0" />
         </div>
       </div>
 
