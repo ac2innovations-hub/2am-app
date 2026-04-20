@@ -152,7 +152,7 @@ export default function ChatClient() {
     (userText: string): Msg => {
       const text = userText.trim();
       if (onboarding === "name") {
-        const name = text.replace(/[.!?]+$/, "").split(/\s+/)[0].toLowerCase();
+        const name = parseName(text);
         const next = updateProfile({ name });
         setProfile(next);
         setOnboarding("stage");
@@ -483,6 +483,40 @@ export default function ChatClient() {
       </form>
     </main>
   );
+}
+
+// Extract a first name from free-text replies like "ali", "my name is ali",
+// "i'm ali", "call me ali", "ali!", etc. Handles straight + curly apostrophes,
+// trailing punctuation, and emoji. Falls back to the last remaining word so a
+// bare "ali" still returns "ali".
+export function parseName(raw: string): string {
+  if (!raw) return "";
+  const norm = raw
+    .toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[^a-z\s']/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!norm) return "";
+
+  const patterns: RegExp[] = [
+    /\bmy\s+name(?:\s+is|'s)\s+([a-z]+)/,
+    /\bthey\s+call\s+me\s+([a-z]+)/,
+    /\bcall\s+me\s+([a-z]+)/,
+    /\bi\s+go\s+by\s+([a-z]+)/,
+    /\bname'?s\s+([a-z]+)/,
+    /\bthis\s+is\s+([a-z]+)/,
+    /\bi\s+am\s+([a-z]+)/,
+    /\bi'?m\s+([a-z]+)/,
+    /\bit'?s\s+([a-z]+)/,
+  ];
+  for (const re of patterns) {
+    const m = norm.match(re);
+    if (m && m[1]) return m[1];
+  }
+
+  const words = norm.split(" ").filter(Boolean);
+  return words[words.length - 1] ?? "";
 }
 
 function parseWeek(text: string): number | null {
