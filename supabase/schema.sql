@@ -4,8 +4,9 @@
 create extension if not exists "pgcrypto";
 
 -- profiles
--- Additive-safe: also run this if upgrading an existing deploy.
+-- Additive-safe: also run these if upgrading an existing deploy.
 -- alter table public.profiles add column if not exists months_trying integer;
+-- alter table public.profiles add column if not exists baby_name text;
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -15,6 +16,7 @@ create table if not exists public.profiles (
   due_date date,
   week integer,
   baby_age_months integer,
+  baby_name text,
   months_trying integer,
   first_pregnancy boolean not null default true,
   concerns text[] not null default '{}',
