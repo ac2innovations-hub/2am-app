@@ -180,29 +180,7 @@ export default function ChatClient() {
       }
 
       if (onboarding === "stage") {
-        const lower = text.toLowerCase();
-        let stage: Stage;
-        if (
-          lower.includes("postpartum") ||
-          lower.includes("new mom") ||
-          lower.includes("already a mom") ||
-          lower.includes("had") ||
-          lower.includes("newborn")
-        )
-          stage = "postpartum";
-        else if (
-          lower.includes("trying") ||
-          lower.includes("ttc") ||
-          lower.includes("conceive")
-        )
-          stage = "ttc";
-        else if (
-          lower.includes("pregnant") ||
-          lower.includes("pregnancy") ||
-          lower.includes("expecting")
-        )
-          stage = "pregnant";
-        else stage = "pregnant";
+        const stage = detectStage(text);
         const next = updateProfile({ stage });
         setProfile(next);
         setOnboarding("when");
@@ -499,6 +477,78 @@ export default function ChatClient() {
       </form>
     </main>
   );
+}
+
+// Classify a free-text stage reply into ttc / pregnant / postpartum.
+// Myla asks "are you trying to conceive, currently pregnant, or already a
+// mom?" — users answer with the exact option, a paraphrase, or context
+// ("my baby is 3 months old", "we've been trying for a year", "24 weeks").
+// Order matters: the most specific signals are checked first so a pregnant
+// user saying "i had a positive test" doesn't trip the postpartum branch.
+export function detectStage(text: string): Stage {
+  const t = text.toLowerCase().replace(/[’‘]/g, "'").trim();
+
+  // Postpartum — explicit stage word, already-born-baby language, or
+  // postpartum-only activities. "had" is only accepted in the "had my/the/a
+  // baby" shape to avoid matching "had a positive test" / "had a scan".
+  const postpartumPatterns: RegExp[] = [
+    /\bpostpartum\b/,
+    /\bpostnatal\b/,
+    /\bnewborn\b/,
+    /\bnew\s+mom\b/,
+    /\balready\s+(?:a\s+)?mom\b/,
+    /\bi'?m\s+a\s+mom\b/,
+    /\bgave\s+birth\b/,
+    /\bdelivered\b/,
+    /\bhad\s+(?:my|the|a)\s+(?:baby|son|daughter|little|kid|boy|girl)\b/,
+    /\bjust\s+had\s+(?:a\s+)?baby\b/,
+    /\bweeks?\s+postpartum\b/,
+    /\bmonths?\s+postpartum\b/,
+    /\b(?:fourth|4th)\s+trimester\b/,
+    /\bbreastfeeding\b/,
+    /\bnursing\b/,
+    /\bbaby\s+(?:is\s+)?\d+\s*(?:weeks?|wks?|months?|mos?|mo)\b/,
+    /\b\d+\s*(?:weeks?|wks?|months?|mos?|mo)\s+old\b/,
+  ];
+  if (postpartumPatterns.some((r) => r.test(t))) return "postpartum";
+
+  // TTC — explicit stage, fertility language, or bare "trying".
+  const ttcPatterns: RegExp[] = [
+    /\btrying\s+to\s+conceive\b/,
+    /\bttc\b/,
+    /\bconceiv/,
+    /\btrying\b/,
+    /\bfertility\b/,
+    /\bovulat/,
+    /\btracking\s+cycles?\b/,
+  ];
+  if (ttcPatterns.some((r) => r.test(t))) return "ttc";
+
+  // Pregnant — explicit stage or pregnancy context. "week 20" / "24 weeks"
+  // counts here; postpartum uses "weeks postpartum" which is matched above.
+  const pregnantPatterns: RegExp[] = [
+    /\bpregnant\b/,
+    /\bpregnancy\b/,
+    /\bexpecting\b/,
+    /\b(?:first|second|third|1st|2nd|3rd)\s+trimester\b/,
+    /\btrimester\b/,
+    /\bdue\s+(?:date|in|on)\b/,
+    /\bweek\s+\d+\b/,
+    /\b\d+\s*(?:weeks?|wks?)\b/,
+    /\bbun\s+in\s+the\s+oven\b/,
+  ];
+  if (pregnantPatterns.some((r) => r.test(t))) return "pregnant";
+
+  // Fallback: Myla's question ends with "already a mom" — if the user just
+  // echoes "mom" / "a mom" / "the third one" without a qualifier, treat as
+  // postpartum rather than silently falling through to pregnant.
+  if (/\b(?:a\s+)?mom\b/.test(t)) return "postpartum";
+  if (/\b(?:3rd|third|last)\s+(?:one|option)\b/.test(t)) return "postpartum";
+
+  // True last resort — something like "hi" or a typo. Default to pregnant
+  // because that's the widest middle of the funnel; user can correct in
+  // chat once onboarding completes.
+  return "pregnant";
 }
 
 // Extract a first name from free-text replies like "ali", "my name is ali",
