@@ -263,32 +263,44 @@ export default function HomeClient() {
         })()}
 
       {/* Myla check-in */}
-      <section className="mx-5 mt-4 rounded-3xl bg-navy/70 p-5">
-        <div className="flex items-start gap-3">
-          <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-bold text-midnight">
-            M
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-peach/80">
-                myla
-              </span>
-              <span className="inline-block h-2 w-2 rounded-full bg-coral" />
+      {(() => {
+        const checkInText =
+          (profile.stage === "pregnant" &&
+            pregnantMilestoneCheckIn(profile)) ||
+          checkInMessage(profile);
+        const replyToCheckIn = () => {
+          setActiveConversationId(null);
+          router.push(
+            `/app/chat?new=1&checkin=${encodeURIComponent(checkInText)}`,
+          );
+        };
+        return (
+          <section className="mx-5 mt-4 rounded-3xl bg-navy/70 p-5">
+            <div className="flex items-start gap-3">
+              <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-bold text-midnight">
+                M
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-peach/80">
+                    myla
+                  </span>
+                  <span className="inline-block h-2 w-2 rounded-full bg-coral" />
+                </div>
+                <p className="mt-1 text-[15px] leading-relaxed text-cream/90">
+                  {checkInText}
+                </p>
+                <button
+                  onClick={replyToCheckIn}
+                  className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-peach hover:text-coral"
+                >
+                  tap to reply →
+                </button>
+              </div>
             </div>
-            <p className="mt-1 text-[15px] leading-relaxed text-cream/90">
-              {(profile.stage === "pregnant" &&
-                pregnantMilestoneCheckIn(profile)) ||
-                checkInMessage(profile)}
-            </p>
-            <button
-              onClick={startNew}
-              className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-peach hover:text-coral"
-            >
-              tap to reply →
-            </button>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* Primary CTA */}
       <div className="px-5 pt-5">

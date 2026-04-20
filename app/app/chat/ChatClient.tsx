@@ -50,12 +50,21 @@ function chipsForStage(stage: Stage | null | undefined): string[] {
   return CHIPS_BY_STAGE[stage ?? "pregnant"];
 }
 
-const MOOD_LINES: Record<string, string> = {
-  great: "i'm feeling great today 💛",
-  okay: "i'm feeling okay today.",
-  meh: "feeling kind of meh today.",
-  rough: "today has been rough.",
-  anxious: "i'm feeling anxious.",
+// Myla opens the conversation with one of these lines when the user taps
+// a mood emoji on the home hub. The user then responds naturally — the
+// chat is seeded with Myla already acknowledging the mood, not the user
+// having auto-sent "i'm feeling rough".
+const MOOD_OPENERS: Record<string, (name: string) => string> = {
+  great: (n) =>
+    `hey ${n} — happy to hear you're feeling great today 💛 anything good happening, or just want to chat?`,
+  okay: (n) =>
+    `hi ${n} — okay is a perfectly valid mood 🤍 anything on your mind today?`,
+  meh: (n) =>
+    `hey ${n} — meh days are real. want to talk about what's making today feel flat?`,
+  rough: (n) =>
+    `hey ${n} — sounds like today's been rough. want to talk about what's going on?`,
+  anxious: (n) =>
+    `hey ${n} — i'm glad you told me. anxious can be a lot. what's swirling for you right now?`,
 };
 
 type OnboardingStep =
@@ -107,10 +116,33 @@ export default function ChatClient() {
       return;
     }
 
+    const sp = new URLSearchParams(window.location.search);
+    const fresh = sp.get("new") === "1";
+    const checkinParam = sp.get("checkin");
+    const moodParam = sp.get("mood");
+
+    // Seeded conversation: home-hub "tap to reply" on a check-in, or a
+    // mood emoji tap. Start a new convo with Myla's opening message
+    // already visible; the user types their reply directly.
+    if (fresh && (checkinParam || moodParam)) {
+      const seedText = checkinParam
+        ? checkinParam
+        : MOOD_OPENERS[moodParam!]?.(p.name ?? "you");
+      if (seedText) {
+        const seed: Msg = {
+          role: "assistant",
+          content: seedText,
+          timestamp: new Date().toISOString(),
+        };
+        const convo = createConversation(seed);
+        setConversationId(convo.id);
+        setMessages([seed]);
+        return;
+      }
+    }
+
     const activeId = getActiveConversationId();
     const existing = activeId ? getConversation(activeId) : null;
-    const fresh =
-      new URLSearchParams(window.location.search).get("new") === "1";
 
     if (existing && !fresh) {
       setConversationId(existing.id);
@@ -143,19 +175,16 @@ export default function ChatClient() {
     };
   }, [messages, sending]);
 
-  // Handle ?q= prefill and ?mood= one-shot
+  // ?q= prefill puts a question in the input box (from the can-i page).
+  // Mood + checkin are handled at mount by seeding Myla's first message,
+  // so no work here for those.
   useEffect(() => {
     if (appliedPrefill.current) return;
     if (onboarding !== "done") return;
     const q = params.get("q");
-    const mood = params.get("mood");
     if (q) {
       appliedPrefill.current = true;
       setInput(q);
-    } else if (mood && MOOD_LINES[mood]) {
-      appliedPrefill.current = true;
-      // auto-send mood as a user message
-      void send(MOOD_LINES[mood]);
     }
   }, [params, onboarding]);
 
