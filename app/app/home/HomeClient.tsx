@@ -27,6 +27,50 @@ const MOODS: { key: string; label: string; emoji: string }[] = [
   { key: "anxious", label: "anxious", emoji: "😰" },
 ];
 
+const FEATURES: {
+  emoji: string;
+  title: string;
+  desc: string;
+  accent: "peach" | "sage" | "lavender" | "gold";
+}[] = [
+  {
+    emoji: "💬",
+    title: "ask anything anytime",
+    desc: "no question too weird. no topic off-limits. always judgment-free.",
+    accent: "peach",
+  },
+  {
+    emoji: "🧠",
+    title: "she remembers you",
+    desc: "your name, your week, your worries — myla holds the context so you never start over.",
+    accent: "lavender",
+  },
+  {
+    emoji: "✅",
+    title: "can i…? instant answers",
+    desc: "sushi, tylenol, hair dye — yes/no with the source, not a rabbit hole.",
+    accent: "sage",
+  },
+  {
+    emoji: "🔒",
+    title: "private by design",
+    desc: "no google history. no targeted ads. your questions stay yours.",
+    accent: "gold",
+  },
+  {
+    emoji: "🌙",
+    title: "built for 2am",
+    desc: "wide awake and scared to bother anyone? myla's up too.",
+    accent: "peach",
+  },
+  {
+    emoji: "🌱",
+    title: "trying to first year",
+    desc: "cycles, trimesters, milestones — one companion for every chapter.",
+    accent: "sage",
+  },
+];
+
 export default function HomeClient() {
   const router = useRouter();
   const [profile, setProfile] = useState<LocalProfile | null>(null);
@@ -324,6 +368,42 @@ export default function HomeClient() {
                 {m.label}
               </span>
             </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="mx-5 mt-10">
+        <div className="mb-3 flex items-end justify-between">
+          <h2 className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/55">
+            what myla can do
+          </h2>
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/35">
+            scroll
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {FEATURES.map((f) => (
+            <div
+              key={f.title}
+              className={`rounded-2xl border bg-navy/50 p-4 ${
+                f.accent === "peach"
+                  ? "border-peach/20"
+                  : f.accent === "sage"
+                    ? "border-sage/25"
+                    : f.accent === "lavender"
+                      ? "border-lavender/25"
+                      : "border-gold/25"
+              }`}
+            >
+              <div className="text-xl">{f.emoji}</div>
+              <div className="mt-2 text-[13px] font-medium lowercase text-cream">
+                {f.title}
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-cream/55">
+                {f.desc}
+              </p>
+            </div>
           ))}
         </div>
       </section>

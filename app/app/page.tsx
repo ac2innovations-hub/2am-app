@@ -1,24 +1,37 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import StarField from "@/components/StarField";
 
+type Status = "loading" | "firstTime";
+
 export default function Splash() {
-  const [hasProfile, setHasProfile] = useState(false);
+  const router = useRouter();
+  const [status, setStatus] = useState<Status>("loading");
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem("2am:profile");
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as { onboardingComplete?: boolean };
-      setHasProfile(!!parsed.onboardingComplete);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { onboardingComplete?: boolean };
+        if (parsed.onboardingComplete) {
+          router.replace("/app/home");
+          return;
+        }
+      }
+      setStatus("firstTime");
     } catch {
-      setHasProfile(false);
+      setStatus("firstTime");
     }
-  }, []);
+  }, [router]);
 
-  const nextHref = hasProfile ? "/app/home" : "/app/chat";
+  if (status === "loading") {
+    // Blank midnight canvas while we decide — prevents splash flash for
+    // returning users about to be redirected to /app/home.
+    return <main className="min-h-svh bg-midnight" />;
+  }
 
   return (
     <main className="relative flex min-h-svh flex-col items-center justify-between overflow-hidden bg-midnight px-6 pt-24 pb-10">
@@ -43,7 +56,7 @@ export default function Splash() {
 
       <div className="relative z-10 flex w-full flex-col items-center gap-6">
         <Link
-          href={nextHref}
+          href="/app/chat"
           className="inline-flex w-full max-w-xs items-center justify-center rounded-full bg-peach-gradient px-10 py-4 text-base font-semibold text-midnight shadow-glow transition active:scale-[0.98]"
         >
           meet myla
