@@ -423,6 +423,9 @@ export default function HomeClient() {
         myla is a friend, not a doctor. always consult your provider
         for medical decisions.
       </p>
+      <p className="mx-5 mt-2 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-cream/30">
+        powered by ai
+      </p>
     </main>
   );
 }
