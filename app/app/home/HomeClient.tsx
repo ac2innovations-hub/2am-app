@@ -79,6 +79,12 @@ export default function HomeClient() {
 
   useEffect(() => {
     const p = getProfile();
+    // DEBUG: temporary — confirms what's actually in localStorage when the
+    // home hub mounts so we can see if stage/babyAgeMonths/monthsTrying are
+    // saved correctly. Remove once the 3-stage pipeline is confirmed.
+    if (typeof window !== "undefined") {
+      console.log("[2am debug] HomeClient mount, profile:", p);
+    }
     if (!p || !p.onboardingComplete) {
       router.replace("/app/chat");
       return;
@@ -136,18 +142,20 @@ export default function HomeClient() {
         </h1>
         {profile.stage === "pregnant" && (
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
-            expecting · week {week}
+            week {week}
             {profile.dueDate ? ` · due ${formatDueDate(profile.dueDate)}` : ""}
           </p>
         )}
-        {profile.stage === "postpartum" && profile.babyAgeMonths !== null && (
+        {profile.stage === "postpartum" && (
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
-            new mom · baby {profile.babyAgeMonths} mo
+            {profile.babyAgeMonths !== null
+              ? `baby is ${profile.babyAgeMonths} ${profile.babyAgeMonths === 1 ? "month" : "months"} old`
+              : "first year · you're doing it"}
           </p>
         )}
         {profile.stage === "ttc" && (
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
-            trying
+            trying to conceive
             {profile.monthsTrying !== null
               ? ` · ${profile.monthsTrying} mo in`
               : ""}
