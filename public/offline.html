@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>2am — offline</title>
+    <meta name="theme-color" content="#0D1628" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0d1628;
+        color: #fffaf5;
+        font-family: -apple-system, "Helvetica Neue", Arial, ui-sans-serif,
+          system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 28px;
+        text-align: center;
+      }
+      .logo {
+        font-size: 96px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        background: linear-gradient(135deg, #f8c8a8, #ee9b78);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .tag {
+        margin-top: 28px;
+        font-size: 18px;
+        line-height: 1.5;
+        max-width: 22rem;
+        color: rgba(255, 250, 245, 0.82);
+      }
+      .retry {
+        margin-top: 40px;
+        display: inline-block;
+        padding: 16px 36px;
+        border-radius: 9999px;
+        background: linear-gradient(135deg, #f8c8a8, #ee9b78);
+        color: #0d1628;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        box-shadow: 0 0 60px rgba(248, 200, 168, 0.2);
+      }
+      .mono {
+        margin-top: 28px;
+        font-size: 11px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(255, 250, 245, 0.42);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="logo">2am</div>
+      <p class="tag">
+        myla needs a connection to chat, but she&rsquo;ll be right here when
+        you&rsquo;re back online 💛
+      </p>
+      <a class="retry" href="/app">try again</a>
+      <p class="mono">hey2am.app · offline</p>
+    </main>
+    <script>
+      // Auto-retry when connectivity returns.
+      window.addEventListener("online", function () {
+        location.replace("/app");
+      });
+    </script>
+  </body>
+</html>
