@@ -420,7 +420,7 @@ export default function HomeClient() {
 
       {/* Disclaimer */}
       <p className="mx-5 mt-8 text-center text-[11px] leading-relaxed text-cream/45">
-        myla is an ai companion, not a doctor. always consult your provider
+        myla is a friend, not a doctor. always consult your provider
         for medical decisions.
       </p>
     </main>

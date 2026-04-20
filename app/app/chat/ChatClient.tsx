@@ -395,7 +395,7 @@ export default function ChatClient() {
       {/* Disclaimer */}
       <div className="border-b border-cream/5 bg-navy/40 px-4 py-2">
         <p className="text-center text-[11px] leading-tight text-cream/55">
-          myla is an ai companion, not a doctor. always consult your provider
+          myla is a friend, not a doctor. always consult your provider
           for medical decisions.
         </p>
       </div>

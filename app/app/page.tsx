@@ -49,7 +49,7 @@ export default function Splash() {
           myla&apos;s always up.
         </p>
         <p className="mt-3 max-w-[22rem] text-sm leading-relaxed text-cream/60">
-          the judgment-free ai companion for your journey — whether you&apos;re
+          the judgment-free friend for your journey — whether you&apos;re
           trying, expecting, or navigating life as a new mom.
         </p>
       </div>

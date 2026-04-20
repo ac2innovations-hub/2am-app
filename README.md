@@ -1,6 +1,6 @@
 # 2am
 
-the judgment-free ai companion for pregnancy & motherhood.
+the judgment-free friend for pregnancy & motherhood.
 domain: **hey2am.app** · ai character: **myla**
 
 mobile-first Next.js 14 (App Router) + TypeScript + Tailwind + Supabase + Anthropic Claude.

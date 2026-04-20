@@ -61,7 +61,7 @@ export default function Landing() {
           <h1>2am</h1>
           <p className="landing-tag">myla’s always up.</p>
           <p className="landing-sub">
-            the judgment-free ai companion for your journey — whether you’re
+            the judgment-free friend for your journey — whether you’re
             trying, expecting, or navigating life as a new mom.
           </p>
           {/* POST-LAUNCH: change this back to <Link href="/app">meet myla</Link> */}
@@ -265,7 +265,7 @@ export default function Landing() {
       <footer className="landing-footer">
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          myla is an ai companion, not a doctor
+          myla is a friend, not a doctor
         </div>
       </footer>
     </>
