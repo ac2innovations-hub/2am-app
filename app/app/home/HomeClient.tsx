@@ -214,31 +214,32 @@ export default function HomeClient() {
         </section>
       )}
 
-      {profile.stage === "ttc" && (
-        <section className="mx-5 mt-5 rounded-3xl border border-sage/25 bg-navy p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-sage">
-                trying to conceive
+      {profile.stage === "ttc" &&
+        (() => {
+          const ttc = ttcCardCopy(profile.monthsTrying);
+          return (
+            <section className="mx-5 mt-5 rounded-3xl border border-sage/25 bg-navy p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-sage">
+                    trying to conceive
+                  </div>
+                  <div className="mt-1 text-[13px] text-cream/80">
+                    {ttc.tagline}
+                  </div>
+                </div>
+                <div className="text-right text-[12px] text-cream/55">
+                  {profile.monthsTrying !== null
+                    ? `${profile.monthsTrying} mo`
+                    : "🌱"}
+                </div>
               </div>
-              <div className="mt-1 text-[13px] text-cream/60">
-                {profile.monthsTrying !== null
-                  ? `${profile.monthsTrying} ${profile.monthsTrying === 1 ? "month" : "months"} in`
-                  : "one cycle at a time"}
-              </div>
-            </div>
-            <div className="text-right text-[12px] text-cream/55">🌱</div>
-          </div>
-          <p className="mt-4 text-[15px] leading-relaxed text-cream/90">
-            averages: most healthy couples under 35 conceive within a year. 85%
-            by 12 months. you&apos;re not behind.
-          </p>
-          <p className="mt-3 text-[13px] leading-relaxed text-cream/55">
-            ask me anything about cycles, timing, or what&apos;s worth bringing
-            up with a doctor.
-          </p>
-        </section>
-      )}
+              <p className="mt-4 text-[15px] leading-relaxed text-cream/90">
+                {ttc.body}
+              </p>
+            </section>
+          );
+        })()}
 
       {/* Myla check-in */}
       <section className="mx-5 mt-4 rounded-3xl bg-navy/70 p-5">
@@ -415,6 +416,38 @@ export default function HomeClient() {
       </p>
     </main>
   );
+}
+
+function ttcCardCopy(monthsTrying: number | null): {
+  tagline: string;
+  body: string;
+} {
+  // Default (unknown duration) reads like the earliest stage — hopeful,
+  // not clinical. The "you're not behind" framing stops at 12 months; after
+  // that we gently bridge to professional care.
+  const m = monthsTrying ?? 0;
+  if (m < 6) {
+    return {
+      tagline: "one cycle at a time",
+      body: "you're right on track. most couples take a few months — it's completely normal for it not to happen right away. 🌱",
+    };
+  }
+  if (m < 12) {
+    return {
+      tagline: "still in the window",
+      body: "you've been at this for a bit — and that's still within the normal range. 85% of couples conceive within 12 months. hang in there. 💛",
+    };
+  }
+  if (m < 18) {
+    return {
+      tagline: "you're not alone in this",
+      body: "a year is a really reasonable moment to talk to your doctor about next steps — not because anything is wrong, but because they may have tools that can help. you're being smart about this. 💛",
+    };
+  }
+  return {
+    tagline: "your journey, your pace",
+    body: "you've been on this journey for a while, and that takes real strength. if you haven't already, talking to a fertility specialist could open up options you might not know about. whatever you're feeling right now is valid. 💛",
+  };
 }
 
 function checkInMessage(p: LocalProfile): string {
