@@ -137,18 +137,32 @@ export default function ChatClient() {
         setOnboarding("stage");
         return {
           role: "assistant",
-          content: `love that, ${name} 💛\n\nso where are you at right now? are you pregnant, postpartum, or trying to conceive?`,
+          content: `love that, ${name} 💛\n\nso where are you on the journey? are you trying to conceive, currently pregnant, or already a mom?`,
           timestamp: now(),
         };
       }
       if (onboarding === "stage") {
         const lower = text.toLowerCase();
         let stage: Stage | null = null;
-        if (lower.includes("postpartum") || lower.includes("had") || lower.includes("newborn"))
+        if (
+          lower.includes("postpartum") ||
+          lower.includes("new mom") ||
+          lower.includes("already a mom") ||
+          lower.includes("had") ||
+          lower.includes("newborn")
+        )
           stage = "postpartum";
-        else if (lower.includes("trying") || lower.includes("ttc") || lower.includes("conceive"))
+        else if (
+          lower.includes("trying") ||
+          lower.includes("ttc") ||
+          lower.includes("conceive")
+        )
           stage = "ttc";
-        else if (lower.includes("pregnant") || lower.includes("pregnancy") || lower.includes("expecting"))
+        else if (
+          lower.includes("pregnant") ||
+          lower.includes("pregnancy") ||
+          lower.includes("expecting")
+        )
           stage = "pregnant";
         else stage = "pregnant";
         const next = updateProfile({ stage });
@@ -158,7 +172,7 @@ export default function ChatClient() {
           return {
             role: "assistant",
             content:
-              "okay, pregnancy mode 🤍\n\nhow far along are you? you can tell me your week, or your due date — whichever's easier.",
+              "okay, expecting mode 🤍\n\nhow far along are you? you can tell me your week, or your due date — whichever's easier.",
             timestamp: now(),
           };
         }
@@ -173,7 +187,7 @@ export default function ChatClient() {
         return {
           role: "assistant",
           content:
-            "got it 🤍 we can talk about anything on your mind — cycles, timing, all of it.\n\nwhat's been on your mind the most lately?",
+            "got it — we can talk about anything on your mind, cycles, timing, all of it 🌱\n\nhow long have you been trying?",
           timestamp: now(),
         };
       }
@@ -191,12 +205,21 @@ export default function ChatClient() {
           const months = parseMonths(text);
           const next = updateProfile({ babyAgeMonths: months ?? null });
           setProfile(next);
+        } else if (stage === "ttc") {
+          const months = parseMonths(text);
+          const next = updateProfile({ monthsTrying: months ?? null });
+          setProfile(next);
         }
         setOnboarding("concerns");
+        const prompt =
+          stage === "ttc"
+            ? "thanks for trusting me with that 🤍\n\nwhat's been weighing on you most?"
+            : stage === "postpartum"
+              ? "got it, logged 🤍\n\nand how are YOU doing — honestly?"
+              : "got it, logged 🤍\n\nwhat are you most excited or nervous about?";
         return {
           role: "assistant",
-          content:
-            "got it, logged 🤍\n\nlast thing — what's been on your mind the most? anything you're worried about or curious about?",
+          content: prompt,
           timestamp: now(),
         };
       }

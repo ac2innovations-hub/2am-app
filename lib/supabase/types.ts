@@ -16,6 +16,7 @@ export type Profile = {
   due_date: string | null;
   week: number | null;
   baby_age_months: number | null;
+  months_trying: number | null;
   first_pregnancy: boolean;
   concerns: string[];
   tone_preference: string;

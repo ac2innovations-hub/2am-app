@@ -60,6 +60,18 @@ export function babySizeForWeek(week: number): string {
   return sizes[best];
 }
 
+export function babyMilestoneForMonths(months: number): string {
+  if (months < 1) return "those blurry, sleepless first weeks — one day at a time.";
+  if (months < 2) return "lots of eye contact, smiles starting to peek through.";
+  if (months < 3) return "social smiles, cooing, and longer awake windows.";
+  if (months < 4) return "hands finding mouths, tummy time strong, maybe a laugh.";
+  if (months < 6) return "rolling over, reaching for things, big personality showing up.";
+  if (months < 9) return "sitting up, starting solids, babbling consonants.";
+  if (months < 12) return "crawling, pulling up, pointing, maybe a first word.";
+  if (months < 18) return "walking, a handful of words, so many feelings in a tiny body.";
+  return "running, talking, testing limits — a whole little person.";
+}
+
 export type TimeBand = "morning" | "afternoon" | "evening" | "night";
 
 export function timeBand(date = new Date()): TimeBand {

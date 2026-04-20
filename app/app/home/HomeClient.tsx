@@ -10,6 +10,7 @@ import {
   type LocalConversation,
 } from "@/lib/conversations";
 import {
+  babyMilestoneForMonths,
   babySizeForWeek,
   formatDueDate,
   greetingFor,
@@ -91,18 +92,26 @@ export default function HomeClient() {
         </h1>
         {profile.stage === "pregnant" && (
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
-            week {week}
+            expecting · week {week}
             {profile.dueDate ? ` · due ${formatDueDate(profile.dueDate)}` : ""}
           </p>
         )}
         {profile.stage === "postpartum" && profile.babyAgeMonths !== null && (
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
-            baby · {profile.babyAgeMonths} months
+            new mom · baby {profile.babyAgeMonths} mo
+          </p>
+        )}
+        {profile.stage === "ttc" && (
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
+            trying
+            {profile.monthsTrying !== null
+              ? ` · ${profile.monthsTrying} mo in`
+              : ""}
           </p>
         )}
       </section>
 
-      {/* Week card */}
+      {/* Stage card */}
       {profile.stage === "pregnant" && (
         <section className="mx-5 mt-5 rounded-3xl border border-peach/20 bg-navy p-5 shadow-[0_0_0_1px_rgba(248,200,168,0.06)]">
           <div className="flex items-start justify-between">
@@ -132,6 +141,58 @@ export default function HomeClient() {
             <span>1</span>
             <span>40</span>
           </div>
+        </section>
+      )}
+
+      {profile.stage === "postpartum" && (
+        <section className="mx-5 mt-5 rounded-3xl border border-peach/20 bg-navy p-5 shadow-[0_0_0_1px_rgba(248,200,168,0.06)]">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-peach/80">
+                {profile.babyAgeMonths !== null
+                  ? `${profile.babyAgeMonths} months`
+                  : "new mom"}
+              </div>
+              <div className="mt-1 text-[13px] text-cream/60">
+                first year · you&apos;re doing it
+              </div>
+            </div>
+            <div className="text-right text-[12px] text-cream/55">
+              🤍
+            </div>
+          </div>
+          <p className="mt-4 text-[15px] leading-relaxed text-cream/90">
+            {babyMilestoneForMonths(profile.babyAgeMonths ?? 0)}
+          </p>
+          <p className="mt-3 text-[13px] leading-relaxed text-cream/55">
+            ranges vary wildly — your baby&apos;s on their own timeline.
+          </p>
+        </section>
+      )}
+
+      {profile.stage === "ttc" && (
+        <section className="mx-5 mt-5 rounded-3xl border border-sage/25 bg-navy p-5">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-sage">
+                trying to conceive
+              </div>
+              <div className="mt-1 text-[13px] text-cream/60">
+                {profile.monthsTrying !== null
+                  ? `${profile.monthsTrying} ${profile.monthsTrying === 1 ? "month" : "months"} in`
+                  : "one cycle at a time"}
+              </div>
+            </div>
+            <div className="text-right text-[12px] text-cream/55">🌱</div>
+          </div>
+          <p className="mt-4 text-[15px] leading-relaxed text-cream/90">
+            averages: most healthy couples under 35 conceive within a year. 85%
+            by 12 months. you&apos;re not behind.
+          </p>
+          <p className="mt-3 text-[13px] leading-relaxed text-cream/55">
+            ask me anything about cycles, timing, or what&apos;s worth bringing
+            up with a doctor.
+          </p>
         </section>
       )}
 
@@ -192,7 +253,11 @@ export default function HomeClient() {
             <div>
               <div className="text-[15px] text-cream">can i…?</div>
               <div className="text-[12px] text-cream/50">
-                quick safety check
+                {profile.stage === "ttc"
+                  ? "while trying · food, habits, supplements"
+                  : profile.stage === "postpartum"
+                    ? "postpartum safety · meds, foods, habits"
+                    : "quick safety check · food, meds, activities"}
               </div>
             </div>
           </div>
@@ -274,8 +339,9 @@ export default function HomeClient() {
 
 function checkInMessage(p: LocalProfile): string {
   const name = p.name ? p.name : "you";
+  const concerns = p.concerns?.[0];
+
   if (p.stage === "pregnant" && p.week) {
-    const concerns = p.concerns?.[0];
     if (concerns) {
       return `thinking about ${name} — last time we talked, ${concerns} was on your mind. how's that feeling today?`;
     }
@@ -284,8 +350,23 @@ function checkInMessage(p: LocalProfile): string {
     }
     return `hey ${name} — week ${p.week} brings its own stuff. anything weird, worrying, or curious today?`;
   }
+
   if (p.stage === "postpartum") {
-    return `hi ${name} — how's your body feeling today? anything on your mind about baby or you?`;
+    if (concerns) {
+      return `hi ${name} — you mentioned ${concerns} last time. how's that landing today?`;
+    }
+    return `hi ${name} — how's your body feeling? and more importantly, how are YOU?`;
   }
+
+  if (p.stage === "ttc") {
+    if (concerns) {
+      return `hey ${name} — ${concerns} was on your mind last time. want to dig into that a little?`;
+    }
+    if (p.monthsTrying !== null && p.monthsTrying >= 12) {
+      return `hey ${name} — a year is a totally reasonable moment to check in with a doctor. want to talk through what to ask?`;
+    }
+    return `hey ${name} — how's this cycle treating you? anything weird, hopeful, or worrying on your mind?`;
+  }
+
   return `hi ${name} — what's been on your mind today?`;
 }

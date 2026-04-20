@@ -18,12 +18,12 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   title: "2am — myla's always up",
   description:
-    "the judgment-free ai companion for pregnancy & motherhood. no judgment. no google history. just answers.",
+    "the judgment-free ai companion for your journey — whether you're trying, expecting, or navigating life as a new mom. no judgment. no google history. just answers.",
   metadataBase: new URL("https://hey2am.app"),
   openGraph: {
     title: "2am — myla's always up",
     description:
-      "the judgment-free ai companion for pregnancy & motherhood.",
+      "the judgment-free ai companion for your journey — whether you're trying, expecting, or navigating life as a new mom.",
     url: "https://hey2am.app",
     siteName: "2am",
     type: "website",
@@ -46,9 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${dmMono.variable}`}>
       <body className="min-h-svh bg-midnight text-cream antialiased">
-        <div className="mx-auto min-h-svh w-full max-w-md bg-midnight">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );

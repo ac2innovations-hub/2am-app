@@ -30,6 +30,7 @@ export type UserProfileContext = {
   concerns?: string[] | null;
   stage?: "pregnant" | "postpartum" | "ttc" | null;
   babyAgeMonths?: number | null;
+  monthsTrying?: number | null;
 };
 
 export function buildUserContextLine(p: UserProfileContext | null | undefined): string {
@@ -50,5 +51,9 @@ export function buildUserContextLine(p: UserProfileContext | null | undefined): 
     p.babyAgeMonths === null || p.babyAgeMonths === undefined
       ? "n/a"
       : `${p.babyAgeMonths} mo`;
-  return `[USER CONTEXT: Name: ${name}, Stage: ${stage}, Week: ${week}, Due: ${dueDate}, Baby age: ${babyAge}, First pregnancy: ${firstPregnancy}, Concerns: ${concerns}]`;
+  const monthsTrying =
+    p.monthsTrying === null || p.monthsTrying === undefined
+      ? "n/a"
+      : `${p.monthsTrying} mo`;
+  return `[USER CONTEXT: Name: ${name}, Stage: ${stage}, Week: ${week}, Due: ${dueDate}, Baby age: ${babyAge}, Months trying: ${monthsTrying}, First pregnancy: ${firstPregnancy}, Concerns: ${concerns}]`;
 }

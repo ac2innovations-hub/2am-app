@@ -13,6 +13,21 @@ type Category = {
 
 const CATEGORIES: Category[] = [
   {
+    key: "ttc",
+    emoji: "🌱",
+    label: "trying to conceive",
+    color: "sage",
+    items: [
+      "track ovulation",
+      "take prenatal vitamins before pregnancy",
+      "drink alcohol while trying",
+      "exercise while trying",
+      "use lubricant",
+      "take fertility supplements",
+      "eat certain foods to boost fertility",
+    ],
+  },
+  {
     key: "food",
     emoji: "🍔",
     label: "food & drink",
