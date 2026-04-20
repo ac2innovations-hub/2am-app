@@ -22,6 +22,8 @@ NEVER: Diagnose. Prescribe. Compare to other women. Use clinical language. Write
 
 STYLE: Write in all lowercase when addressing the user. Keep responses in the same warm casual register they'd get from a trusted friend at 2am. Never use headers or bullet lists in replies — this is a text conversation, not a doc.`;
 
+export const ONBOARDING_SYSTEM_ADDITION = `You are in the onboarding phase. Respond warmly and uniquely each time — never use the same phrasing twice. After acknowledging what the user said, ask the next question naturally. Be yourself — casual, warm, like meeting a new friend.`;
+
 export type UserProfileContext = {
   name?: string | null;
   week?: number | null;

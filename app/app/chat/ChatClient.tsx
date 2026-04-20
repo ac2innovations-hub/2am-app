@@ -148,23 +148,33 @@ export default function ChatClient() {
     return userTurns >= 1 && userTurns <= 5;
   }, [messages, onboarding]);
 
-  const handleOnboardingReply = useCallback(
-    (userText: string): Msg => {
+  // Parse the user's onboarding reply, save to profile, advance the state,
+  // and return (a) the directive that tells Myla what to ask next and
+  // (b) the freshly-updated profile to send along with the API call.
+  // No scripted Myla text — she writes her own reply from the directive.
+  const processOnboardingInput = useCallback(
+    (
+      userText: string,
+    ): {
+      directive: string;
+      updatedProfile: LocalProfile;
+    } => {
       const text = userText.trim();
+
       if (onboarding === "name") {
         const name = parseName(text);
         const next = updateProfile({ name });
         setProfile(next);
         setOnboarding("stage");
         return {
-          role: "assistant",
-          content: `love that, ${name} 💛\n\nso where are you on the journey? are you trying to conceive, currently pregnant, or already a mom?`,
-          timestamp: now(),
+          updatedProfile: next,
+          directive: `The user just told you their name is "${name || text}". Acknowledge warmly and uniquely — do not use canned phrases like "love that" or "nice to meet you". Then ask where they are on the journey: trying to conceive, currently pregnant, or already a mom. Keep it casual and conversational.`,
         };
       }
+
       if (onboarding === "stage") {
         const lower = text.toLowerCase();
-        let stage: Stage | null = null;
+        let stage: Stage;
         if (
           lower.includes("postpartum") ||
           lower.includes("new mom") ||
@@ -189,82 +199,67 @@ export default function ChatClient() {
         const next = updateProfile({ stage });
         setProfile(next);
         setOnboarding("when");
-        if (stage === "pregnant") {
-          return {
-            role: "assistant",
-            content:
-              "okay, expecting mode 🤍\n\nhow far along are you? you can tell me your week, or your due date — whichever's easier.",
-            timestamp: now(),
-          };
-        }
-        if (stage === "postpartum") {
-          return {
-            role: "assistant",
-            content:
-              "welcome to the other side 🤍\n\nhow old is your little one? weeks or months is fine.",
-            timestamp: now(),
-          };
-        }
-        return {
-          role: "assistant",
-          content:
-            "got it — we can talk about anything on your mind, cycles, timing, all of it 🌱\n\nhow long have you been trying?",
-          timestamp: now(),
-        };
+        const stageDirective =
+          stage === "pregnant"
+            ? "The user just told you they're currently pregnant. Acknowledge warmly and uniquely, then ask how far along they are — they can answer with a week number or a due date, whichever is easier."
+            : stage === "postpartum"
+              ? "The user just told you they're already a new mom. Acknowledge warmly and uniquely, then ask how old their little one is — weeks or months are both fine."
+              : "The user just told you they're trying to conceive. Acknowledge warmly and uniquely (never the same phrasing twice), then gently ask how long they've been trying. Be supportive and not clinical.";
+        return { updatedProfile: next, directive: stageDirective };
       }
+
       if (onboarding === "when") {
         const stage = profile?.stage ?? "pregnant";
+        let next: LocalProfile;
+        let detailLine: string;
         if (stage === "pregnant") {
           const week = parseWeek(text);
           const dueDate = parseDueDate(text);
-          const next = updateProfile({
+          next = updateProfile({
             week: week ?? profile?.week ?? null,
             dueDate: dueDate ?? profile?.dueDate ?? null,
           });
-          setProfile(next);
+          detailLine = `they're currently at week ${next.week ?? "(unspecified)"}${next.dueDate ? `, due ${next.dueDate}` : ""}`;
         } else if (stage === "postpartum") {
           const months = parseMonths(text);
-          const next = updateProfile({ babyAgeMonths: months ?? null });
-          setProfile(next);
-        } else if (stage === "ttc") {
+          next = updateProfile({ babyAgeMonths: months ?? null });
+          detailLine = `their baby is ${next.babyAgeMonths !== null ? `${next.babyAgeMonths} months old` : "a newborn (age unspecified)"}`;
+        } else {
           const months = parseMonths(text);
-          const next = updateProfile({ monthsTrying: months ?? null });
-          setProfile(next);
+          next = updateProfile({ monthsTrying: months ?? null });
+          detailLine = `they've been trying for ${next.monthsTrying !== null ? `${next.monthsTrying} months` : "a while (duration unspecified)"}`;
         }
+        setProfile(next);
         setOnboarding("concerns");
-        const prompt =
+        const nextQuestion =
           stage === "ttc"
-            ? "thanks for trusting me with that 🤍\n\nwhat's been weighing on you most?"
+            ? "Then ask what's been weighing on them most lately. Be extra gentle if they've been trying for a while."
             : stage === "postpartum"
-              ? "got it, logged 🤍\n\nand how are YOU doing — honestly?"
-              : "got it, logged 🤍\n\nwhat are you most excited or nervous about?";
+              ? "Then ask how THEY are doing — honestly. Make sure this question is about HER, not the baby. Emphasize it's a question about how she is personally."
+              : "Then ask what they're most excited or nervous about.";
         return {
-          role: "assistant",
-          content: prompt,
-          timestamp: now(),
+          updatedProfile: next,
+          directive: `The user just shared that ${detailLine}. Acknowledge warmly and uniquely. ${nextQuestion}`,
         };
       }
+
       if (onboarding === "concerns") {
         const concerns = text
           .split(/[,\n]/)
           .map((s) => s.trim())
           .filter(Boolean);
-        const next = updateProfile({
-          concerns,
-          onboardingComplete: true,
-        });
+        const next = updateProfile({ concerns, onboardingComplete: true });
         setProfile(next);
         setOnboarding("done");
         return {
-          role: "assistant",
-          content: `okay — i've got you${next.name ? `, ${next.name}` : ""} 💛\n\nwhenever something comes up, big or small, just tell me. i'm always up.`,
-          timestamp: now(),
+          updatedProfile: next,
+          directive: `The user just shared what's been on their mind: "${text}". This is the end of onboarding. Acknowledge what they shared warmly and specifically (reference what they said — don't be generic). Then close the onboarding: let them know you're here whenever, day or night, no question too small. Never use canned phrases like "i've got you" — make it feel personal.`,
         };
       }
+
       return {
-        role: "assistant",
-        content: "i'm listening 💛",
-        timestamp: now(),
+        updatedProfile: profile ?? updateProfile({}),
+        directive: "Acknowledge what the user said warmly.",
       };
     },
     [onboarding, profile],
@@ -283,15 +278,13 @@ export default function ChatClient() {
 
       if (conversationId) appendMessages(conversationId, [userMsg]);
 
-      // Onboarding short-circuit: scripted replies, no API call.
+      // Onboarding: parse + save + advance state. Let Myla write the reply.
+      let directive: string | null = null;
+      let profileForApi: LocalProfile | null = profile;
       if (onboarding !== "done") {
-        setTimeout(() => {
-          const reply = handleOnboardingReply(text);
-          setMessages((prev) => [...prev, reply]);
-          if (conversationId) appendMessages(conversationId, [reply]);
-          setSending(false);
-        }, 500);
-        return;
+        const r = processOnboardingInput(text);
+        directive = r.directive;
+        profileForApi = r.updatedProfile;
       }
 
       try {
@@ -303,17 +296,19 @@ export default function ChatClient() {
               role,
               content,
             })),
-            userProfile: profile
+            userProfile: profileForApi
               ? {
-                  name: profile.name,
-                  week: profile.week,
-                  dueDate: profile.dueDate,
-                  firstPregnancy: profile.firstPregnancy,
-                  concerns: profile.concerns,
-                  stage: profile.stage,
-                  babyAgeMonths: profile.babyAgeMonths,
+                  name: profileForApi.name,
+                  week: profileForApi.week,
+                  dueDate: profileForApi.dueDate,
+                  firstPregnancy: profileForApi.firstPregnancy,
+                  concerns: profileForApi.concerns,
+                  stage: profileForApi.stage,
+                  babyAgeMonths: profileForApi.babyAgeMonths,
+                  monthsTrying: profileForApi.monthsTrying,
                 }
               : null,
+            onboardingDirective: directive,
           }),
         });
         const data = (await res.json()) as { message?: string; error?: string };
@@ -340,7 +335,14 @@ export default function ChatClient() {
         setSending(false);
       }
     },
-    [messages, sending, onboarding, handleOnboardingReply, conversationId, profile],
+    [
+      messages,
+      sending,
+      onboarding,
+      processOnboardingInput,
+      conversationId,
+      profile,
+    ],
   );
 
   const canSend = input.trim().length > 0 && !sending;

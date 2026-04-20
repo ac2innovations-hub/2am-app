@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import {
   MYLA_SYSTEM_PROMPT,
+  ONBOARDING_SYSTEM_ADDITION,
   buildUserContextLine,
   type UserProfileContext,
 } from "@/lib/myla/system-prompt";
@@ -17,6 +18,11 @@ type IncomingMessage = {
 type Body = {
   messages: IncomingMessage[];
   userProfile?: UserProfileContext | null;
+  /**
+   * When present, Myla is in onboarding mode. The directive tells her what
+   * to ask next and nudges her to vary her phrasing each turn.
+   */
+  onboardingDirective?: string | null;
 };
 
 const MODEL = "claude-sonnet-4-20250514";
@@ -61,6 +67,10 @@ export async function POST(req: NextRequest) {
   }
 
   const contextLine = buildUserContextLine(body.userProfile);
+  const directive =
+    typeof body.onboardingDirective === "string"
+      ? body.onboardingDirective.trim()
+      : "";
 
   const systemBlocks = [
     {
@@ -69,6 +79,15 @@ export async function POST(req: NextRequest) {
       cache_control: { type: "ephemeral" as const },
     },
     ...(contextLine ? [{ type: "text" as const, text: contextLine }] : []),
+    ...(directive
+      ? [
+          { type: "text" as const, text: ONBOARDING_SYSTEM_ADDITION },
+          {
+            type: "text" as const,
+            text: `[ONBOARDING DIRECTIVE: ${directive}]`,
+          },
+        ]
+      : []),
   ];
 
   try {
