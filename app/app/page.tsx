@@ -40,7 +40,7 @@ export default function Splash() {
 
       <div className="relative z-10 flex flex-col items-center text-center">
         <div className="mb-2 font-mono text-[11px] uppercase tracking-[0.35em] text-cream/50">
-          hey2am.app
+          for every stage of motherhood
         </div>
         <h1 className="mt-6 text-gradient-peach text-[96px] font-black leading-none tracking-tight">
           2am
