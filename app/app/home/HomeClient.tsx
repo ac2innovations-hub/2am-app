@@ -216,6 +216,15 @@ export default function HomeClient() {
 
       {profile.stage === "ttc" &&
         (() => {
+          // DEBUG: temporary — confirms the TTC card is reading monthsTrying
+          // from the profile correctly. Remove once verified end-to-end.
+          if (typeof window !== "undefined") {
+            console.log(
+              "[2am debug] TTC card render: monthsTrying=%o → tagline=%o",
+              profile.monthsTrying,
+              ttcCardCopy(profile.monthsTrying).tagline,
+            );
+          }
           const ttc = ttcCardCopy(profile.monthsTrying);
           return (
             <section className="mx-5 mt-5 rounded-3xl border border-sage/25 bg-navy p-5">

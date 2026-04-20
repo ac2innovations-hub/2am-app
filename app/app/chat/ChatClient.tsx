@@ -227,6 +227,13 @@ export default function ChatClient() {
         } else {
           const months = parseMonths(text);
           next = updateProfile({ monthsTrying: months ?? null });
+          // DEBUG: temporary — remove once TTC parser is verified end-to-end.
+          console.log(
+            "[2am debug] TTC onboarding: raw=%o parsedMonths=%o saved=%o",
+            text,
+            months,
+            next.monthsTrying,
+          );
           detailLine = `they've been trying for ${next.monthsTrying !== null ? `${next.monthsTrying} months` : "a while (duration unspecified)"}`;
         }
         setProfile(next);
@@ -537,9 +544,68 @@ function parseDueDate(text: string): string | null {
   return null;
 }
 
-function parseMonths(text: string): number | null {
-  const m = text.match(/(\d{1,2})\s*(?:months?|mo\b)/i) ?? text.match(/^(\d{1,2})$/);
-  if (!m) return null;
-  const n = parseInt(m[1], 10);
-  return n >= 0 && n <= 60 ? n : null;
+const WORD_NUMBERS: Record<string, number> = {
+  a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5,
+  six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12,
+};
+
+const NUM_OR_WORD =
+  "(\\d+(?:\\.\\d+)?|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)";
+
+function toNum(s: string): number | null {
+  if (/^\d+(\.\d+)?$/.test(s)) return parseFloat(s);
+  const key = s.toLowerCase();
+  return key in WORD_NUMBERS ? WORD_NUMBERS[key] : null;
+}
+
+function clampMonths(n: number): number | null {
+  const rounded = Math.round(n);
+  return rounded >= 0 && rounded <= 120 ? rounded : null;
+}
+
+// Parse duration replies like "2 years", "a year", "1.5 years",
+// "a year and a half", "6 months", "18 months", bare "2", "about 2 years",
+// "like a year", "over a year", "2 years and 3 months". Returns months.
+export function parseMonths(text: string): number | null {
+  if (!text) return null;
+  const t = text.toLowerCase().replace(/[’‘]/g, "'").trim();
+
+  // "X years and a half" / "X years and half"
+  const yrsHalf = t.match(
+    new RegExp(`\\b${NUM_OR_WORD}\\s+years?\\s+(?:and\\s+)?(?:a\\s+half|half)\\b`),
+  );
+  if (yrsHalf) {
+    const y = toNum(yrsHalf[1]);
+    if (y !== null) return clampMonths(y * 12 + 6);
+  }
+
+  // "X years and Y months"
+  const yrsMo = t.match(
+    new RegExp(`\\b${NUM_OR_WORD}\\s+years?\\s+(?:and\\s+)?${NUM_OR_WORD}\\s+months?\\b`),
+  );
+  if (yrsMo) {
+    const y = toNum(yrsMo[1]);
+    const m = toNum(yrsMo[2]);
+    if (y !== null && m !== null) return clampMonths(y * 12 + m);
+  }
+
+  // "X years" / "a year" / "one year" / "1.5 years" (about/like/over/etc. all OK — regex is anchored on the number+years phrase)
+  const years = t.match(new RegExp(`\\b${NUM_OR_WORD}\\s+years?\\b`));
+  if (years) {
+    const y = toNum(years[1]);
+    if (y !== null) return clampMonths(y * 12);
+  }
+
+  // "X months" / "X month" / "X mo"
+  const months = t.match(new RegExp(`\\b${NUM_OR_WORD}\\s+(?:months?|mo)\\b`));
+  if (months) {
+    const m = toNum(months[1]);
+    if (m !== null) return clampMonths(m);
+  }
+
+  // Bare number → months
+  const bare = t.match(/^(\d+(?:\.\d+)?)$/);
+  if (bare) return clampMonths(parseFloat(bare[1]));
+
+  return null;
 }
