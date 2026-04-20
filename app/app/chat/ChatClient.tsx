@@ -189,8 +189,62 @@ export default function ChatClient() {
 
       if (onboarding === "stage") {
         const stage = detectStage(text);
-        const next = updateProfile({ stage });
+        const patch: Partial<LocalProfile> = { stage };
+        let combinedDetail: string | null = null;
+
+        // If the user's reply *also* carried their timing in one turn
+        // ("5 weeks", "baby is 6 months", "trying for a year"), capture it
+        // now so we can skip the when-step and not ask them again.
+        if (stage === "pregnant") {
+          const week = parseWeek(text);
+          const dueDate = parseDueDate(text);
+          if (week !== null) {
+            patch.week = week;
+            combinedDetail = `they're pregnant and currently at week ${week}`;
+          } else if (dueDate) {
+            patch.dueDate = dueDate;
+            combinedDetail = `they're pregnant, due ${dueDate}`;
+          }
+        } else if (stage === "postpartum") {
+          // Only accept a bare months number here if the reply clearly
+          // carries postpartum context — otherwise "5 months" could mean
+          // months-pregnant or months-trying.
+          if (/\b(?:postpartum|postnatal|old|baby\s+is|baby\s+was|gave\s+birth|delivered|newborn|breastfeeding|nursing|fourth\s+trimester|4th\s+trimester)\b/i.test(text)) {
+            const months = parseMonths(text);
+            if (months !== null) {
+              patch.babyAgeMonths = months;
+              combinedDetail = `they're a new mom, their baby is ${months} months old`;
+            }
+          }
+        } else {
+          // ttc
+          const months = parseMonths(text);
+          if (months !== null) {
+            patch.monthsTrying = months;
+            combinedDetail = `they've been trying to conceive for ${months} months`;
+          }
+        }
+
+        const next = updateProfile(patch);
         setProfile(next);
+
+        if (combinedDetail) {
+          // Skip the when step — directive explicitly tells Myla not to
+          // ask about timing, since the user just answered it.
+          setOnboarding("concerns");
+          const concernsAsk =
+            stage === "ttc"
+              ? "ask what's been weighing on them most lately. Be extra gentle if they've been trying for a while."
+              : stage === "postpartum"
+                ? "ask how THEY are doing — honestly. Make sure this question is about HER personally, not the baby."
+                : "ask what they're most excited or nervous about.";
+          return {
+            updatedProfile: next,
+            directive: `The user just told you in one go that ${combinedDetail}. Do NOT ask how far along they are, how old the baby is, or how long they've been trying — they already told you. Acknowledge the stage AND the timing warmly and uniquely, then ${concernsAsk}`,
+          };
+        }
+
+        // Stage only — ask the when-question next turn.
         setOnboarding("when");
         const stageDirective =
           stage === "pregnant"
@@ -598,20 +652,54 @@ export function parseName(raw: string): string {
   return words[words.length - 1] ?? "";
 }
 
-function parseWeek(text: string): number | null {
-  const m = text.match(/(\d{1,2})\s*(?:weeks?|wks?|w\b)/i) ?? text.match(/^(\d{1,2})$/);
+export function parseWeek(text: string): number | null {
+  // "20 weeks" / "20 wks" / "20w"
+  let m = text.match(/\b(\d{1,2})\s*(?:weeks?|wks?|w)\b/i);
+  // "week 20"
+  if (!m) m = text.match(/\bweek\s+(\d{1,2})\b/i);
+  // bare "20"
+  if (!m) m = text.match(/^\s*(\d{1,2})\s*$/);
   if (!m) return null;
   const n = parseInt(m[1], 10);
   if (n < 1 || n > 42) return null;
   return n;
 }
 
-function parseDueDate(text: string): string | null {
-  const d = new Date(text);
-  if (!Number.isNaN(d.getTime()) && d.getTime() > Date.now()) {
-    return d.toISOString().slice(0, 10);
+const MONTH_NAMES = [
+  "jan", "feb", "mar", "apr", "may", "jun",
+  "jul", "aug", "sep", "oct", "nov", "dec",
+];
+
+export function parseDueDate(text: string): string | null {
+  // Direct parse first — ISO strings, "june 15 2026", etc.
+  const direct = new Date(text);
+  if (!Number.isNaN(direct.getTime()) && direct.getTime() > Date.now()) {
+    return direct.toISOString().slice(0, 10);
   }
-  return null;
+
+  // Extract month name + optional day from anywhere in text.
+  // Handles: "due in july", "due date is july 18", "july 18th",
+  // "due july 3rd", "september 2025".
+  const monthRe =
+    /\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b(?:\s+(\d{1,2})(?:st|nd|rd|th)?)?(?:\s+(\d{4}))?/i;
+  const m = text.match(monthRe);
+  if (!m) return null;
+
+  const monthShort = m[1].toLowerCase().slice(0, 3);
+  const monthIdx = MONTH_NAMES.indexOf(monthShort);
+  if (monthIdx < 0) return null;
+
+  const day = m[2] ? parseInt(m[2], 10) : 15; // default to mid-month
+  const now = new Date();
+  let year = m[3] ? parseInt(m[3], 10) : now.getFullYear();
+  let candidate = new Date(year, monthIdx, day);
+  // If inferred date is already in the past (> 1 week), roll to next year.
+  if (!m[3] && candidate.getTime() < now.getTime() - 7 * 24 * 60 * 60 * 1000) {
+    year += 1;
+    candidate = new Date(year, monthIdx, day);
+  }
+  if (Number.isNaN(candidate.getTime())) return null;
+  return candidate.toISOString().slice(0, 10);
 }
 
 const WORD_NUMBERS: Record<string, number> = {
