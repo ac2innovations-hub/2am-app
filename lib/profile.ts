@@ -10,6 +10,7 @@ export type LocalProfile = {
   week: number | null;
   babyAgeMonths: number | null;
   babyName: string | null;
+  babySex: string | null;
   monthsTrying: number | null;
   firstPregnancy: boolean;
   concerns: string[];
@@ -47,6 +48,7 @@ export function updateProfile(patch: Partial<LocalProfile>): LocalProfile {
     week: null,
     babyAgeMonths: null,
     babyName: null,
+    babySex: null,
     monthsTrying: null,
     firstPregnancy: true,
     concerns: [],

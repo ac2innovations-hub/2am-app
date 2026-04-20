@@ -276,7 +276,9 @@ export default function HomeClient() {
               <span className="inline-block h-2 w-2 rounded-full bg-coral" />
             </div>
             <p className="mt-1 text-[15px] leading-relaxed text-cream/90">
-              {checkInMessage(profile)}
+              {(profile.stage === "pregnant" &&
+                pregnantMilestoneCheckIn(profile)) ||
+                checkInMessage(profile)}
             </p>
             <button
               onClick={startNew}
@@ -472,6 +474,39 @@ function ttcCardCopy(monthsTrying: number | null): {
     tagline: "your journey, your pace",
     body: "you've been on this journey for a while, and that takes real strength. if you haven't already, talking to a fertility specialist could open up options you might not know about. whatever you're feeling right now is valid. 💛",
   };
+}
+
+// Pregnant-stage milestone check-ins. Myla proactively nudges at the right
+// moments to capture baby sex intent/result and name brainstorming.
+// Returns null when no milestone fits, so the generic check-in can run.
+// Weeks chosen conservatively — 16+ for sex (not earlier; insensitive for
+// early losses), 25-30 for names (second/third trimester).
+function pregnantMilestoneCheckIn(p: LocalProfile): string | null {
+  const week = p.week ?? 0;
+  const name = p.name ? p.name : "you";
+
+  // Week 16-18: first sex conversation — find out or keep it a surprise?
+  if (week >= 16 && week <= 18 && !p.babySex) {
+    return `hey ${name} — some moms start finding out the sex around now. are you planning to find out, or keeping it a surprise?`;
+  }
+
+  // Week 18-22: follow-up if they said they were finding out
+  if (week >= 18 && week <= 22 && p.babySex === "finding out") {
+    return `hey ${name} — did you find out? boy or girl? or still waiting?`;
+  }
+
+  // Week 25-30: nudge toward names (only when sex plan is settled and no
+  // name yet). "surprise" counts as settled; "finding out" doesn't.
+  const sexSettled =
+    p.babySex === "boy" ||
+    p.babySex === "girl" ||
+    p.babySex === "surprise" ||
+    p.babySex === "not sharing";
+  if (week >= 25 && week <= 30 && sexSettled && !p.babyName) {
+    return `hi ${name} — have you started thinking about names yet?`;
+  }
+
+  return null;
 }
 
 function checkInMessage(p: LocalProfile): string {

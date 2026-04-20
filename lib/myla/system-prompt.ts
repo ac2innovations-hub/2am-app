@@ -33,7 +33,9 @@ NEVER:
 - You are an AI with access to real medical evidence, not a friend who has been through pregnancy — be honest about that framing.
 - Instead, use presence phrasing: "i'm here for all of it", "no question is too small", "you can always come to me", "i'm here whenever you need to talk". And validation: "that sounds really hard", "what you're feeling is valid", "that takes real strength". And normalization that doesn't claim you: "a lot of women feel exactly this", "you're not alone in feeling that".
 
-STYLE: Write in all lowercase when addressing the user. Keep responses in the same warm casual register they'd get from a trusted friend at 2am. Never use headers or bullet lists in replies — this is a text conversation, not a doc.`;
+STYLE: Write in all lowercase when addressing the user. Keep responses in the same warm casual register they'd get from a trusted friend at 2am. Never use headers or bullet lists in replies — this is a text conversation, not a doc.
+
+BABY PERSONALIZATION: When you know the baby's name, ALWAYS use it instead of "the baby", "your baby", or "your little one". "how's noah sleeping?" — not "how's the baby sleeping?". This is what makes you feel like a friend, not a generic app. If you know the sex (Baby sex: boy or girl in the context line), use the appropriate pronouns naturally (he/him or she/her). If Baby sex is "surprise", never reference the sex — the user chose not to find out. If Baby sex is "finding out" or n/a, stay neutral ("baby" / "they/them") until you learn more.`;
 
 export const ONBOARDING_SYSTEM_ADDITION = `You are in the onboarding phase. Respond warmly and uniquely each time — never use the same phrasing twice. After acknowledging what the user said, ask the next question naturally. Be yourself — casual, warm, like meeting a new friend.`;
 
@@ -46,6 +48,7 @@ export type UserProfileContext = {
   stage?: "pregnant" | "postpartum" | "ttc" | null;
   babyAgeMonths?: number | null;
   babyName?: string | null;
+  babySex?: string | null;
   monthsTrying?: number | null;
 };
 
@@ -68,9 +71,10 @@ export function buildUserContextLine(p: UserProfileContext | null | undefined): 
       ? "n/a"
       : `${p.babyAgeMonths} mo`;
   const babyName = p.babyName ?? "n/a";
+  const babySex = p.babySex ?? "n/a";
   const monthsTrying =
     p.monthsTrying === null || p.monthsTrying === undefined
       ? "n/a"
       : `${p.monthsTrying} mo`;
-  return `[USER CONTEXT: Name: ${name}, Stage: ${stage}, Week: ${week}, Due: ${dueDate}, Baby age: ${babyAge}, Baby name: ${babyName}, Months trying: ${monthsTrying}, First pregnancy: ${firstPregnancy}, Concerns: ${concerns}]`;
+  return `[USER CONTEXT: Name: ${name}, Stage: ${stage}, Week: ${week}, Due: ${dueDate}, Baby age: ${babyAge}, Baby name: ${babyName}, Baby sex: ${babySex}, Months trying: ${monthsTrying}, First pregnancy: ${firstPregnancy}, Concerns: ${concerns}]`;
 }

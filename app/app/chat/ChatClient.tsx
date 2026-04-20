@@ -62,7 +62,8 @@ type OnboardingStep =
   | "name"
   | "stage"
   | "when"
-  | "baby"
+  | "baby_name"
+  | "baby_sex"
   | "concerns"
   | "done";
 
@@ -217,11 +218,13 @@ export default function ChatClient() {
               combinedDetail = `they're a new mom, their baby is ${months} months old`;
             }
           }
-          // A user answering stage+age might also slip the baby's name
-          // into the same turn ("new mom, baby is 3 months, her name is
-          // maya"). Pull it so we can skip the dedicated baby step.
+          // A user answering stage+age might also slip the baby's name or
+          // sex into the same turn ("new mom, baby boy, 3 months, his name
+          // is owen"). Pull anything we can to skip ahead.
           const earlyName = parseBabyName(text);
           if (earlyName) patch.babyName = earlyName;
+          const earlySex = parseBabySex(text);
+          if (earlySex) patch.babySex = earlySex;
         } else {
           // ttc
           const months = parseMonths(text);
@@ -235,28 +238,39 @@ export default function ChatClient() {
         setProfile(next);
 
         if (combinedDetail) {
-          // Postpartum with age but no name yet — pivot to the baby step
-          // (ask for their name) instead of jumping to concerns.
-          if (stage === "postpartum" && !next.babyName) {
-            setOnboarding("baby");
+          if (stage === "postpartum") {
+            // Postpartum branches by what the fast-path already captured.
+            if (!next.babyName) {
+              setOnboarding("baby_name");
+              return {
+                updatedProfile: next,
+                directive: `The user just told you in one go that ${combinedDetail}. Do NOT ask how old the baby is — they already told you. Acknowledge the age warmly and uniquely, then warmly ask about the baby's name (something like "does your little one have a name?"). Keep it short. Do NOT ask about gender or sex yet.`,
+              };
+            }
+            if (!next.babySex) {
+              setOnboarding("baby_sex");
+              return {
+                updatedProfile: next,
+                directive: `The user just told you in one go that ${combinedDetail} and their baby's name is ${next.babyName}. Do NOT ask the age or the name again — they already told you. Briefly celebrate the name ("${next.babyName}" — one short warm sentence), then ask naturally "boy or girl?" in your own words.`,
+              };
+            }
+            // Age + name + sex all captured in one reply — pivot to mom.
+            setOnboarding("concerns");
             return {
               updatedProfile: next,
-              directive: `The user just told you in one go that ${combinedDetail}. Do NOT ask how old the baby is — they already told you. Acknowledge the age warmly and uniquely, then ask ONE brief, warm question about the baby — specifically their name. Keep it short and light, like you're excited to meet them. Do NOT ask about gender or sex.`,
+              directive: `The user just told you in one go that ${combinedDetail}, their baby's name is ${next.babyName}, and the baby is a ${next.babySex}. Do NOT re-ask any of these. Briefly acknowledge (use the name "${next.babyName}" naturally, one short sentence), then pivot firmly to HER: "okay now tell me about YOU — how are you actually doing?" This pivot is critical. Everyone in her life asks about the baby. You are the one who asks about HER. Make her feel seen.`,
             };
           }
 
-          // Everyone else (including postpartum with name already in reply):
-          // skip straight to concerns.
+          // Pregnant / ttc fast-path — go to concerns.
           setOnboarding("concerns");
           const concernsAsk =
             stage === "ttc"
               ? "ask what's been weighing on them most lately. Be extra gentle if they've been trying for a while."
-              : stage === "postpartum"
-                ? `Then pivot firmly to HER: "now tell me about YOU — how are you actually doing, honestly?" This pivot is critical. Everyone in her life asks about the baby. You are the one who asks about HER.${next.babyName ? ` Reference the baby by name (${next.babyName}) when you acknowledge them, then pivot.` : ""}`
-                : "ask what they're most excited or nervous about.";
+              : "ask what they're most excited or nervous about.";
           return {
             updatedProfile: next,
-            directive: `The user just told you in one go that ${combinedDetail}${next.babyName ? ` and their baby's name is ${next.babyName}` : ""}. Do NOT ask how far along they are, how old the baby is, or how long they've been trying — they already told you. Acknowledge the stage AND the timing warmly and uniquely. ${concernsAsk}`,
+            directive: `The user just told you in one go that ${combinedDetail}. Do NOT ask how far along they are or how long they've been trying — they already told you. Acknowledge the stage AND the timing warmly and uniquely, then ${concernsAsk}`,
           };
         }
 
@@ -305,10 +319,10 @@ export default function ChatClient() {
         // "concerns" — one warm, light question about the baby (name),
         // then the concerns step is the pivot to HER.
         if (stage === "postpartum") {
-          setOnboarding("baby");
+          setOnboarding("baby_name");
           return {
             updatedProfile: next,
-            directive: `The user just shared that ${detailLine}. Acknowledge the age warmly and uniquely, then ask ONE brief, warm question about the baby — specifically their name. Keep it short and light, like you're excited to meet them. Do NOT ask about gender or sex.`,
+            directive: `The user just shared that ${detailLine}. Acknowledge the age warmly and uniquely, then warmly ask about the baby's name (something like "does your little one have a name?"). Keep it short and light. Do NOT ask about gender or sex yet — that's a later step.`,
           };
         }
 
@@ -323,17 +337,32 @@ export default function ChatClient() {
         };
       }
 
-      if (onboarding === "baby") {
+      if (onboarding === "baby_name") {
         const babyName = parseBabyName(text);
         const next = updateProfile({ babyName: babyName ?? null });
         setProfile(next);
-        setOnboarding("concerns");
+        setOnboarding("baby_sex");
         const namePhrase = babyName
           ? `their baby's name is ${babyName}`
           : `they didn't share a name (that's fine — don't push)`;
         return {
           updatedProfile: next,
-          directive: `The user just shared something about their baby: "${text}". You now know that ${namePhrase}. Acknowledge the baby warmly and briefly${babyName ? ` (use the name "${babyName}" naturally)` : ""}. Then pivot firmly to HER with this exact intent (in your own warm words): "now tell me about YOU — how are you actually doing, honestly?" This pivot is critical. Everyone in her life asks about the baby. You are the one who asks about HER. Make her feel seen.`,
+          directive: `The user just shared something about their baby: "${text}". You now know that ${namePhrase}. Briefly celebrate the name${babyName ? ` ("${babyName}" — something light and warm, one short sentence)` : ""}, then ask naturally "boy or girl?" in your own words. Keep it casual and warm. Do NOT pivot to her yet — that comes after.`,
+        };
+      }
+
+      if (onboarding === "baby_sex") {
+        const babySex = parseBabySex(text);
+        const next = updateProfile({ babySex: babySex ?? null });
+        setProfile(next);
+        setOnboarding("concerns");
+        const babyName = next.babyName;
+        const sexPhrase = babySex
+          ? `their baby is ${babySex === "surprise" || babySex === "not sharing" ? `(${babySex})` : `a ${babySex}`}`
+          : `they didn't name a sex (don't assume — stay neutral)`;
+        return {
+          updatedProfile: next,
+          directive: `The user just shared the baby's sex: "${text}". You now know that ${sexPhrase}${babyName ? ` and the baby's name is ${babyName}` : ""}. Briefly acknowledge (${babyName ? `use the name "${babyName}"` : `keep it warm and neutral`}, one short sentence). Then pivot firmly to HER: "okay now tell me about YOU — how are you actually doing?" This pivot is critical. Everyone in her life asks about the baby. You are the one who asks about HER. Make her feel seen.`,
         };
       }
 
@@ -379,6 +408,25 @@ export default function ChatClient() {
         const r = processOnboardingInput(text);
         directive = r.directive;
         profileForApi = r.updatedProfile;
+      } else if (profile) {
+        // Post-onboarding: passive extraction. If the user casually mentions
+        // the baby's name or sex in free chat — e.g. after a milestone
+        // check-in on the home hub — capture it so future turns can
+        // personalize without re-asking.
+        const passivePatch: Partial<LocalProfile> = {};
+        if (!profile.babyName) {
+          const n = parseBabyName(text);
+          if (n) passivePatch.babyName = n;
+        }
+        if (!profile.babySex) {
+          const s = parseBabySex(text);
+          if (s) passivePatch.babySex = s;
+        }
+        if (Object.keys(passivePatch).length > 0) {
+          const updated = updateProfile(passivePatch);
+          setProfile(updated);
+          profileForApi = updated;
+        }
       }
 
       try {
@@ -690,6 +738,46 @@ export function parseName(raw: string): string {
 
   const words = norm.split(" ").filter(Boolean);
   return words[words.length - 1] ?? "";
+}
+
+// Extract the baby's sex from natural replies. Returns canonical values:
+// "boy" | "girl" | "surprise" | "finding out" | "not sharing" | null.
+// Order matters: surprise/finding-out/decline checks go first so we don't
+// mis-classify "we're not finding out" as "not" + something.
+export function parseBabySex(raw: string): string | null {
+  if (!raw) return null;
+  const t = raw.toLowerCase().replace(/[’‘]/g, "'").trim();
+
+  // Surprise — user explicitly not finding out
+  if (
+    /\b(?:team\s+green|surprise|keeping\s+it\s+a\s+surprise|not\s+finding\s+out|don'?t\s+want\s+to\s+know|didn'?t\s+find\s+out|waiting\s+(?:til|till|until)\s+(?:birth|delivery|baby\s+comes?))\b/.test(t)
+  ) {
+    return "surprise";
+  }
+
+  // Finding out (intent, not yet known). Matches any phrasing that
+  // contains "finding out" / "find out" / "gonna find out" etc.
+  if (
+    /\b(?:finding\s+out|gonna\s+find\s+out|going\s+to\s+find\s+out|planning\s+to\s+find\s+out|will\s+find\s+out|we'?ll\s+find\s+out|team\s+(?:blue\s+or\s+pink|yellow))\b/.test(t)
+  ) {
+    return "finding out";
+  }
+
+  // Not sharing with Myla
+  if (/\bnot\s+sharing\b|prefer\s+not\s+to\s+say/.test(t)) {
+    return "not sharing";
+  }
+
+  // Boy / girl — after the surprise/finding-out bailouts so "finding out
+  // a boy" doesn't accidentally return boy; though that phrase is rare.
+  if (/\b(?:it'?s\s+a\s+)?boy\b|\bhaving\s+a\s+boy\b|\bteam\s+blue\b|\bbaby\s+boy\b/.test(t)) {
+    return "boy";
+  }
+  if (/\b(?:it'?s\s+a\s+)?girl\b|\bhaving\s+a\s+girl\b|\bteam\s+pink\b|\bbaby\s+girl\b/.test(t)) {
+    return "girl";
+  }
+
+  return null;
 }
 
 // Extract a baby's name from free-text replies like "maya", "her name is

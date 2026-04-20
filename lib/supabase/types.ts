@@ -17,6 +17,7 @@ export type Profile = {
   week: number | null;
   baby_age_months: number | null;
   baby_name: string | null;
+  baby_sex: string | null;
   months_trying: number | null;
   first_pregnancy: boolean;
   concerns: string[];
