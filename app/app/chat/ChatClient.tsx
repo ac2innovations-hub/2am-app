@@ -21,13 +21,34 @@ import {
 } from "@/lib/profile";
 import type { ChatMessage as Msg, Stage } from "@/lib/supabase/types";
 
-const GENERIC_CHIPS = [
-  "can i eat sushi?",
-  "can i drink coffee?",
-  "can i take tylenol?",
-  "can i dye my hair?",
-  "is heartburn normal?",
-];
+const CHIPS_BY_STAGE: Record<Stage, string[]> = {
+  ttc: [
+    "does ovulation tracking actually work?",
+    "how long should we try before seeing a doctor?",
+    "can i drink alcohol while trying?",
+    "what supplements should i take?",
+    "is it normal to feel jealous of pregnant friends?",
+  ],
+  pregnant: [
+    "can i eat sushi?",
+    "can i drink coffee?",
+    "is this discharge normal?",
+    "can i take tylenol?",
+    "why do i feel so emotional?",
+  ],
+  postpartum: [
+    "is my baby's sleep normal?",
+    "do i have ppd or am i just tired?",
+    "can i drink coffee while breastfeeding?",
+    "when should my baby start solids?",
+    "why won't my baby latch?",
+  ],
+};
+
+function chipsForStage(stage: Stage | null | undefined): string[] {
+  // During onboarding stage isn't set yet — fall back to pregnant chips.
+  return CHIPS_BY_STAGE[stage ?? "pregnant"];
+}
 
 const MOOD_LINES: Record<string, string> = {
   great: "i'm feeling great today 💛",
@@ -406,7 +427,7 @@ export default function ChatClient() {
       {showChips && (
         <div className="border-t border-cream/5 bg-midnight px-4 pt-3">
           <QuickChips
-            suggestions={GENERIC_CHIPS}
+            suggestions={chipsForStage(profile?.stage ?? null)}
             onPick={(s) => send(s)}
             disabled={sending}
           />
