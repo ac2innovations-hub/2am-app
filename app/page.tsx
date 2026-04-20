@@ -1,4 +1,11 @@
-import Link from "next/link";
+// POST-LAUNCH: When you're ready to open the app:
+//   1. Change the hero CTA back to <Link href="/app">meet myla</Link>
+//   2. Replace <WaitlistForm /> usages with the same CTA
+//   3. Delete components/WaitlistForm.tsx and the waitlist styles in
+//      app/landing.css
+//   4. Re-add the footer app link if desired
+
+import WaitlistForm from "@/components/WaitlistForm";
 import "./landing.css";
 
 const STARS = [
@@ -57,14 +64,33 @@ export default function Landing() {
             the judgment-free ai companion for your journey — whether you’re
             trying, expecting, or navigating life as a new mom.
           </p>
-          <Link className="landing-cta" href="/app">
-            meet myla
-          </Link>
+          {/* POST-LAUNCH: change this back to <Link href="/app">meet myla</Link> */}
+          <a className="landing-cta" href="#waitlist">
+            join the waitlist
+          </a>
           <p className="landing-tiny landing-mono">
             no judgment · no google history · just answers
           </p>
         </div>
       </header>
+
+      {/* waitlist — hero form */}
+      <section id="waitlist" className="landing-waitlist-section">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">
+            myla is almost ready
+          </span>
+          <h2 className="landing-title">be the first in.</h2>
+          <p className="landing-lede" style={{ margin: "0 auto 28px" }}>
+            we’re opening the door soon. drop your email and we’ll let you
+            know the minute myla is live.
+          </p>
+          <WaitlistForm source="hero" />
+          <p className="landing-waitlist-note">
+            no spam. no data selling. ever. we mean it.
+          </p>
+        </div>
+      </section>
 
       {/* problem */}
       <section className="landing-section landing-problem">
@@ -222,27 +248,24 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* final cta */}
+      {/* final cta — second waitlist form */}
       <section className="landing-final">
         <span className="landing-mono">whenever you need her</span>
         <h2 className="landing-title">myla’s always up.</h2>
         <p className="landing-lede">
-          trying, expecting, or holding a brand new human at 3am — she’s right
-          here.
+          trying, expecting, or holding a brand new human at 3am — she’ll be
+          right here.
         </p>
         <div style={{ marginTop: 32 }}>
-          <Link className="landing-cta" href="/app">
-            meet myla
-          </Link>
+          {/* POST-LAUNCH: replace with <Link className="landing-cta" href="/app">meet myla</Link> */}
+          <WaitlistForm source="final-cta" />
         </div>
       </section>
 
       <footer className="landing-footer">
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          <Link href="/app">app</Link>
-          <span className="dot">·</span>
-          <span>myla is an ai companion, not a doctor</span>
+          myla is an ai companion, not a doctor
         </div>
       </footer>
     </>
