@@ -120,22 +120,25 @@ export default function ChatClient() {
     }
   }, []);
 
-  // Keep the newest message (or the typing dots) in view. Uses a bottom
-  // sentinel ref so every render that changes `messages` or toggles `sending`
-  // re-anchors the scroll. First pass snaps instantly to avoid animating
-  // through already-rendered history on initial mount; subsequent scrolls
-  // are smooth so new turns feel gentle. rAF ensures layout has settled
-  // (heights computed) before we call scrollIntoView — otherwise the scroll
-  // can overshoot or miss on the first paint.
+  // Anchor-based auto-scroll. Fire on every messages/sending change.
+  // - rAF: run after React has flushed layout for this render
+  // - 100ms follow-up: catch post-paint layout shifts (font metrics
+  //   swapping in, late image/asset reflow, iOS keyboard opening)
+  // First fire on mount snaps instantly; everything after is smooth.
   useEffect(() => {
-    const el = bottomRef.current;
-    if (!el) return;
-    const behavior: ScrollBehavior = hasAutoScrolled.current ? "smooth" : "auto";
-    const raf = requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior, block: "end" });
-    });
+    const scrollNow = (behavior: ScrollBehavior) => {
+      bottomRef.current?.scrollIntoView({ behavior, block: "end" });
+    };
+    const initialBehavior: ScrollBehavior = hasAutoScrolled.current
+      ? "smooth"
+      : "auto";
+    const raf = requestAnimationFrame(() => scrollNow(initialBehavior));
+    const settleTimer = setTimeout(() => scrollNow("smooth"), 100);
     hasAutoScrolled.current = true;
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(settleTimer);
+    };
   }, [messages, sending]);
 
   // Handle ?q= prefill and ?mood= one-shot
@@ -395,7 +398,7 @@ export default function ChatClient() {
       </div>
 
       {/* Messages */}
-      <div className="messages-mask flex-1 overflow-y-auto px-4 pt-4 pb-10">
+      <div className="messages-mask flex-1 overflow-y-auto px-4 pt-4 pb-32">
         <div className="flex flex-col gap-5">
           {messages.map((m, i) => (
             <ChatMessage key={i} role={m.role} content={m.content} />
@@ -420,10 +423,10 @@ export default function ChatClient() {
               </p>
             </div>
           )}
-          {/* Scroll anchor — real-height spacer so scrollIntoView lifts the
-              last real message well clear of the sticky input bar and the
-              bottom fade mask. */}
-          <div ref={bottomRef} aria-hidden className="h-6 w-full shrink-0" />
+          {/* Scroll anchor — tall spacer parked after every message, typing
+              dots, and chips. scrollIntoView on this element parks the last
+              real content well clear of the sticky input bar + safe area. */}
+          <div ref={bottomRef} aria-hidden className="h-10 w-full shrink-0" />
         </div>
       </div>
 
