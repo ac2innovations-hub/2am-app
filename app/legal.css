@@ -1,0 +1,112 @@
+/* Shared styling for static legal pages (/privacy, /terms). */
+
+.legal-page {
+  min-height: 100svh;
+  padding: 48px 24px 96px;
+  color: var(--cream);
+}
+
+.legal-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.legal-back {
+  display: inline-block;
+  margin-bottom: 32px;
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 250, 245, 0.55);
+  text-decoration: none;
+}
+.legal-back:hover { color: var(--cream); }
+
+.legal-logo {
+  display: block;
+  margin: 0 0 28px;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.legal-title {
+  margin: 0 0 6px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.legal-meta {
+  margin: 0 0 40px;
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 250, 245, 0.45);
+}
+
+.legal-section {
+  margin: 36px 0 0;
+}
+
+.legal-section h2 {
+  margin: 0 0 14px;
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--peach);
+}
+
+.legal-section h3 {
+  margin: 20px 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cream);
+}
+
+.legal-section p {
+  margin: 0 0 14px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255, 250, 245, 0.85);
+}
+
+.legal-section ul {
+  margin: 0 0 14px;
+  padding: 0 0 0 18px;
+  list-style: disc;
+  color: rgba(255, 250, 245, 0.85);
+}
+
+.legal-section li {
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.legal-section strong { color: var(--cream); font-weight: 600; }
+
+.legal-section a {
+  color: var(--peach);
+  text-decoration: underline;
+}
+
+.legal-footer {
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 250, 245, 0.08);
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 250, 245, 0.45);
+}

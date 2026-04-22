@@ -367,3 +367,7 @@ html { scroll-behavior: smooth; }
   color: rgba(255, 250, 245, 0.3);
 }
 .landing-footer a { color: rgba(255, 250, 245, 0.65); }
+.landing-footer-link {
+  color: inherit;
+  text-decoration: underline;
+}

@@ -333,13 +333,6 @@ export default function ChatClient() {
         } else {
           const months = parseMonths(text);
           next = updateProfile({ monthsTrying: months ?? null });
-          // DEBUG: temporary — remove once TTC parser is verified end-to-end.
-          console.log(
-            "[2am debug] TTC onboarding: raw=%o parsedMonths=%o saved=%o",
-            text,
-            months,
-            next.monthsTrying,
-          );
           detailLine = `they've been trying for ${next.monthsTrying !== null ? `${next.monthsTrying} months` : "a while (duration unspecified)"}`;
         }
         setProfile(next);
@@ -561,11 +554,18 @@ export default function ChatClient() {
       </header>
 
       {/* Disclaimer */}
-      <div className="border-b border-cream/5 bg-navy/40 px-4 py-2">
-        <p className="text-center text-[11px] leading-tight text-cream/55">
-          myla is an ai-powered friend, not a doctor. always consult your
-          provider for medical decisions.
-        </p>
+      <div
+        style={{
+          padding: "8px 16px",
+          borderBottom: "1px solid rgba(255,255,255,0.04)",
+          textAlign: "center",
+          fontFamily: "var(--font-dm-mono), ui-monospace, monospace",
+          fontSize: "11px",
+          color: "rgba(255,255,255,0.2)",
+        }}
+      >
+        myla is powered by ai — she&apos;s a well-read friend, not a doctor.
+        always check with your provider for medical decisions.
       </div>
 
       {/* Messages */}

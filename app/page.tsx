@@ -5,8 +5,39 @@
 //      app/landing.css
 //   4. Re-add the footer app link if desired
 
+import type { Metadata } from "next";
+import Link from "next/link";
 import WaitlistForm from "@/components/WaitlistForm";
 import "./landing.css";
+
+export const metadata: Metadata = {
+  title:
+    "2am — myla's always up. | the judgment-free friend for trying, pregnancy & new motherhood",
+  description:
+    "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom. no google history. no embarrassment. just answers.",
+  openGraph: {
+    title:
+      "2am — myla's always up. | the judgment-free friend for trying, pregnancy & new motherhood",
+    description:
+      "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
+    url: "https://hey2am.app",
+    siteName: "2am",
+    type: "website",
+    images: [
+      {
+        url: "https://hey2am.app/og-image.png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title:
+      "2am — myla's always up. | the judgment-free friend for trying, pregnancy & new motherhood",
+    description:
+      "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
+    images: ["https://hey2am.app/og-image.png"],
+  },
+};
 
 const STARS = [
   { top: "12%", left: "8%", delay: "0s" },
@@ -210,39 +241,45 @@ export default function Landing() {
       {/* testimonials */}
       <section className="landing-section landing-testimonials">
         <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">real women</span>
-          <h2 className="landing-title">what myla feels like.</h2>
+          <span className="landing-eyebrow landing-mono">
+            built for moments like these
+          </span>
+          <h2 className="landing-title">
+            the questions you’d never ask out loud.
+          </h2>
           <div className="landing-t-grid">
             <figure className="landing-testimonial">
               <blockquote>
-                “i’d been trying for 8 months and was too embarrassed to tell
-                anyone it wasn’t happening. myla helped me understand what’s
-                normal and when to talk to my doctor. no judgment, just
-                facts.”
+                “i accidentally had a glass of wine before i knew i was
+                pregnant. is my baby okay?”
               </blockquote>
-              <cite>— the trying mom</cite>
-              <div className="who">ttc · 8 months</div>
+              <cite>— 3:47 am</cite>
+              <div className="who">
+                myla answered in 8 seconds. no judgment. just reassurance.
+              </div>
             </figure>
 
             <figure className="landing-testimonial">
               <blockquote>
-                “i asked myla 14 questions between 11pm and 2am and she
-                answered every one like it was the first. i have never felt
-                that un-judged by google in my life.”
+                “we’ve been trying for 14 months. is something wrong with me?”
               </blockquote>
-              <cite>— the first timer</cite>
-              <div className="who">expecting · week 22</div>
+              <cite>— 1:22 am</cite>
+              <div className="who">
+                myla talked her through the numbers, the options, and reminded
+                her she’s not alone.
+              </div>
             </figure>
 
             <figure className="landing-testimonial">
               <blockquote>
-                “my baby wouldn’t latch for the first three weeks. myla walked
-                me through every position, every trick, and also told me it
-                was okay to cry. the mom groups made me feel worse. she
-                didn’t.”
+                “my baby is 4 months old and i don’t feel bonded yet. am i a
+                bad mom?”
               </blockquote>
-              <cite>— the new mom</cite>
-              <div className="who">postpartum · 6 weeks</div>
+              <cite>— 2:08 am</cite>
+              <div className="who">
+                myla normalized it, explained the science, and gently
+                suggested talking to her doctor.
+              </div>
             </figure>
           </div>
         </div>
@@ -265,7 +302,15 @@ export default function Landing() {
       <footer className="landing-footer">
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          myla is a friend, not a doctor
+          © 2026 2AM. myla is an ai companion, not a medical provider.
+          {" · "}
+          <Link href="/privacy" className="landing-footer-link">
+            privacy
+          </Link>
+          {" · "}
+          <Link href="/terms" className="landing-footer-link">
+            terms
+          </Link>
         </div>
       </footer>
     </>
