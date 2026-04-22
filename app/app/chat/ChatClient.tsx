@@ -532,28 +532,34 @@ export default function ChatClient() {
 
   const canSend = input.trim().length > 0 && !sending;
 
-  const hasProfile = !!profile?.onboardingComplete;
+  // Has finished Myla's conversational onboarding — name + stage are the
+  // authoritative signals (they map to Supabase columns, so they're
+  // stable across devices). The `onboardingComplete` flag is local-only
+  // and unreliable on a fresh browser, so don't use it as a gate.
+  const onboardingDone = !!(profile?.name && profile?.stage);
 
   return (
     <main className="relative flex min-h-[100svh] min-h-[100dvh] flex-col bg-midnight">
       {/* Header */}
       <header className="safe-top sticky top-0 z-20 flex items-center justify-between border-b border-cream/5 bg-midnight/95 px-4 pb-3 backdrop-blur">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push(hasProfile ? "/app/home" : "/app")}
-            aria-label="back"
-            className="rounded-full p-1 text-cream/70 active:scale-95"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M12 4l-6 6 6 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          {onboardingDone && (
+            <button
+              onClick={() => router.push("/app/home")}
+              aria-label="back"
+              className="rounded-full p-1 text-cream/70 active:scale-95"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M12 4l-6 6 6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
           <MylaAvatar size={36} />
           <div className="leading-tight">
             <div className="text-[15px] font-medium lowercase text-cream">
@@ -565,13 +571,22 @@ export default function ChatClient() {
             </div>
           </div>
         </div>
-        <Link
-          href="/app/home"
-          aria-label="home"
-          className="text-gradient-peach font-display text-lg font-black rounded-md px-2 py-1 -mr-2 transition hover:opacity-80 active:scale-95"
-        >
-          2am
-        </Link>
+        {onboardingDone ? (
+          <Link
+            href="/app/home"
+            aria-label="home"
+            className="text-gradient-peach font-display text-lg font-black rounded-md px-2 py-1 -mr-2 transition hover:opacity-80 active:scale-95"
+          >
+            2am
+          </Link>
+        ) : (
+          <span
+            aria-hidden
+            className="text-gradient-peach font-display text-lg font-black rounded-md px-2 py-1 -mr-2"
+          >
+            2am
+          </span>
+        )}
       </header>
 
       {/* Disclaimer */}
@@ -668,7 +683,7 @@ export default function ChatClient() {
             </svg>
           </button>
         </div>
-        {hasProfile && (
+        {onboardingDone && (
           <div className="mt-2 flex justify-center">
             <Link
               href="/app/home"
