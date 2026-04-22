@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import StarField from "@/components/StarField";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "login" | "signup";
+
+// Hardcoded because Supabase's Redirect URL allowlist is configured against
+// the production domain. Using window.location.origin here would resolve
+// to preview-deployment hostnames (e.g. 2am-app-git-foo.vercel.app), which
+// Supabase then refuses — silently falling back to SITE_URL and dropping
+// the callback path, which is exactly how users ended up back on /app/auth.
+const EMAIL_REDIRECT_BASE = "https://hey2am.app/auth/callback";
 
 export default function AuthPage() {
   return (
@@ -31,6 +38,33 @@ function AuthPageInner() {
   const [error, setError] = useState<string | null>(initialError);
   const [info, setInfo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  // If the user already has a valid session (e.g. they got here from
+  // an expired link but are actually still signed in, or they hit Back
+  // after signing in), skip the form and send them straight into the app.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (cancelled) return;
+        if (user) {
+          router.replace(next);
+          return;
+        }
+      } catch {
+        // fall through to form
+      }
+      if (!cancelled) setCheckingSession(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [router, next]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,7 +89,7 @@ function AuthPageInner() {
           email: trimmedEmail,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+            emailRedirectTo: `${EMAIL_REDIRECT_BASE}?next=${encodeURIComponent(next)}`,
           },
         });
         if (error) {
@@ -87,6 +121,10 @@ function AuthPageInner() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (checkingSession) {
+    return <main className="min-h-svh bg-midnight" />;
   }
 
   return (

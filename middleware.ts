@@ -60,6 +60,9 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.json|splash.svg|apple-touch-icon.svg|sw.js|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$|.*\\.webp$|.*\\.gif$|.*\\.ico$).*)",
+    // Excludes static assets AND the supabase auth callback routes, so
+    // nothing interferes with the PKCE code exchange before the session
+    // cookie has been written.
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.json|splash.svg|apple-touch-icon.svg|sw.js|auth/callback|auth/confirm|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$|.*\\.webp$|.*\\.gif$|.*\\.ico$).*)",
   ],
 };
