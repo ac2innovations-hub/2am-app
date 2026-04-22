@@ -7,6 +7,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import WaitlistForm from "@/components/WaitlistForm";
 import "./landing.css";
 
@@ -74,7 +75,33 @@ const MOM_BUBBLES = [
   "how long will this postpartum bleeding last?",
 ];
 
-export default function Landing() {
+export default function Landing({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  // Safety net: if a Supabase verification email is configured to land on
+  // SITE_URL with no path, users arrive here with ?code= or ?token_hash=
+  // still attached. Forward them to the right handler so the session
+  // actually gets exchanged.
+  const code = typeof searchParams.code === "string" ? searchParams.code : null;
+  const tokenHash =
+    typeof searchParams.token_hash === "string" ? searchParams.token_hash : null;
+  const type = typeof searchParams.type === "string" ? searchParams.type : null;
+  const next =
+    typeof searchParams.next === "string" && searchParams.next.startsWith("/")
+      ? searchParams.next
+      : "/app/home";
+
+  if (code) {
+    redirect(`/auth/callback?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`);
+  }
+  if (tokenHash && type) {
+    redirect(
+      `/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${encodeURIComponent(type)}&next=${encodeURIComponent(next)}`,
+    );
+  }
+
   return (
     <>
       {/* hero */}

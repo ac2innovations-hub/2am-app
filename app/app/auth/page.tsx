@@ -20,11 +20,15 @@ function AuthPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") ?? "/app/home";
+  const initialError =
+    params.get("error") === "verification_failed"
+      ? "that verification link didn't work. try logging in, or sign up again to get a fresh link."
+      : null;
 
   const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [info, setInfo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,6 +54,9 @@ function AuthPageInner() {
         const { data, error } = await supabase.auth.signUp({
           email: trimmedEmail,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          },
         });
         if (error) {
           setError(error.message.toLowerCase());
