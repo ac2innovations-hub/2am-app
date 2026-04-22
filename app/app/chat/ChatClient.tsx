@@ -118,7 +118,13 @@ export default function ChatClient() {
       const p = remoteProfile ?? getProfile();
       setProfile(p);
 
-      if (!p || !p.onboardingComplete) {
+      // Trigger Myla's opening greeting whenever the authoritative signals
+      // (name, stage) are missing. The Supabase trigger auto-creates a
+      // profile row at signup with empty fields, so a brand new user will
+      // always have p.name === null here — don't treat the row's existence
+      // as "onboarded". Advance mid-onboarding returners based on what
+      // they've already answered.
+      if (!p || !p.name || !p.stage) {
         setOnboarding(p?.name ? (p.stage ? "when" : "stage") : "name");
         const firstMsg = onboardingGreeting();
         const convo = createConversation(firstMsg);

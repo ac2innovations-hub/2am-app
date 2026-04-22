@@ -13,17 +13,39 @@ export async function GET(request: NextRequest) {
   const token_hash = url.searchParams.get("token_hash");
   const type = url.searchParams.get("type") as EmailOtpType | null;
 
-  if (token_hash && type) {
-    const supabase = createClient();
-    const { error } = await supabase.auth.verifyOtp({ type, token_hash });
-    if (!error) {
-      const destination = await pickDestination(supabase);
-      return NextResponse.redirect(new URL(destination, url.origin));
-    }
+  console.log(
+    "[auth/confirm] hit — token_hash=%s type=%s",
+    token_hash ? "present" : "missing",
+    type ?? "n/a",
+  );
+
+  if (!token_hash || !type) {
+    console.error("[auth/confirm] missing token_hash or type");
+    return redirectToAuthError(url, "missing_token");
   }
 
+  const supabase = createClient();
+  const { error } = await supabase.auth.verifyOtp({ type, token_hash });
+  if (error) {
+    console.error(
+      "[auth/confirm] verifyOtp failed: %s (status=%s name=%s)",
+      error.message,
+      (error as { status?: number }).status ?? "n/a",
+      error.name,
+    );
+    return redirectToAuthError(url, "verify_failed");
+  }
+
+  console.log("[auth/confirm] verify ok");
+  const destination = await pickDestination(supabase);
+  console.log("[auth/confirm] redirecting to %s", destination);
+  return NextResponse.redirect(new URL(destination, url.origin));
+}
+
+function redirectToAuthError(url: URL, reason: string) {
   const fallback = new URL("/app/auth", url.origin);
   fallback.searchParams.set("error", "verification_failed");
+  fallback.searchParams.set("reason", reason);
   return NextResponse.redirect(fallback);
 }
 
@@ -34,7 +56,10 @@ async function pickDestination(supabase: SupabaseClient): Promise<string> {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return "/app/chat";
+    if (!user) {
+      console.warn("[auth/confirm] getUser returned null after verify");
+      return "/app/chat";
+    }
 
     const { data, error } = await supabase
       .from("profiles")
@@ -42,11 +67,31 @@ async function pickDestination(supabase: SupabaseClient): Promise<string> {
       .eq("id", user.id)
       .maybeSingle();
 
-    if (error) return "/app/chat";
-    if (!data) return "/app/chat";
-    if (!data.name || !data.stage) return "/app/chat";
+    if (error) {
+      console.error(
+        "[auth/confirm] profiles lookup failed: %s",
+        error.message,
+      );
+      return "/app/chat";
+    }
+    if (!data) {
+      console.log("[auth/confirm] no profile row yet — onboarding");
+      return "/app/chat";
+    }
+    if (!data.name || !data.stage) {
+      console.log(
+        "[auth/confirm] profile has empty name/stage — onboarding (name=%s stage=%s)",
+        data.name ?? "null",
+        data.stage ?? "null",
+      );
+      return "/app/chat";
+    }
     return "/app/home";
-  } catch {
+  } catch (err) {
+    console.error(
+      "[auth/confirm] pickDestination threw: %s",
+      err instanceof Error ? err.message : String(err),
+    );
     return "/app/chat";
   }
 }
