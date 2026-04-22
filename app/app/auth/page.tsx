@@ -8,13 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 
 type Mode = "login" | "signup";
 
-// Hardcoded because Supabase's Redirect URL allowlist is configured against
-// the production domain. Using window.location.origin here would resolve
-// to preview-deployment hostnames (e.g. 2am-app-git-foo.vercel.app), which
-// Supabase then refuses — silently falling back to SITE_URL and dropping
-// the callback path, which is exactly how users ended up back on /app/auth.
-const EMAIL_REDIRECT_BASE = "https://hey2am.app/auth/callback";
-
 export default function AuthPage() {
   return (
     <Suspense fallback={<main className="min-h-svh bg-midnight" />}>
@@ -89,7 +82,7 @@ function AuthPageInner() {
           email: trimmedEmail,
           password,
           options: {
-            emailRedirectTo: `${EMAIL_REDIRECT_BASE}?next=${encodeURIComponent(next)}`,
+            emailRedirectTo: "https://hey2am.app/auth/callback",
           },
         });
         if (error) {
