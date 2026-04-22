@@ -514,7 +514,7 @@ export default function ChatClient() {
   const hasProfile = !!profile?.onboardingComplete;
 
   return (
-    <main className="relative flex h-[100dvh] flex-col bg-midnight">
+    <main className="relative flex min-h-[100svh] min-h-[100dvh] flex-col bg-midnight">
       {/* Header */}
       <header className="safe-top sticky top-0 z-20 flex items-center justify-between border-b border-cream/5 bg-midnight/95 px-4 pb-3 backdrop-blur">
         <div className="flex items-center gap-3">
