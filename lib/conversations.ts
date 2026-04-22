@@ -1,6 +1,7 @@
 "use client";
 
-import type { ChatMessage } from "@/lib/supabase/types";
+import { createClient } from "@/lib/supabase/client";
+import type { ChatMessage, Conversation } from "@/lib/supabase/types";
 
 export type LocalConversation = {
   id: string;
@@ -54,6 +55,12 @@ export function setActiveConversationId(id: string | null) {
 }
 
 function genId() {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return crypto.randomUUID();
+  }
   return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
@@ -70,6 +77,7 @@ export function createConversation(firstMessage?: ChatMessage): LocalConversatio
   all.unshift(convo);
   writeAll(all);
   setActiveConversationId(convo.id);
+  void mirrorToSupabase(convo);
   return convo;
 }
 
@@ -86,6 +94,7 @@ export function appendMessages(id: string, messages: ChatMessage[]) {
   }
   all[idx] = c;
   writeAll(all);
+  void mirrorToSupabase(c);
 }
 
 export function replaceConversation(convo: LocalConversation) {
@@ -94,9 +103,82 @@ export function replaceConversation(convo: LocalConversation) {
   if (idx === -1) all.unshift(convo);
   else all[idx] = convo;
   writeAll(all);
+  void mirrorToSupabase(convo);
+}
+
+export function deleteConversation(id: string) {
+  const all = readAll().filter((c) => c.id !== id);
+  writeAll(all);
+  if (getActiveConversationId() === id) setActiveConversationId(null);
+  void deleteFromSupabase(id);
 }
 
 function titleFrom(text: string): string {
   const t = text.trim().toLowerCase().replace(/\s+/g, " ");
   return t.length > 48 ? t.slice(0, 48) + "…" : t;
+}
+
+// Pull conversations from Supabase into localStorage on mount. Silent on
+// any failure — localStorage continues to serve the UI.
+export async function hydrateConversationsFromSupabase(): Promise<LocalConversation[]> {
+  if (typeof window === "undefined") return [];
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return listConversations();
+
+    const { data, error } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false });
+
+    if (error || !data) return listConversations();
+
+    const list: LocalConversation[] = data.map(rowToLocal);
+    writeAll(list);
+    return list;
+  } catch {
+    return listConversations();
+  }
+}
+
+function rowToLocal(row: Conversation): LocalConversation {
+  return {
+    id: row.id,
+    title: row.title,
+    messages: Array.isArray(row.messages) ? row.messages : [],
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+async function mirrorToSupabase(convo: LocalConversation) {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from("conversations").upsert(
+      {
+        id: convo.id,
+        user_id: user.id,
+        title: convo.title,
+        messages: convo.messages,
+      },
+      { onConflict: "id" },
+    );
+  } catch {
+    // localStorage has the write; no-op.
+  }
+}
+
+async function deleteFromSupabase(id: string) {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from("conversations").delete().eq("id", id).eq("user_id", user.id);
+  } catch {
+    // No-op.
+  }
 }

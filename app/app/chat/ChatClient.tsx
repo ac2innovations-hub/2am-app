@@ -12,10 +12,12 @@ import {
   createConversation,
   getActiveConversationId,
   getConversation,
+  hydrateConversationsFromSupabase,
   setActiveConversationId,
 } from "@/lib/conversations";
 import {
   getProfile,
+  hydrateProfileFromSupabase,
   updateProfile,
   type LocalProfile,
 } from "@/lib/profile";
@@ -104,54 +106,67 @@ export default function ChatClient() {
 
   // Hydrate profile + conversation on mount
   useEffect(() => {
-    const p = getProfile();
-    setProfile(p);
+    let cancelled = false;
+    (async () => {
+      // Pull from Supabase first (falls back to localStorage on failure)
+      // so users signing in on a new device don't restart onboarding.
+      const [remoteProfile] = await Promise.all([
+        hydrateProfileFromSupabase(),
+        hydrateConversationsFromSupabase(),
+      ]);
+      if (cancelled) return;
+      const p = remoteProfile ?? getProfile();
+      setProfile(p);
 
-    if (!p || !p.onboardingComplete) {
-      setOnboarding(p?.name ? (p.stage ? "when" : "stage") : "name");
-      const firstMsg = onboardingGreeting();
-      const convo = createConversation(firstMsg);
-      setConversationId(convo.id);
-      setMessages([firstMsg]);
-      return;
-    }
-
-    const sp = new URLSearchParams(window.location.search);
-    const fresh = sp.get("new") === "1";
-    const checkinParam = sp.get("checkin");
-    const moodParam = sp.get("mood");
-
-    // Seeded conversation: home-hub "tap to reply" on a check-in, or a
-    // mood emoji tap. Start a new convo with Myla's opening message
-    // already visible; the user types their reply directly.
-    if (fresh && (checkinParam || moodParam)) {
-      const seedText = checkinParam
-        ? checkinParam
-        : MOOD_OPENERS[moodParam!]?.(p.name ?? "you");
-      if (seedText) {
-        const seed: Msg = {
-          role: "assistant",
-          content: seedText,
-          timestamp: new Date().toISOString(),
-        };
-        const convo = createConversation(seed);
+      if (!p || !p.onboardingComplete) {
+        setOnboarding(p?.name ? (p.stage ? "when" : "stage") : "name");
+        const firstMsg = onboardingGreeting();
+        const convo = createConversation(firstMsg);
         setConversationId(convo.id);
-        setMessages([seed]);
+        setMessages([firstMsg]);
         return;
       }
-    }
 
-    const activeId = getActiveConversationId();
-    const existing = activeId ? getConversation(activeId) : null;
+      const sp = new URLSearchParams(window.location.search);
+      const fresh = sp.get("new") === "1";
+      const checkinParam = sp.get("checkin");
+      const moodParam = sp.get("mood");
 
-    if (existing && !fresh) {
-      setConversationId(existing.id);
-      setMessages(existing.messages);
-    } else {
-      const convo = createConversation();
-      setConversationId(convo.id);
-      setMessages([]);
-    }
+      // Seeded conversation: home-hub "tap to reply" on a check-in, or a
+      // mood emoji tap. Start a new convo with Myla's opening message
+      // already visible; the user types their reply directly.
+      if (fresh && (checkinParam || moodParam)) {
+        const seedText = checkinParam
+          ? checkinParam
+          : MOOD_OPENERS[moodParam!]?.(p.name ?? "you");
+        if (seedText) {
+          const seed: Msg = {
+            role: "assistant",
+            content: seedText,
+            timestamp: new Date().toISOString(),
+          };
+          const convo = createConversation(seed);
+          setConversationId(convo.id);
+          setMessages([seed]);
+          return;
+        }
+      }
+
+      const activeId = getActiveConversationId();
+      const existing = activeId ? getConversation(activeId) : null;
+
+      if (existing && !fresh) {
+        setConversationId(existing.id);
+        setMessages(existing.messages);
+      } else {
+        const convo = createConversation();
+        setConversationId(convo.id);
+        setMessages([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Anchor-based auto-scroll. Fire on every messages/sending change.
