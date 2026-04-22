@@ -84,7 +84,7 @@ function AuthPageInner() {
       if (mode === "signup") {
         // No emailRedirectTo — we're using OTP flow. Supabase's email
         // template should surface {{ .Token }} so the user gets a
-        // 6-digit code instead of a click-through link.
+        // verification code instead of a click-through link.
         const { data, error } = await supabase.auth.signUp({
           email: trimmedEmail,
           password,
@@ -97,7 +97,7 @@ function AuthPageInner() {
         if (!data.session) {
           setStep("verify");
           setInfo(
-            "check your email — we sent you a 6-digit code. enter it below.",
+            "check your email — we sent you a verification code. enter it below.",
           );
           return;
         }
@@ -130,8 +130,8 @@ function AuthPageInner() {
     setInfo(null);
 
     const token = otp.replace(/\s+/g, "");
-    if (!/^\d{6}$/.test(token)) {
-      setError("enter the 6-digit code from your email.");
+    if (!/^\d{8}$/.test(token)) {
+      setError("enter the verification code from your email.");
       return;
     }
 
@@ -208,7 +208,7 @@ function AuthPageInner() {
         </p>
         <p className="mt-3 max-w-[22rem] text-sm leading-relaxed text-cream/60">
           {step === "verify"
-            ? `we sent a 6-digit code to ${email}. enter it to finish signing up.`
+            ? `we sent a verification code to ${email}. enter it to finish signing up.`
             : "sign in to keep your conversations with myla across all your devices."}
         </p>
       </div>
@@ -222,14 +222,14 @@ function AuthPageInner() {
             type="text"
             inputMode="numeric"
             autoComplete="one-time-code"
-            placeholder="6-digit code"
+            placeholder="verification code"
             value={otp}
             onChange={(e) =>
-              setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+              setOtp(e.target.value.replace(/\D/g, "").slice(0, 8))
             }
             className="w-full rounded-full border border-cream/10 bg-navy/70 px-5 py-3 text-center text-[18px] tracking-[0.4em] text-cream placeholder:tracking-normal placeholder:text-cream/40 focus:border-peach/50 focus:outline-none"
             required
-            maxLength={6}
+            maxLength={8}
             autoFocus
           />
 
