@@ -96,7 +96,11 @@ export default function HomeClient() {
       ]);
       if (cancelled) return;
       const p = remoteProfile ?? getProfile();
-      if (!p || !p.onboardingComplete) {
+      // Direct signal-based check: if there's no name or no stage, the
+      // user hasn't gone through Myla's onboarding yet. More reliable
+      // than the derived `onboardingComplete` flag, which can be stale
+      // or missing when the profile was hydrated from a fresh device.
+      if (!p || !p.name || !p.stage) {
         router.replace("/app/chat");
         return;
       }
