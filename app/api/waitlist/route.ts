@@ -10,7 +10,7 @@ const WELCOME_HTML = `<div style="font-family: sans-serif; font-size: 15px; line
 <p>hey!</p>
 <p>you just joined the 2am waitlist — and honestly, we're so glad you're here.</p>
 <p>we're building something for you. for the questions you'd never google. for the 2 am moments when everyone else is asleep and you just need someone to tell you it's going to be okay.</p>
-<p>myla is an ai-powered friend — not a doctor, not a search engine, not a mom group with opinions. just a warm, evidence-based, judgment-free companion for wherever you are in your journey. trying. expecting. navigating life as a new mom.</p>
+<p>myla is an ai-powered friend — not a doctor, not a search engine, not a mom group with opinions. just a warm, evidence-based, judgment-free friend for wherever you are in your journey. trying. expecting. navigating life as a new mom.</p>
 <p>she's almost ready. we'll be in touch soon.</p>
 <p>— the 2am team<br><a href="https://hey2am.app" style="color: #EE9B78;">hey2am.app</a></p>
 </div>`;
