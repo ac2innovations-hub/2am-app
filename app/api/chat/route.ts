@@ -1,4 +1,8 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic, {
+  APIConnectionError,
+  APIError,
+  APIUserAbortError,
+} from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import {
   MYLA_SYSTEM_PROMPT,
@@ -6,6 +10,8 @@ import {
   buildUserContextLine,
   type UserProfileContext,
 } from "@/lib/myla/system-prompt";
+import { checkRateLimit } from "@/lib/rate-limiter";
+import { createClient as createServerSupabase } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,20 +24,112 @@ type IncomingMessage = {
 type Body = {
   messages: IncomingMessage[];
   userProfile?: UserProfileContext | null;
-  /**
-   * When present, Myla is in onboarding mode. The directive tells her what
-   * to ask next and nudges her to vary her phrasing each turn.
-   */
   onboardingDirective?: string | null;
 };
 
 const MODEL = "claude-sonnet-4-20250514";
 const MAX_TOKENS = 800;
+const ANTHROPIC_TIMEOUT_MS = 30_000;
+const RETRY_DELAY_MS = 2_000;
+const DAILY_MESSAGE_LIMIT = 50;
 
 function getClient() {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("ANTHROPIC_API_KEY is not set");
   return new Anthropic({ apiKey: key });
+}
+
+function getClientIp(req: NextRequest): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  const real = req.headers.get("x-real-ip");
+  if (real) return real.trim();
+  return "unknown";
+}
+
+async function getRateLimitKey(req: NextRequest): Promise<string> {
+  try {
+    const supabase = createServerSupabase();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) return `user:${user.id}`;
+  } catch {
+    // fall through to IP
+  }
+  return `ip:${getClientIp(req)}`;
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+type FriendlyError = {
+  status: number;
+  body: { error: string; message: string };
+};
+
+const ERRORS = {
+  upstreamRateLimited: {
+    status: 503,
+    body: {
+      error: "upstream_rate_limited",
+      message: "myla needs a quick breather — try again in a moment 💛",
+    },
+  } as FriendlyError,
+  upstreamOverloaded: {
+    status: 503,
+    body: {
+      error: "upstream_overloaded",
+      message: "myla needs a quick breather — try again in a moment 💛",
+    },
+  } as FriendlyError,
+  network: {
+    status: 503,
+    body: {
+      error: "network_error",
+      message: "looks like something went wrong on our end — try again? 💛",
+    },
+  } as FriendlyError,
+  emptyResponse: {
+    status: 503,
+    body: {
+      error: "empty_response",
+      message: "hmm, myla got a little lost. try rephrasing? 💛",
+    },
+  } as FriendlyError,
+  generic: {
+    status: 503,
+    body: {
+      error: "api_error",
+      message:
+        "myla's being a little slow right now — try sending that again in a sec 💛",
+    },
+  } as FriendlyError,
+};
+
+function mapAnthropicError(err: unknown): FriendlyError {
+  if (err instanceof APIError) {
+    const status = err.status ?? 0;
+    if (status === 429) return ERRORS.upstreamRateLimited;
+    if (status === 529) return ERRORS.upstreamOverloaded;
+    if (status >= 500) return ERRORS.generic;
+  }
+  if (err instanceof APIConnectionError) return ERRORS.network;
+  if (err instanceof APIUserAbortError) return ERRORS.generic;
+  if (err instanceof Error && err.name === "AbortError") return ERRORS.generic;
+  return ERRORS.generic;
+}
+
+function isRetryable(err: unknown): boolean {
+  if (err instanceof APIError) {
+    const status = err.status ?? 0;
+    return status >= 500 && status !== 529;
+  }
+  if (err instanceof APIConnectionError) return true;
+  if (err instanceof APIUserAbortError) return true;
+  if (err instanceof Error && err.name === "AbortError") return true;
+  return false;
 }
 
 export async function POST(req: NextRequest) {
@@ -66,6 +164,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Rate limit — key on auth user if present, else IP.
+  const rateLimitKey = await getRateLimitKey(req);
+  const rl = checkRateLimit(rateLimitKey, DAILY_MESSAGE_LIMIT);
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        error: "limit_reached",
+        message:
+          "you've hit your daily message limit. myla will be back tomorrow! 💛",
+      },
+      { status: 429 },
+    );
+  }
+
   const contextLine = buildUserContextLine(body.userProfile);
   const directive =
     typeof body.onboardingDirective === "string"
@@ -90,30 +202,64 @@ export async function POST(req: NextRequest) {
       : []),
   ];
 
-  try {
+  async function callOnce() {
     const anthropic = getClient();
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system: systemBlocks,
-      messages: cleaned,
-    });
-
-    const text = response.content
-      .map((b) => (b.type === "text" ? b.text : ""))
-      .join("");
-
-    return NextResponse.json({
-      message: text,
-      usage: response.usage,
-      stopReason: response.stop_reason,
-    });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "unknown error";
-    console.error("/api/chat failed:", message);
-    return NextResponse.json(
-      { error: "myla had trouble responding. please try again." },
-      { status: 500 },
+    const controller = new AbortController();
+    const timer = setTimeout(
+      () => controller.abort(),
+      ANTHROPIC_TIMEOUT_MS,
     );
+    try {
+      return await anthropic.messages.create(
+        {
+          model: MODEL,
+          max_tokens: MAX_TOKENS,
+          system: systemBlocks,
+          messages: cleaned,
+        },
+        { signal: controller.signal },
+      );
+    } finally {
+      clearTimeout(timer);
+    }
   }
+
+  let response;
+  try {
+    try {
+      response = await callOnce();
+    } catch (err) {
+      if (!isRetryable(err)) throw err;
+      console.warn(
+        "/api/chat first attempt failed, retrying in %dms: %s",
+        RETRY_DELAY_MS,
+        err instanceof Error ? err.message : String(err),
+      );
+      await sleep(RETRY_DELAY_MS);
+      response = await callOnce();
+    }
+  } catch (err) {
+    const friendly = mapAnthropicError(err);
+    console.error(
+      "/api/chat failed after retry: %s",
+      err instanceof Error ? err.message : String(err),
+    );
+    return NextResponse.json(friendly.body, { status: friendly.status });
+  }
+
+  const text = response.content
+    .map((b) => (b.type === "text" ? b.text : ""))
+    .join("");
+
+  if (!text.trim()) {
+    return NextResponse.json(ERRORS.emptyResponse.body, {
+      status: ERRORS.emptyResponse.status,
+    });
+  }
+
+  return NextResponse.json({
+    message: text,
+    usage: response.usage,
+    stopReason: response.stop_reason,
+  });
 }

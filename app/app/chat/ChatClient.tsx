@@ -100,6 +100,10 @@ export default function ChatClient() {
   const [sending, setSending] = useState(false);
   const [onboarding, setOnboarding] = useState<OnboardingStep>("done");
   const [conversationId, setConversationId] = useState<string | null>(null);
+  // Last user message that didn't land a reply. When set, the Myla
+  // error bubble is decorated with a "tap to retry" affordance. Cleared
+  // on the next successful send or when a fresh user message is typed.
+  const [retryableText, setRetryableText] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const hasAutoScrolled = useRef(false);
   const appliedPrefill = useRef(false);
@@ -432,26 +436,39 @@ export default function ChatClient() {
   );
 
   const send = useCallback(
-    async (rawText: string) => {
+    async (rawText: string, opts?: { isRetry?: boolean }) => {
       const text = rawText.trim();
       if (!text || sending) return;
 
-      const userMsg: Msg = { role: "user", content: text, timestamp: now() };
-      const nextMessages = [...messages, userMsg];
-      setMessages(nextMessages);
-      setInput("");
+      let nextMessages: Msg[];
+      if (opts?.isRetry) {
+        // Retry: user message is already in the transcript. Strip the
+        // trailing Myla error bubble (kept in state only, never
+        // persisted) and re-send with the same conversation context.
+        nextMessages =
+          messages.length > 0 &&
+          messages[messages.length - 1].role === "assistant"
+            ? messages.slice(0, -1)
+            : messages;
+        setMessages(nextMessages);
+      } else {
+        const userMsg: Msg = { role: "user", content: text, timestamp: now() };
+        nextMessages = [...messages, userMsg];
+        setMessages(nextMessages);
+        setInput("");
+        if (conversationId) appendMessages(conversationId, [userMsg]);
+      }
+      setRetryableText(null);
       setSending(true);
-
-      if (conversationId) appendMessages(conversationId, [userMsg]);
 
       // Onboarding: parse + save + advance state. Let Myla write the reply.
       let directive: string | null = null;
       let profileForApi: LocalProfile | null = profile;
-      if (onboarding !== "done") {
+      if (!opts?.isRetry && onboarding !== "done") {
         const r = processOnboardingInput(text);
         directive = r.directive;
         profileForApi = r.updatedProfile;
-      } else if (profile) {
+      } else if (!opts?.isRetry && profile) {
         // Post-onboarding: passive extraction. If the user casually mentions
         // the baby's name or sex in free chat — e.g. after a milestone
         // check-in on the home hub — capture it so future turns can
@@ -496,13 +513,30 @@ export default function ChatClient() {
             onboardingDirective: directive,
           }),
         });
-        const data = (await res.json()) as { message?: string; error?: string };
+        const data = (await res.json().catch(() => ({}))) as {
+          message?: string;
+          error?: string;
+        };
+        if (!res.ok) {
+          // Friendly error bubble. Held in React state only — not
+          // persisted to localStorage/Supabase — so retrying cleanly
+          // replaces it with the real reply.
+          const reply: Msg = {
+            role: "assistant",
+            content:
+              data.message ??
+              "myla's being a little slow right now — try sending that again in a sec 💛",
+            timestamp: now(),
+          };
+          setMessages((prev) => [...prev, reply]);
+          if (res.status !== 429) setRetryableText(text);
+          return;
+        }
         const reply: Msg = {
           role: "assistant",
           content:
             data.message ??
-            data.error ??
-            "hmm, i glitched for a sec. try asking me that again?",
+            "hmm, myla got a little lost. try rephrasing? 💛",
           timestamp: now(),
         };
         setMessages((prev) => [...prev, reply]);
@@ -511,11 +545,11 @@ export default function ChatClient() {
         const reply: Msg = {
           role: "assistant",
           content:
-            "i'm having trouble connecting — check your wifi and try again in a sec 🤍",
+            "looks like something went wrong on our end — try again? 💛",
           timestamp: now(),
         };
         setMessages((prev) => [...prev, reply]);
-        if (conversationId) appendMessages(conversationId, [reply]);
+        setRetryableText(text);
       } finally {
         setSending(false);
       }
@@ -529,6 +563,11 @@ export default function ChatClient() {
       profile,
     ],
   );
+
+  const retry = useCallback(() => {
+    if (!retryableText || sending) return;
+    void send(retryableText, { isRetry: true });
+  }, [retryableText, sending, send]);
 
   const canSend = input.trim().length > 0 && !sending;
 
@@ -628,6 +667,17 @@ export default function ChatClient() {
               <p className="text-sm text-cream/50">
                 ask me anything. no judgment.
               </p>
+            </div>
+          )}
+          {retryableText && !sending && (
+            <div className="-mt-2 ml-10">
+              <button
+                type="button"
+                onClick={retry}
+                className="font-mono text-[10px] uppercase tracking-[0.22em] text-peach underline underline-offset-4 hover:text-coral"
+              >
+                tap to retry
+              </button>
             </div>
           )}
           {/* Scroll anchor — tall spacer parked after every message, typing
