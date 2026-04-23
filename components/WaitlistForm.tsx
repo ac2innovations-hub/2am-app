@@ -4,14 +4,11 @@ import { useState } from "react";
 
 // POST-LAUNCH: When switching the landing back to "meet myla" mode,
 // delete this component and its usage in app/page.tsx.
-// Paste your real Formspree ID in place of MY_FORM_ID below, or set
-// NEXT_PUBLIC_FORMSPREE_ID in Vercel env vars to override without a code change.
-const FORM_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || "MY_FORM_ID";
 
 type Status = "idle" | "sending" | "success" | "error";
 
 type Props = {
-  /** "hero" or "cta" — used as a hidden source field for Formspree. */
+  /** "hero" or "cta" — forwarded to the API so Formspree tags the source. */
   source?: string;
 };
 
@@ -26,7 +23,7 @@ export default function WaitlistForm({ source = "hero" }: Props) {
     setStatus("sending");
     setErrorMsg("");
     try {
-      const res = await fetch(`https://formspree.io/f/${FORM_ID}`, {
+      const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
