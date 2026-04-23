@@ -233,6 +233,20 @@ export default function Landing({
               </p>
             </article>
           </div>
+          <p
+            style={{
+              fontFamily: "var(--font-outfit), system-ui, sans-serif",
+              fontSize: "16px",
+              fontStyle: "italic",
+              color: "rgba(255, 255, 255, 0.35)",
+              maxWidth: "560px",
+              margin: "32px auto 0",
+              textAlign: "center",
+            }}
+          >
+            whether you’re doing this with a partner, on your own, or with a
+            team of doctors helping you get there — myla’s here for all of it.
+          </p>
         </div>
       </section>
 
