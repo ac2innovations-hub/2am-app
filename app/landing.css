@@ -371,3 +371,77 @@ html { scroll-behavior: smooth; }
   color: inherit;
   text-decoration: underline;
 }
+
+/* top nav (about / blog) */
+.landing-topnav {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  display: flex;
+  gap: 22px;
+  z-index: 10;
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  pointer-events: auto;
+}
+.landing-topnav a {
+  color: rgba(255, 250, 245, 0.55);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.landing-topnav a:hover { color: var(--cream); }
+
+/* "from the blog" preview */
+.landing-blog-preview {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(190, 178, 215, 0.06), transparent 55%);
+}
+.landing-blog-list {
+  margin: 36px auto 0;
+  padding: 0;
+  list-style: none;
+  max-width: 680px;
+  display: grid;
+  gap: 2px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 250, 245, 0.06);
+}
+.landing-blog-list li a {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 24px;
+  background: rgba(22, 34, 54, 0.55);
+  color: var(--cream);
+  text-decoration: none;
+  transition: background-color 150ms ease;
+}
+.landing-blog-list li a:hover {
+  background: rgba(22, 34, 54, 0.85);
+}
+.landing-blog-list li a .t {
+  font-size: 16.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.landing-blog-list li a .d {
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 250, 245, 0.45);
+}
+.landing-blog-more {
+  display: inline-block;
+  margin-top: 24px;
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--peach);
+  text-decoration: none;
+}
+.landing-blog-more:hover { color: var(--coral); }

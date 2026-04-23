@@ -179,6 +179,12 @@ export default function TermsPage() {
 
         <footer className="legal-footer">
           © 2026 2am (ac2 innovations llc). built with care in florida.
+          <div className="legal-footer-links">
+            <Link href="/about">about</Link>
+            <Link href="/blog">blog</Link>
+            <Link href="/privacy">privacy</Link>
+            <Link href="/terms">terms</Link>
+          </div>
         </footer>
       </div>
     </main>

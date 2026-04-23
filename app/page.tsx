@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import WaitlistForm from "@/components/WaitlistForm";
+import { getRecentPosts } from "@/lib/blog/posts";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -102,8 +103,17 @@ export default function Landing({
     );
   }
 
+  const recentPosts = getRecentPosts(3);
+
   return (
     <>
+      {/* top nav */}
+      <nav className="landing-topnav" aria-label="primary">
+        <Link href="/about">about</Link>
+        <Link href="/blog">blog</Link>
+        <Link href="#waitlist">waitlist</Link>
+      </nav>
+
       {/* hero */}
       <header className="landing-hero">
         <div className="landing-stars" aria-hidden>
@@ -326,6 +336,31 @@ export default function Landing({
         </div>
       </section>
 
+      {/* from the blog */}
+      <section className="landing-section landing-blog-preview">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">from the blog</span>
+          <h2 className="landing-title">
+            answers for the questions you’d never google.
+          </h2>
+          <ul className="landing-blog-list">
+            {recentPosts.map((p) => (
+              <li key={p.slug}>
+                <Link href={`/blog/${p.slug}`}>
+                  <span className="t">{p.title}</span>
+                  <span className="d">{p.audience}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div>
+            <Link href="/blog" className="landing-blog-more">
+              read more →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* final cta — second waitlist form */}
       <section className="landing-final">
         <span className="landing-mono">whenever you need her</span>
@@ -344,6 +379,14 @@ export default function Landing({
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
           © 2026 2AM. myla is an ai companion, not a medical provider.
+          {" · "}
+          <Link href="/about" className="landing-footer-link">
+            about
+          </Link>
+          {" · "}
+          <Link href="/blog" className="landing-footer-link">
+            blog
+          </Link>
           {" · "}
           <Link href="/privacy" className="landing-footer-link">
             privacy
