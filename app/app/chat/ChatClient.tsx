@@ -963,7 +963,24 @@ function clampMonths(n: number): number | null {
 // "like a year", "over a year", "2 years and 3 months". Returns months.
 export function parseMonths(text: string): number | null {
   if (!text) return null;
-  const t = text.toLowerCase().replace(/[’‘]/g, "'").trim();
+  let t = text.toLowerCase().replace(/[’‘]/g, "'").trim();
+
+  // Strip child/baby-age phrases ("4 year old", "6 months old", "a year
+  // old") before matching any duration — otherwise "i have a 4 year old
+  // and we've been trying for a couple years" binds the 4 years to
+  // "trying" and returns 48 months instead of 24.
+  t = t.replace(
+    /\b(?:\d+(?:\.\d+)?|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|couple|few)\s+(?:years?|yrs?|months?|mos?|mo|weeks?|wks?)[-\s]+old\b/g,
+    " ",
+  );
+
+  // Natural-language quantifiers: "a couple (of) years/months" = 2,
+  // "a few years/months" = 3. Checked before the numeric patterns so
+  // "couple"/"few" don't fall through to the bare-number branch.
+  if (/\b(?:a\s+)?couple\s+(?:of\s+)?years?\b/.test(t)) return 24;
+  if (/\b(?:a\s+)?couple\s+(?:of\s+)?months?\b/.test(t)) return 2;
+  if (/\b(?:a\s+)?few\s+years?\b/.test(t)) return 36;
+  if (/\b(?:a\s+)?few\s+months?\b/.test(t)) return 3;
 
   // "X years and a half" / "X years and half"
   const yrsHalf = t.match(
