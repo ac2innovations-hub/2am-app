@@ -8,7 +8,10 @@ type Category = {
   emoji: string;
   label: string;
   color: string;
+  // "can i ..." items — rendered as "can i {item}?" and searched raw.
   items: string[];
+  // Full informational questions — rendered as-is and sent to Myla verbatim.
+  questions?: string[];
 };
 
 const CATEGORIES: Category[] = [
@@ -25,6 +28,18 @@ const CATEGORIES: Category[] = [
       "use lubricant",
       "take fertility supplements",
       "eat certain foods to boost fertility",
+      "drink alcohol while trying to conceive",
+      "drink coffee while trying to conceive",
+      "take fertility supplements like CoQ10",
+      "exercise while trying to conceive",
+      "use lubricant while trying to conceive",
+      "take ibuprofen while trying to conceive",
+      "get dental work while trying to conceive",
+      "use hot tubs or saunas while trying to conceive",
+      "travel while trying to conceive",
+    ],
+    questions: [
+      "is it normal that it's taking this long to conceive?",
     ],
   },
   {
@@ -85,6 +100,23 @@ const CATEGORIES: Category[] = [
       "whiten my teeth",
     ],
   },
+  {
+    key: "postpartum",
+    emoji: "🍼",
+    label: "postpartum",
+    color: "lavender",
+    items: [
+      "exercise after giving birth",
+      "take antidepressants while breastfeeding",
+      "dye my hair postpartum",
+      "have sex after giving birth",
+      "take birth control while breastfeeding",
+    ],
+    questions: [
+      "is postpartum hair loss normal?",
+      "when should i worry about postpartum bleeding?",
+    ],
+  },
 ];
 
 function toQuery(item: string) {
@@ -95,16 +127,41 @@ function pillHref(item: string) {
   return `/app/chat?new=1&q=${encodeURIComponent(toQuery(item))}`;
 }
 
+function questionHref(q: string) {
+  return `/app/chat?new=1&q=${encodeURIComponent(q)}`;
+}
+
+type Entry = {
+  category: Category;
+  label: string; // what the pill shows
+  href: string; // where the pill sends the user
+  haystack: string; // lowercased text used for search matches
+};
+
+function entriesFor(cat: Category): Entry[] {
+  const items: Entry[] = cat.items.map((item) => ({
+    category: cat,
+    label: item,
+    href: pillHref(item),
+    haystack: `can i ${item}`.toLowerCase(),
+  }));
+  const questions: Entry[] = (cat.questions ?? []).map((q) => ({
+    category: cat,
+    label: q,
+    href: questionHref(q),
+    haystack: q.toLowerCase(),
+  }));
+  return [...items, ...questions];
+}
+
 export default function CanIPage() {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return null;
-    const all = CATEGORIES.flatMap((c) =>
-      c.items.map((item) => ({ category: c, item })),
-    );
-    return all.filter(({ item }) => item.toLowerCase().includes(q));
+    const all = CATEGORIES.flatMap(entriesFor);
+    return all.filter((e) => e.haystack.includes(q));
   }, [search]);
 
   return (
@@ -185,16 +242,18 @@ export default function CanIPage() {
                 nothing matched — ask myla directly below.
               </div>
             )}
-            {filtered.map(({ category, item }) => (
+            {filtered.map((entry) => (
               <Link
-                key={`${category.key}-${item}`}
-                href={pillHref(item)}
+                key={`${entry.category.key}-${entry.label}`}
+                href={entry.href}
                 className="flex items-center justify-between gap-3 px-4 py-3 text-left"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">{category.emoji}</span>
+                  <span className="text-lg">{entry.category.emoji}</span>
                   <span className="text-[15px] text-cream/90">
-                    can i {item}?
+                    {entry.haystack.startsWith("can i ")
+                      ? `can i ${entry.label}?`
+                      : entry.label}
                   </span>
                 </div>
                 <span className="text-cream/40">›</span>
@@ -220,6 +279,15 @@ export default function CanIPage() {
                     className="rounded-full border border-cream/10 bg-navy/70 px-4 py-2 text-[13px] text-cream/90 active:scale-[0.97]"
                   >
                     {item}
+                  </Link>
+                ))}
+                {cat.questions?.map((q) => (
+                  <Link
+                    key={q}
+                    href={questionHref(q)}
+                    className="rounded-full border border-peach/30 bg-peach/5 px-4 py-2 text-[13px] text-peach/90 active:scale-[0.97]"
+                  >
+                    {q}
                   </Link>
                 ))}
               </div>
