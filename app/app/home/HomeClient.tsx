@@ -16,6 +16,7 @@ import {
   type LocalConversation,
 } from "@/lib/conversations";
 import { createClient } from "@/lib/supabase/client";
+import MylaAvatar from "@/components/MylaAvatar";
 import {
   babyMilestoneForMonths,
   babySizeForWeek,
@@ -305,8 +306,8 @@ export default function HomeClient() {
         return (
           <section className="mx-5 mt-4 rounded-3xl bg-navy/70 p-5">
             <div className="flex items-start gap-3">
-              <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-bold text-midnight">
-                M
+              <div className="mt-1">
+                <MylaAvatar size={36} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
