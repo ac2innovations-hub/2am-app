@@ -1,14 +1,14 @@
-// POST-LAUNCH: When you're ready to open the app:
-//   1. Change the hero CTA back to <Link href="/app">meet myla</Link>
-//   2. Replace <WaitlistForm /> usages with the same CTA
-//   3. Delete components/WaitlistForm.tsx and the waitlist styles in
-//      app/landing.css
-//   4. Re-add the footer app link if desired
+// POST-LAUNCH MODE (active): the app is open, so the landing CTAs link
+// straight to /app ("meet myla") and the waitlist form is no longer
+// rendered here. components/WaitlistForm.tsx is intentionally KEPT (and
+// its .landing-waitlist* styles in app/landing.css) so this is reversible.
+// To go back to waitlist mode: restore the hero <a href="#waitlist">, the
+// #waitlist section, the top-nav waitlist link, and the final-cta
+// <WaitlistForm source="final-cta" />, and re-import WaitlistForm below.
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import WaitlistForm from "@/components/WaitlistForm";
 import { getRecentPosts } from "@/lib/blog/posts";
 import "./landing.css";
 
@@ -111,7 +111,6 @@ export default function Landing({
       <nav className="landing-topnav" aria-label="primary">
         <Link href="/about">about</Link>
         <Link href="/blog">blog</Link>
-        <Link href="#waitlist">waitlist</Link>
       </nav>
 
       {/* hero */}
@@ -132,33 +131,14 @@ export default function Landing({
             the judgment-free friend for your journey — whether you’re
             trying, expecting, or navigating life as a new mom.
           </p>
-          {/* POST-LAUNCH: change this back to <Link href="/app">meet myla</Link> */}
-          <a className="landing-cta" href="#waitlist">
-            join the waitlist
-          </a>
+          <Link className="landing-cta" href="/app">
+            meet myla
+          </Link>
           <p className="landing-tiny landing-mono">
             no judgment · no google history · just answers
           </p>
         </div>
       </header>
-
-      {/* waitlist — hero form */}
-      <section id="waitlist" className="landing-waitlist-section">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            myla is almost ready
-          </span>
-          <h2 className="landing-title">be the first in.</h2>
-          <p className="landing-lede" style={{ margin: "0 auto 28px" }}>
-            we’re opening the door soon. drop your email and we’ll let you
-            know the minute myla is live.
-          </p>
-          <WaitlistForm source="hero" />
-          <p className="landing-waitlist-note">
-            no spam. no data selling. ever. we mean it.
-          </p>
-        </div>
-      </section>
 
       {/* problem */}
       <section className="landing-section landing-problem">
@@ -361,7 +341,7 @@ export default function Landing({
         </div>
       </section>
 
-      {/* final cta — second waitlist form */}
+      {/* final cta */}
       <section className="landing-final">
         <span className="landing-mono">whenever you need her</span>
         <h2 className="landing-title">myla’s always up.</h2>
@@ -370,8 +350,9 @@ export default function Landing({
           right here.
         </p>
         <div style={{ marginTop: 32 }}>
-          {/* POST-LAUNCH: replace with <Link className="landing-cta" href="/app">meet myla</Link> */}
-          <WaitlistForm source="final-cta" />
+          <Link className="landing-cta" href="/app">
+            meet myla
+          </Link>
         </div>
       </section>
 
