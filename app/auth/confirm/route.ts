@@ -13,12 +13,6 @@ export async function GET(request: NextRequest) {
   const token_hash = url.searchParams.get("token_hash");
   const type = url.searchParams.get("type") as EmailOtpType | null;
 
-  console.log(
-    "[auth/confirm] hit — token_hash=%s type=%s",
-    token_hash ? "present" : "missing",
-    type ?? "n/a",
-  );
-
   if (!token_hash || !type) {
     console.error("[auth/confirm] missing token_hash or type");
     return redirectToAuthError(url, "missing_token");
@@ -36,9 +30,7 @@ export async function GET(request: NextRequest) {
     return redirectToAuthError(url, "verify_failed");
   }
 
-  console.log("[auth/confirm] verify ok");
   const destination = await pickDestination(supabase);
-  console.log("[auth/confirm] redirecting to %s", destination);
   return NextResponse.redirect(new URL(destination, url.origin));
 }
 
@@ -75,15 +67,9 @@ async function pickDestination(supabase: SupabaseClient): Promise<string> {
       return "/app/chat";
     }
     if (!data) {
-      console.log("[auth/confirm] no profile row yet — onboarding");
       return "/app/chat";
     }
     if (!data.name || !data.stage) {
-      console.log(
-        "[auth/confirm] profile has empty name/stage — onboarding (name=%s stage=%s)",
-        data.name ?? "null",
-        data.stage ?? "null",
-      );
       return "/app/chat";
     }
     return "/app/home";
