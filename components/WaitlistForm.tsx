@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 
-// POST-LAUNCH: When switching the landing back to "meet myla" mode,
-// delete this component and its usage in app/page.tsx.
+// Kept for potential reactivation — not currently rendered on the landing
+// page (post-launch "meet myla" mode; see app/page.tsx). Re-add
+// <WaitlistForm /> there to bring the waitlist back.
 
 type Status = "idle" | "sending" | "success" | "error";
 
