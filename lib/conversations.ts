@@ -135,9 +135,39 @@ export async function hydrateConversationsFromSupabase(): Promise<LocalConversat
 
     if (error || !data) return listConversations();
 
-    const list: LocalConversation[] = data.map(rowToLocal);
-    writeAll(list);
-    return list;
+    // Union by id. Remote is the baseline; a local copy only wins when it's
+    // strictly newer (an edit made offline). Conversations that exist only
+    // locally were created while signed-out and never mirrored — keep them
+    // and push them up, so signing up doesn't wipe chat history the user
+    // already has on this device. (Without this, `data` is [] for a brand
+    // new user and the old code did writeAll([]), erasing it.)
+    const remote: LocalConversation[] = data.map(rowToLocal);
+    const byId = new Map<string, LocalConversation>();
+    for (const c of remote) byId.set(c.id, c);
+
+    const toPushUp: LocalConversation[] = [];
+    for (const c of readAll()) {
+      const r = byId.get(c.id);
+      const localIsNewer =
+        r &&
+        new Date(c.updatedAt).getTime() > new Date(r.updatedAt).getTime();
+      if (!r || localIsNewer) {
+        byId.set(c.id, c);
+        toPushUp.push(c);
+      }
+    }
+
+    const merged = Array.from(byId.values()).sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+    writeAll(merged);
+
+    // Fire-and-forget: catch the server up on local-only / locally-newer
+    // conversations. Errors are swallowed inside mirrorToSupabase.
+    for (const c of toPushUp) void mirrorToSupabase(c);
+
+    return merged;
   } catch {
     return listConversations();
   }

@@ -94,12 +94,70 @@ export async function hydrateProfileFromSupabase(): Promise<LocalProfile | null>
 
     if (error || !data) return getProfile();
 
-    const local = profileRowToLocal(data);
-    localStorage.setItem(KEY, JSON.stringify(local));
-    return local;
+    const remoteLocal = profileRowToLocal(data);
+    const merged = mergeProfile(remoteLocal, getProfile());
+    localStorage.setItem(KEY, JSON.stringify(merged));
+
+    // Onboarded-before-signup: the signup trigger creates an empty profiles
+    // row, so `data` has no name/stage but local does. The merge keeps the
+    // local answers — push them up so the server row is no longer empty and
+    // other devices pick them up. Fire-and-forget; localStorage is already
+    // authoritative for the UI.
+    const remoteHadOnboarding = isSet(data.name) && isSet(data.stage);
+    const mergedHasOnboarding = isSet(merged.name) && isSet(merged.stage);
+    if (!remoteHadOnboarding && mergedHasOnboarding) {
+      void mirrorToSupabase(merged);
+    }
+
+    return merged;
   } catch {
     return getProfile();
   }
+}
+
+function isSet(v: unknown): boolean {
+  if (v === null || v === undefined) return false;
+  if (typeof v === "string") return v.trim().length > 0;
+  if (Array.isArray(v)) return v.length > 0;
+  return true;
+}
+
+// Field-level reconcile between the remote row and whatever is in
+// localStorage. The remote value wins for any field the server actually
+// has (so a profile edited on another device still propagates here); for
+// fields the server hasn't got yet, the local value is kept. Without this,
+// hydrate would overwrite a user who completed Myla's onboarding *before*
+// signing up with the blank row the signup trigger creates.
+function mergeProfile(
+  remote: LocalProfile,
+  local: LocalProfile | null,
+): LocalProfile {
+  if (!local) return remote;
+  const pick = <K extends keyof LocalProfile>(k: K): LocalProfile[K] =>
+    isSet(remote[k]) ? remote[k] : local[k];
+  const remotePopulated = isSet(remote.name) || isSet(remote.stage);
+  return {
+    name: pick("name"),
+    stage: pick("stage"),
+    dueDate: pick("dueDate"),
+    week: pick("week"),
+    babyAgeMonths: pick("babyAgeMonths"),
+    babyName: pick("babyName"),
+    babySex: pick("babySex"),
+    monthsTrying: pick("monthsTrying"),
+    // A real `false` is meaningful for a boolean, so only defer to the
+    // remote value when the remote row is otherwise populated.
+    firstPregnancy: remotePopulated
+      ? remote.firstPregnancy
+      : local.firstPregnancy,
+    concerns: pick("concerns"),
+    onboardingComplete: local.onboardingComplete || remote.onboardingComplete,
+    // Keep the earliest known creation time.
+    createdAt:
+      local.createdAt && local.createdAt < remote.createdAt
+        ? local.createdAt
+        : remote.createdAt,
+  };
 }
 
 function profileRowToLocal(row: Profile): LocalProfile {
