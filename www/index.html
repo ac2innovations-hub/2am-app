@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>2am</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0d0f1a;
+        color: #fdf6ee;
+        font-family: -apple-system, system-ui, sans-serif;
+      }
+      .wrap {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+      }
+      .mark {
+        font-size: 40px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #f8c8a8, #ee9b78);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .sub {
+        font-size: 13px;
+        color: rgba(253, 246, 238, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Placeholder webDir only. This project has API routes + middleware so it
+      can't use Next static export; the native shell loads the live site via
+      capacitor.config.ts `server.url`. This screen shows only momentarily
+      before the remote loads, or as a fallback if it can't be reached.
+    -->
+    <div class="wrap">
+      <div class="mark">2am</div>
+      <div class="sub">myla’s always up.</div>
+    </div>
+    <noscript>open hey2am.app in your browser.</noscript>
+  </body>
+</html>
