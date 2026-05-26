@@ -41,15 +41,20 @@
   </head>
   <body>
     <!--
-      Placeholder webDir only. This project has API routes + middleware so it
-      can't use Next static export; the native shell loads the live site via
-      capacitor.config.ts `server.url`. This screen shows only momentarily
-      before the remote loads, or as a fallback if it can't be reached.
+      Native shell entry point. Paints the branded screen synchronously so
+      WKWebView never shows a blank window, then JS-redirects to the live
+      site. If the network is unreachable, the user stays on this screen
+      instead of seeing white — fixes the App Store Guideline 2.1 rejection.
     -->
     <div class="wrap">
       <div class="mark">2am</div>
       <div class="sub">myla’s always up.</div>
     </div>
     <noscript>open hey2am.app in your browser.</noscript>
+    <script>
+      setTimeout(function () {
+        window.location.replace("https://hey2am.app/app");
+      }, 1000);
+    </script>
   </body>
 </html>
