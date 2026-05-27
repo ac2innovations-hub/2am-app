@@ -41,20 +41,15 @@
   </head>
   <body>
     <!--
-      Native shell entry point. Paints the branded screen synchronously so
-      WKWebView never shows a blank window, then JS-redirects to the live
-      site. If the network is unreachable, the user stays on this screen
-      instead of seeing white — fixes the App Store Guideline 2.1 rejection.
+      Branded splash bundled with the app. Capacitor loads server.url
+      (https://hey2am.app/app) directly into the WebView, so this file
+      isn't rendered on the happy path — it's here as the webDir asset
+      and as a fallback target if we later wire up errorPath.
     -->
     <div class="wrap">
       <div class="mark">2am</div>
       <div class="sub">myla’s always up.</div>
     </div>
     <noscript>open hey2am.app in your browser.</noscript>
-    <script>
-      setTimeout(function () {
-        window.location.replace("https://hey2am.app/app");
-      }, 1000);
-    </script>
   </body>
 </html>
