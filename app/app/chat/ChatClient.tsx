@@ -234,12 +234,118 @@ export default function ChatClient() {
 
       if (onboarding === "name") {
         const name = parseName(text);
-        const next = updateProfile({ name });
+        const patch: Partial<LocalProfile> = {};
+        // Only patch name when we actually parsed one — passing an empty
+        // string would clobber a previously-saved name.
+        if (name) patch.name = name;
+
+        // Users often pack stage + timing into the same first reply
+        // ("i'm sarah, 16 weeks" / "5 weeks pregnant"). Capture what we
+        // can now so it isn't dropped and we don't re-ask. detectStage
+        // defaults to "pregnant" with no signal, so gate on hasStageSignal.
+        let combinedDetail: string | null = null;
+        let detectedStage: Stage | null = null;
+        if (hasStageSignal(text)) {
+          detectedStage = detectStage(text);
+          patch.stage = detectedStage;
+
+          if (detectedStage === "pregnant") {
+            const week = parseWeek(text);
+            const dueDate = parseDueDate(text);
+            if (week !== null) {
+              patch.week = week;
+              combinedDetail = `they're at week ${week}`;
+            } else if (dueDate) {
+              patch.dueDate = dueDate;
+              combinedDetail = `they're pregnant, due ${dueDate}`;
+            }
+          } else if (detectedStage === "postpartum") {
+            // Only accept a months value here if the text actually carries
+            // postpartum age context — guards against "5 months" alone
+            // (could be months-trying or weeks-pregnant otherwise).
+            if (
+              /\b(?:postpartum|postnatal|newborn|old|baby\s+is|baby\s+was|gave\s+birth|delivered|breastfeeding|nursing|fourth\s+trimester|4th\s+trimester)\b/i.test(text)
+            ) {
+              const months = parseMonths(text);
+              if (months !== null) {
+                patch.babyAgeMonths = months;
+                combinedDetail = `their baby is ${months} months old`;
+              }
+            }
+          } else {
+            const months = parseMonths(text);
+            if (months !== null) {
+              patch.monthsTrying = months;
+              combinedDetail = `they've been trying for ${months} months`;
+            }
+          }
+        }
+
+        const next = updateProfile(patch);
         setProfile(next);
+
+        // No name yet — stay at the "name" step regardless of what stage
+        // / timing we picked up. The data we did capture is already saved,
+        // so the next turn just needs to give us a name.
+        if (!name) {
+          const stageAck =
+            detectedStage === "pregnant"
+              ? "you now know they're pregnant"
+              : detectedStage === "postpartum"
+                ? "you now know they're a new mom"
+                : detectedStage === "ttc"
+                  ? "you now know they're trying to conceive"
+                  : null;
+          const ackBits = [stageAck, combinedDetail].filter(Boolean).join(" — ");
+          const lead = ackBits
+            ? `${ackBits}. Briefly acknowledge that warmly, then `
+            : "";
+          return {
+            updatedProfile: next,
+            directive: `${lead}gently ask for their name — they didn't share one yet. Keep it warm and conversational, like a friend who just wants to know what to call them. Do NOT re-ask the stage or timing.`,
+          };
+        }
+
+        // Name + stage + timing in one reply → skip the when-step.
+        if (combinedDetail) {
+          if (detectedStage === "postpartum") {
+            setOnboarding("baby_name");
+            return {
+              updatedProfile: next,
+              directive: `The user told you in one go that their name is "${name}" and ${combinedDetail}. Do NOT ask the baby's age again. Acknowledge warmly using their name, then warmly ask about the baby's name (something like "does your little one have a name?"). Keep it short. Do NOT ask about gender or sex yet.`,
+            };
+          }
+          setOnboarding("concerns");
+          const concernsAsk =
+            detectedStage === "ttc"
+              ? "ask what's been weighing on them most lately. Be extra gentle if they've been trying for a while."
+              : "ask what they're most excited or nervous about.";
+          return {
+            updatedProfile: next,
+            directive: `The user told you in one go that their name is "${name}" and ${combinedDetail}. Do NOT re-ask the stage or how far along / how long. Acknowledge warmly using their name and what they shared, then ${concernsAsk}`,
+          };
+        }
+
+        // Name + stage but no timing → skip "stage", go straight to "when".
+        if (detectedStage) {
+          setOnboarding("when");
+          const whenAsk =
+            detectedStage === "pregnant"
+              ? "ask how far along they are — a week number or a due date is fine."
+              : detectedStage === "postpartum"
+                ? "ask how old their little one is — weeks or months are both fine."
+                : "gently ask how long they've been trying. Be supportive, not clinical.";
+          return {
+            updatedProfile: next,
+            directive: `The user told you their name is "${name}" and shared where they are on the journey. Acknowledge warmly using their name, then ${whenAsk}`,
+          };
+        }
+
+        // Plain name reply — the original flow.
         setOnboarding("stage");
         return {
           updatedProfile: next,
-          directive: `The user just told you their name is "${name || text}". Acknowledge warmly and uniquely — do not use canned phrases like "love that" or "nice to meet you". Then ask where they are on the journey: trying to conceive, currently pregnant, or already a mom. Keep it casual and conversational.`,
+          directive: `The user just told you their name is "${name}". Acknowledge warmly and uniquely — do not use canned phrases like "love that" or "nice to meet you". Then ask where they are on the journey: trying to conceive, currently pregnant, or already a mom. Keep it casual and conversational.`,
         };
       }
 
@@ -821,10 +927,40 @@ export function detectStage(text: string): Stage {
   return "pregnant";
 }
 
+// Stage / timing / filler tokens that are never the user's name. Without
+// this guard, the old fallback `words[words.length - 1]` returned things
+// like "weeks", "pregnant", "months" when the user packed stage info into
+// the same reply ("sarah, 16 weeks" → "weeks"; "5 weeks pregnant" →
+// "pregnant"). Anything in here is rejected from both the pattern
+// captures and the bare-word fallback.
+const NON_NAME_TOKENS = new Set([
+  "week", "weeks", "wk", "wks",
+  "month", "months", "mo", "mos",
+  "year", "years", "yr", "yrs",
+  "day", "days",
+  "pregnant", "pregnancy", "expecting", "trimester", "due",
+  "trying", "ttc", "conceive", "conceiving", "fertility",
+  "ovulating", "ovulation",
+  "baby", "newborn", "postpartum", "postnatal",
+  "mom", "mama", "mommy", "mother",
+  "old", "ago", "since", "about", "around", "like", "over", "under", "for", "with",
+  "boy", "girl", "twins", "son", "daughter", "kid",
+  "named", "name",
+  "yes", "no", "yeah", "nope", "yep", "nah",
+  "okay", "ok", "hi", "hey", "hello", "sure", "maybe",
+  "one", "two", "three", "four", "five", "six", "seven", "eight",
+  "nine", "ten", "eleven", "twelve",
+  "a", "an", "the", "and", "or", "but", "so", "just", "still",
+  "im", "i", "me", "my", "we", "us", "our",
+  "its", "it", "is", "are", "was", "were", "been", "be",
+  "to", "at", "in", "on", "of", "by", "from",
+]);
+
 // Extract a first name from free-text replies like "ali", "my name is ali",
 // "i'm ali", "call me ali", "ali!", etc. Handles straight + curly apostrophes,
-// trailing punctuation, and emoji. Falls back to the last remaining word so a
-// bare "ali" still returns "ali".
+// trailing punctuation, and emoji. When no pattern matches, returns the first
+// remaining word that isn't a stage/timing token — so "sarah, 16 weeks"
+// returns "sarah" and "5 weeks pregnant" returns "" (no plausible name).
 export function parseName(raw: string): string {
   if (!raw) return "";
   const norm = raw
@@ -848,11 +984,34 @@ export function parseName(raw: string): string {
   ];
   for (const re of patterns) {
     const m = norm.match(re);
-    if (m && m[1]) return m[1];
+    if (m && m[1] && !NON_NAME_TOKENS.has(m[1]) && m[1].length >= 2) {
+      return m[1];
+    }
   }
 
+  // Walk left-to-right and pick the first token that looks like a name —
+  // not a stop-listed word, not a single letter. "sarah, 16 weeks" → "sarah"
+  // (digits already stripped by the char filter above). Strip apostrophes
+  // before the stop-list lookup so contractions ("i'm", "it's") get caught.
   const words = norm.split(" ").filter(Boolean);
-  return words[words.length - 1] ?? "";
+  for (const w of words) {
+    const bare = w.replace(/'/g, "");
+    if (NON_NAME_TOKENS.has(bare)) continue;
+    if (bare.length < 2) continue;
+    return bare;
+  }
+  return "";
+}
+
+// Does the text contain any signal that the user is talking about stage
+// or timing? Used to gate detectStage at the name step — detectStage
+// falls back to "pregnant" by design, so a bare "ali" would otherwise be
+// tagged as pregnant. We only trust detectStage when there's actually
+// something stage-y to detect.
+export function hasStageSignal(text: string): boolean {
+  const t = text.toLowerCase().replace(/[’‘]/g, "'");
+  if (/\d/.test(t)) return true;
+  return /\b(?:pregnant|pregnancy|expecting|trimester|due\s+(?:date|in|on)|trying|ttc|conceiv|fertility|ovulat|postpartum|postnatal|newborn|new\s+mom|already\s+a\s+mom|gave\s+birth|delivered|breastfeeding|nursing|fourth\s+trimester|baby|week|month|year)\b/.test(t);
 }
 
 // Extract the baby's sex from natural replies. Returns canonical values:
