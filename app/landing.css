@@ -80,6 +80,36 @@ html { scroll-behavior: smooth; }
   font-size: 13px;
 }
 
+/* secondary "not ready yet?" capture under the hero CTA — subdued so it
+   sits below the main "meet myla" button without competing with it. */
+.landing-secondary-capture {
+  position: relative;
+  margin: 40px auto 0;
+  max-width: 420px;
+}
+.landing-secondary-capture-prompt {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: rgba(255, 250, 245, 0.5);
+  text-align: center;
+}
+.landing-waitlist--secondary {
+  gap: 8px;
+}
+.landing-waitlist--secondary .landing-waitlist-input {
+  padding: 11px 18px;
+  font-size: 13px;
+  background: rgba(22, 34, 54, 0.55);
+}
+.landing-waitlist--secondary .landing-waitlist-btn {
+  padding: 11px 20px;
+  font-size: 13px;
+  background: transparent;
+  color: var(--peach);
+  border: 1px solid rgba(248, 200, 168, 0.5);
+  box-shadow: none;
+}
+
 .landing-mono {
   font-family: "DM Mono", ui-monospace, monospace;
   font-size: 11px;

@@ -2,18 +2,31 @@
 
 import { useState } from "react";
 
-// Kept for potential reactivation — not currently rendered on the landing
-// page (post-launch "meet myla" mode; see app/page.tsx). Re-add
-// <WaitlistForm /> there to bring the waitlist back.
+// Primary "join the waitlist" variant is currently dormant (post-launch
+// "meet myla" mode; see app/page.tsx). The secondary variant is rendered
+// as a "not ready yet? drop your email" capture under the main CTA.
 
 type Status = "idle" | "sending" | "success" | "error";
 
 type Props = {
-  /** "hero" or "cta" — forwarded to the API so Formspree tags the source. */
+  /** Forwarded to the API so Formspree tags the source. */
   source?: string;
+  /** "primary" is the full-width gradient form; "secondary" is the subdued under-CTA capture. */
+  variant?: "primary" | "secondary";
+  placeholder?: string;
+  submitLabel?: string;
+  submittingLabel?: string;
+  successMessage?: React.ReactNode;
 };
 
-export default function WaitlistForm({ source = "hero" }: Props) {
+export default function WaitlistForm({
+  source = "hero",
+  variant = "primary",
+  placeholder = "enter your email",
+  submitLabel = "join the waitlist",
+  submittingLabel = "joining…",
+  successMessage,
+}: Props) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -48,16 +61,23 @@ export default function WaitlistForm({ source = "hero" }: Props) {
     }
   }
 
+  const formClass =
+    variant === "secondary"
+      ? "landing-waitlist landing-waitlist--secondary"
+      : "landing-waitlist";
+
   if (status === "success") {
     return (
       <p className="landing-waitlist-success" role="status" aria-live="polite">
-        you&rsquo;re in! we&rsquo;ll let you know when myla is ready 💛
+        {successMessage ?? (
+          <>you&rsquo;re in! we&rsquo;ll let you know when myla is ready 💛</>
+        )}
       </p>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="landing-waitlist" noValidate>
+    <form onSubmit={handleSubmit} className={formClass} noValidate>
       <input
         type="email"
         name="email"
@@ -65,7 +85,7 @@ export default function WaitlistForm({ source = "hero" }: Props) {
         autoComplete="email"
         inputMode="email"
         spellCheck={false}
-        placeholder="enter your email"
+        placeholder={placeholder}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="landing-waitlist-input"
@@ -77,7 +97,7 @@ export default function WaitlistForm({ source = "hero" }: Props) {
         className="landing-waitlist-btn"
         disabled={status === "sending" || !email.trim()}
       >
-        {status === "sending" ? "joining…" : "join the waitlist"}
+        {status === "sending" ? submittingLabel : submitLabel}
       </button>
       {status === "error" && (
         <p className="landing-waitlist-error" role="alert">

@@ -1,15 +1,15 @@
-// POST-LAUNCH MODE (active): the app is open, so the landing CTAs link
-// straight to /app ("meet myla") and the waitlist form is no longer
-// rendered here. components/WaitlistForm.tsx is intentionally KEPT (and
-// its .landing-waitlist* styles in app/landing.css) so this is reversible.
-// To go back to waitlist mode: restore the hero <a href="#waitlist">, the
-// #waitlist section, the top-nav waitlist link, and the final-cta
-// <WaitlistForm source="final-cta" />, and re-import WaitlistForm below.
+// POST-LAUNCH MODE (active): the app is open, so the primary CTA links to
+// /app ("meet myla"). A secondary "not ready yet?" email capture sits
+// below the hero CTA — same /api/waitlist endpoint, just subdued styling.
+// To restore full waitlist mode, swap the hero CTA to <a href="#waitlist">,
+// add the #waitlist section, the top-nav waitlist link, and the final-cta
+// <WaitlistForm source="final-cta" />.
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
+import WaitlistForm from "@/components/WaitlistForm";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -137,6 +137,19 @@ export default function Landing({
           <p className="landing-tiny landing-mono">
             no judgment · no google history · just answers
           </p>
+          <div className="landing-secondary-capture">
+            <p className="landing-secondary-capture-prompt">
+              not ready yet? drop your email and we&rsquo;ll check in 💛
+            </p>
+            <WaitlistForm
+              source="hero-secondary"
+              variant="secondary"
+              placeholder="your email"
+              submitLabel="keep me posted"
+              submittingLabel="sending…"
+              successMessage={<>got it — we&rsquo;ll check in soon 💛</>}
+            />
+          </div>
         </div>
       </header>
 
