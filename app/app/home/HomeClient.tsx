@@ -18,14 +18,17 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import MylaAvatar from "@/components/MylaAvatar";
 import {
-  babyMilestoneForMonths,
-  babySizeForWeek,
   formatDueDate,
   greetingFor,
   relativeTime,
   timeBand,
-  trimester,
 } from "@/lib/utils";
+import TrackerCard from "./TrackerCard";
+import {
+  currentBabyAge,
+  currentPregnancyWeek,
+  formatBabyAge,
+} from "@/lib/tracker";
 
 const MOODS: { key: string; label: string; emoji: string }[] = [
   { key: "great", label: "great", emoji: "😊" },
@@ -141,11 +144,12 @@ export default function HomeClient() {
     return <div className="p-6 text-cream/60">loading…</div>;
   }
 
-  const week = profile.week ?? 1;
-  const tri = trimester(week);
-  const size = babySizeForWeek(week);
-  const progress = Math.min(100, Math.round((week / 40) * 100));
   const initial = (profile.name ?? "m").charAt(0).toUpperCase();
+  // Derived live from profile + today's date so the snapshot moves on its own.
+  const curWeek =
+    profile.stage === "pregnant" ? currentPregnancyWeek(profile) : null;
+  const babyAge =
+    profile.stage === "postpartum" ? currentBabyAge(profile) : null;
 
   const startNew = () => {
     setActiveConversationId(null);
@@ -201,14 +205,14 @@ export default function HomeClient() {
         </h1>
         {profile.stage === "pregnant" && (
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
-            week {week}
+            {curWeek != null ? `week ${curWeek}` : "pregnant"}
             {profile.dueDate ? ` · due ${formatDueDate(profile.dueDate)}` : ""}
           </p>
         )}
         {profile.stage === "postpartum" && (
           <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
-            {profile.babyAgeMonths !== null
-              ? `baby is ${profile.babyAgeMonths} ${profile.babyAgeMonths === 1 ? "month" : "months"} old`
+            {babyAge
+              ? `baby is ${formatBabyAge(babyAge)}`
               : "first year · you're doing it"}
           </p>
         )}
@@ -222,98 +226,16 @@ export default function HomeClient() {
         )}
       </section>
 
-      {/* Stage card */}
-      {profile.stage === "pregnant" && (
-        <section className="mx-5 mt-5 rounded-3xl border border-peach/20 bg-navy p-5 shadow-[0_0_0_1px_rgba(248,200,168,0.06)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-peach/80">
-                week {week}
-              </div>
-              <div className="mt-1 text-[13px] text-cream/60">
-                trimester {tri}
-              </div>
-            </div>
-            <div className="text-right text-[12px] text-cream/55">
-              {40 - week > 0 ? `${40 - week} wks to go` : "any day now 🤍"}
-            </div>
-          </div>
-          <p className="mt-4 text-[15px] leading-relaxed text-cream/90">
-            baby is about the size of <span className="text-peach">{size}</span>
-            .
-          </p>
-          <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-midnight">
-            <div
-              className="h-full rounded-full bg-peach-gradient transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <div className="mt-2 flex justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-cream/45">
-            <span>1</span>
-            <span>40</span>
-          </div>
-        </section>
-      )}
-
-      {profile.stage === "postpartum" && (
-        <section className="mx-5 mt-5 rounded-3xl border border-peach/20 bg-navy p-5 shadow-[0_0_0_1px_rgba(248,200,168,0.06)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-peach/80">
-                {profile.babyAgeMonths !== null
-                  ? `${profile.babyAgeMonths} months`
-                  : "new mom"}
-              </div>
-              <div className="mt-1 text-[13px] text-cream/60">
-                first year · you&apos;re doing it
-              </div>
-            </div>
-            <div className="text-right text-[12px] text-cream/55">
-              🤍
-            </div>
-          </div>
-          <p className="mt-4 text-[15px] leading-relaxed text-cream/90">
-            {babyMilestoneForMonths(profile.babyAgeMonths ?? 0)}
-          </p>
-          <p className="mt-3 text-[13px] leading-relaxed text-cream/55">
-            ranges vary wildly — your baby&apos;s on their own timeline.
-          </p>
-        </section>
-      )}
-
-      {profile.stage === "ttc" &&
-        (() => {
-          const ttc = ttcCardCopy(profile.monthsTrying);
-          return (
-            <section className="mx-5 mt-5 rounded-3xl border border-sage/25 bg-navy p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-sage">
-                    trying to conceive
-                  </div>
-                  <div className="mt-1 text-[13px] text-cream/80">
-                    {ttc.tagline}
-                  </div>
-                </div>
-                <div className="text-right text-[12px] text-cream/55">
-                  {profile.monthsTrying !== null
-                    ? `${profile.monthsTrying} mo`
-                    : "🌱"}
-                </div>
-              </div>
-              <p className="mt-4 text-[15px] leading-relaxed text-cream/90">
-                {ttc.body}
-              </p>
-            </section>
-          );
-        })()}
+      {/* Tracking snapshot — stage-aware, self-updating */}
+      <TrackerCard profile={profile} />
 
       {/* Myla check-in */}
       {(() => {
+        const effectiveWeek = curWeek ?? profile.week ?? 0;
         const checkInText =
           (profile.stage === "pregnant" &&
-            pregnantMilestoneCheckIn(profile)) ||
-          checkInMessage(profile);
+            pregnantMilestoneCheckIn(profile, effectiveWeek)) ||
+          checkInMessage(profile, effectiveWeek);
         const replyToCheckIn = () => {
           setActiveConversationId(null);
           router.push(
@@ -512,45 +434,15 @@ export default function HomeClient() {
   );
 }
 
-function ttcCardCopy(monthsTrying: number | null): {
-  tagline: string;
-  body: string;
-} {
-  // Default (unknown duration) reads like the earliest stage — hopeful,
-  // not clinical. The "you're not behind" framing stops at 12 months; after
-  // that we gently bridge to professional care.
-  const m = monthsTrying ?? 0;
-  if (m < 6) {
-    return {
-      tagline: "one cycle at a time",
-      body: "you're right on track. most couples take a few months — it's completely normal for it not to happen right away. 🌱",
-    };
-  }
-  if (m < 12) {
-    return {
-      tagline: "still in the window",
-      body: "you've been at this for a bit — and that's still within the normal range. 85% of couples conceive within 12 months. hang in there. 💛",
-    };
-  }
-  if (m < 18) {
-    return {
-      tagline: "you're not alone in this",
-      body: "a year is a really reasonable moment to talk to your doctor about next steps — not because anything is wrong, but because they may have tools that can help. you're being smart about this. 💛",
-    };
-  }
-  return {
-    tagline: "your journey, your pace",
-    body: "you've been on this journey for a while, and that takes real strength. if you haven't already, talking to a fertility specialist could open up options you might not know about. whatever you're feeling right now is valid. 💛",
-  };
-}
-
 // Pregnant-stage milestone check-ins. Myla proactively nudges at the right
 // moments to capture baby sex intent/result and name brainstorming.
 // Returns null when no milestone fits, so the generic check-in can run.
 // Weeks chosen conservatively — 16+ for sex (not earlier; insensitive for
 // early losses), 25-30 for names (second/third trimester).
-function pregnantMilestoneCheckIn(p: LocalProfile): string | null {
-  const week = p.week ?? 0;
+function pregnantMilestoneCheckIn(
+  p: LocalProfile,
+  week: number,
+): string | null {
   const name = p.name ? p.name : "you";
 
   // Week 16-18: first sex conversation — find out or keep it a surprise?
@@ -577,18 +469,18 @@ function pregnantMilestoneCheckIn(p: LocalProfile): string | null {
   return null;
 }
 
-function checkInMessage(p: LocalProfile): string {
+function checkInMessage(p: LocalProfile, week: number): string {
   const name = p.name ? p.name : "you";
   const concerns = p.concerns?.[0];
 
-  if (p.stage === "pregnant" && p.week) {
+  if (p.stage === "pregnant" && week) {
     if (concerns) {
       return `thinking about ${name} — last time we talked, ${concerns} was on your mind. how's that feeling today?`;
     }
-    if (p.week >= 36) {
+    if (week >= 36) {
       return `hey ${name} — you're in the home stretch 🤍 anything showing up today i can help with?`;
     }
-    return `hey ${name} — week ${p.week} brings its own stuff. anything weird, worrying, or curious today?`;
+    return `hey ${name} — week ${week} brings its own stuff. anything weird, worrying, or curious today?`;
   }
 
   if (p.stage === "postpartum") {
