@@ -120,7 +120,7 @@ export default function PrivacyPage() {
             <li>
               <strong>to personalize your experience</strong> — myla remembers
               your name, your stage, your concerns, and your preferences so
-              she can be a better companion.
+              she can be a better friend.
             </li>
             <li>
               <strong>to improve the product</strong> — we analyze aggregated,

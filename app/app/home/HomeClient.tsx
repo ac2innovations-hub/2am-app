@@ -74,7 +74,7 @@ const FEATURES: {
   {
     emoji: "🌱",
     title: "trying to first year",
-    desc: "cycles, trimesters, milestones — one companion for every chapter.",
+    desc: "cycles, trimesters, milestones — one friend for every chapter.",
     accent: "sage",
   },
 ];

@@ -184,7 +184,7 @@ export default function Landing({
       <section className="landing-section landing-stages">
         <div className="landing-container">
           <span className="landing-eyebrow landing-mono">for every stage</span>
-          <h2 className="landing-title">three chapters, one companion.</h2>
+          <h2 className="landing-title">three chapters, one friend.</h2>
           <p className="landing-lede">
             myla meets you where you are, and she remembers. no starting over,
             no re-explaining. she grows with you.

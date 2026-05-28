@@ -5,7 +5,7 @@ import "../legal.css";
 export const metadata: Metadata = {
   title: "terms of service — 2am",
   description:
-    "the terms of service for 2am. myla is an ai companion, not a medical provider. always consult your healthcare provider for medical decisions.",
+    "the terms of service for 2am. myla is an ai friend, not a medical provider. always consult your healthcare provider for medical decisions.",
 };
 
 export default function TermsPage() {
@@ -27,7 +27,7 @@ export default function TermsPage() {
           <p>
             2am is the judgment-free friend for your journey — whether
             you&apos;re trying, expecting, or navigating life as a new mom.
-            powered by an ai companion named myla.
+            powered by an ai friend named myla.
           </p>
           <p>
             2am is not a medical device, diagnostic tool, or substitute for
