@@ -372,7 +372,7 @@ export default function Landing({
       <footer className="landing-footer">
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          © 2026 2AM. myla is an ai companion, not a medical provider.
+          © 2026 2AM. myla is an ai friend, not a medical provider.
           {" · "}
           <Link href="/about" className="landing-footer-link">
             about
