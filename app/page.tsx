@@ -1,9 +1,7 @@
-// POST-LAUNCH MODE (active): the app is open, so the primary CTA links to
-// /app ("meet myla"). A secondary "not ready yet?" email capture sits
-// below the hero CTA — same /api/waitlist endpoint, just subdued styling.
-// To restore full waitlist mode, swap the hero CTA to <a href="#waitlist">,
-// add the #waitlist section, the top-nav waitlist link, and the final-cta
-// <WaitlistForm source="final-cta" />.
+// BETA MODE (active): the "meet myla" CTA goes straight to /app/auth
+// (signup). A subdued secondary email capture under the hero collects
+// testers for the small-batch beta via the same /api/waitlist endpoint.
+// The bottom of the page is feedback + FAQ (not a second CTA).
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -131,7 +129,7 @@ export default function Landing({
             the judgment-free friend for your journey — whether you’re
             trying, expecting, or navigating life as a new mom.
           </p>
-          <Link className="landing-cta" href="/app">
+          <Link className="landing-cta" href="/app/auth">
             meet myla
           </Link>
           <p className="landing-tiny landing-mono">
@@ -139,7 +137,8 @@ export default function Landing({
           </p>
           <div className="landing-secondary-capture">
             <p className="landing-secondary-capture-prompt">
-              not ready yet? drop your email and we&rsquo;ll check in 💛
+              we&rsquo;re inviting testers in small batches — drop your email
+              and we&rsquo;ll let you know when there&rsquo;s a spot. 💛
             </p>
             <WaitlistForm
               source="hero-secondary"
@@ -354,18 +353,134 @@ export default function Landing({
         </div>
       </section>
 
-      {/* final cta */}
-      <section className="landing-final">
-        <span className="landing-mono">whenever you need her</span>
-        <h2 className="landing-title">myla’s always up.</h2>
-        <p className="landing-lede">
-          trying, expecting, or holding a brand new human at 3am — she’ll be
-          right here.
-        </p>
-        <div style={{ marginTop: 32 }}>
-          <Link className="landing-cta" href="/app">
-            meet myla
-          </Link>
+      {/* early-tester feedback */}
+      <section className="landing-section landing-feedback">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">
+            what early testers are telling us
+          </span>
+          <h2 className="landing-title">the feedback we keep hearing.</h2>
+          <div className="landing-feedback-grid">
+            <figure className="landing-feedback-card ttc">
+              <blockquote>
+                “i’ve been trying for 11 months and every other app made me
+                feel like a project. myla just talked to me. she didn’t tell
+                me to relax or try harder.”
+              </blockquote>
+              <cite>— sarah, cycle 11</cite>
+            </figure>
+            <figure className="landing-feedback-card exp">
+              <blockquote>
+                “i texted myla at 4 am about brown spotting at 8 weeks. she
+                told me what was likely and what wasn’t, and said ‘this is
+                worth a call to your OB in the morning, but it’s not an
+                emergency tonight.’ i actually went back to sleep.”
+              </blockquote>
+              <cite>— jess, 8 weeks</cite>
+            </figure>
+            <figure className="landing-feedback-card mom">
+              <blockquote>
+                “i thought i was the only one who hadn’t felt that
+                bonded-from-day-one thing. myla explained why it’s normal,
+                told me when it usually shifts, and said the part i needed to
+                hear: ‘this doesn’t mean you’re a bad mom.’”
+              </blockquote>
+              <cite>— maya, 9 weeks postpartum</cite>
+            </figure>
+          </div>
+          <p className="landing-feedback-note landing-mono">
+            names and details changed for privacy.
+          </p>
+        </div>
+      </section>
+
+      {/* faq */}
+      <section className="landing-section landing-faq">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">common questions</span>
+          <h2 className="landing-title">
+            what people ask before they meet myla.
+          </h2>
+          <div className="landing-faq-list">
+            <details className="landing-faq-item">
+              <summary>is myla free?</summary>
+              <div className="landing-faq-answer">
+                yes — free during beta. when we open public access, the core
+                experience will stay free. we may add a paid tier later for
+                things like longer memory or extra features, but the questions
+                you’d never google will always be free to ask.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>when does the app launch?</summary>
+              <div className="landing-faq-answer">
+                right now we’re in private beta with a small group of testers.
+                we’re opening access in small batches. drop your email above
+                and we’ll let you know when there’s a spot.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>how is this different from just asking chatgpt?</summary>
+              <div className="landing-faq-answer">
+                three things. one — myla is trained specifically on guidelines
+                from organizations like ACOG, the CDC, and the AAP, so the
+                answers are evidence-based rather than averaged across the
+                whole internet. two — she remembers your story, so you never
+                have to re-explain that you’re 14 weeks pregnant or that you’ve
+                been trying for 8 months. three — she’s built for the 2 am
+                emotional register: warm, not clinical. she knows the
+                difference between someone asking a factual question and
+                someone asking because they’re scared.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>what happens to my chat history? is it private?</summary>
+              <div className="landing-faq-answer">
+                your conversations are yours. we don’t sell your data. we don’t
+                show you ads. we don’t share it with insurers, advertisers, or
+                anyone else. if you want, you can delete any conversation or
+                your entire history at any time.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>is myla a doctor? can she diagnose me?</summary>
+              <div className="landing-faq-answer">
+                no. myla is an ai friend, not a medical provider. she doesn’t
+                diagnose, prescribe, or replace your OB. she helps you figure
+                out which questions are worth bringing to your doctor, and
+                tells you when something needs a call tonight vs. when it can
+                wait.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>what if i’m in a mental health crisis at 2 am?</summary>
+              <div className="landing-faq-answer">
+                myla is trained to recognize when something is beyond her
+                scope. if you mention thoughts of self-harm, severe postpartum
+                symptoms, or a medical emergency, she’ll tell you to reach out
+                to a real human and give you the right resource right there in
+                the chat. she’s never a substitute for real help. she’s the
+                friend who tells you to go get it.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>what devices does this work on?</summary>
+              <div className="landing-faq-answer">
+                right now myla lives in your browser — so it works on any
+                phone, tablet, or computer. a dedicated iOS app is coming soon.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>who built this?</summary>
+              <div className="landing-faq-answer">
+                ali miller, from cape coral, florida. not a health tech
+                conglomerate.{" "}
+                <Link href="/about" className="landing-faq-link">
+                  read the full story →
+                </Link>
+              </div>
+            </details>
+          </div>
         </div>
       </section>
 

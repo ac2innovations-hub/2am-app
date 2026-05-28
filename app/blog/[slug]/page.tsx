@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  AUDIENCE_LABEL,
-  POSTS,
-  formatDate,
-  getPost,
-} from "@/lib/blog/posts";
+import { AUDIENCE_LABEL, POSTS, getPost } from "@/lib/blog/posts";
 import "../../legal.css";
 
 type Props = { params: { slug: string } };
@@ -33,7 +28,6 @@ export function generateMetadata({ params }: Props): Metadata {
       url,
       siteName: "2am",
       type: "article",
-      publishedTime: post.date,
       authors: ["2am"],
       images: [{ url: OG_IMAGE }],
     },
@@ -56,8 +50,6 @@ export default function BlogPostPage({ params }: Props) {
     "@type": "Article",
     headline: post.title,
     description: post.description,
-    datePublished: post.date,
-    dateModified: post.date,
     author: { "@type": "Organization", name: "2am", url: SITE },
     publisher: {
       "@type": "Organization",
@@ -85,9 +77,6 @@ export default function BlogPostPage({ params }: Props) {
 
         <h1 className="legal-title">{post.title}</h1>
         <div className="blog-meta-row">
-          <span className="legal-meta" style={{ margin: 0 }}>
-            {formatDate(post.date)}
-          </span>
           <span className="blog-tag">{AUDIENCE_LABEL[post.audience]}</span>
         </div>
 
@@ -101,7 +90,7 @@ export default function BlogPostPage({ params }: Props) {
             have a question you&apos;d never google? myla answers at 2 am
             with zero judgment.
           </p>
-          <Link href="/app">meet myla →</Link>
+          <Link href="/app/auth">meet myla →</Link>
         </section>
 
         <footer className="legal-footer">

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AUDIENCE_LABEL, formatDate, getAllPosts } from "@/lib/blog/posts";
+import { AUDIENCE_LABEL, getAllPosts } from "@/lib/blog/posts";
 import "../legal.css";
 
 export const metadata: Metadata = {
@@ -49,8 +49,6 @@ export default function BlogIndexPage() {
               className="blog-index-card"
             >
               <div className="blog-index-card-meta">
-                <span>{formatDate(p.date)}</span>
-                <span>·</span>
                 <span>{AUDIENCE_LABEL[p.audience]}</span>
               </div>
               <h2>{p.title}</h2>

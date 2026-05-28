@@ -4,7 +4,6 @@ export type BlogPost = {
   slug: string;
   title: string;
   description: string;
-  date: string; // ISO (YYYY-MM-DD)
   audience: Audience;
   content: string; // HTML
 };
@@ -22,7 +21,6 @@ export const POSTS: BlogPost[] = [
     title: "can i eat sushi while pregnant? here's the real answer.",
     description:
       "cooked sushi is fine during pregnancy. here's what ACOG and the FDA actually say about raw fish, mercury, and what to order.",
-    date: "2026-04-23",
     audience: "pregnant",
     content: `<p>you're staring at a menu. your friend just ordered a spicy tuna roll. and now you're doing that thing where you pretend to study the menu while frantically trying to remember what the internet said about raw fish.</p>
 <p>let's clear this up.</p>
@@ -45,7 +43,6 @@ export const POSTS: BlogPost[] = [
       "how long does it take to get pregnant? the real numbers nobody tells you.",
     description:
       "85% of couples conceive within 12 months. here's what the research says about timelines, when to see a specialist, and what actually matters.",
-    date: "2026-04-23",
     audience: "ttc",
     content: `<p>you've been trying for a few months. or maybe longer. and every time your period shows up, the same thought creeps in: <em>is something wrong with me?</em></p>
 <p>before you spiral, let's look at what the numbers actually say.</p>
@@ -68,11 +65,10 @@ export const POSTS: BlogPost[] = [
 <p class="source"><em>sources: ASRM practice committee, ACOG FAQ on evaluating infertility</em></p>`,
   },
   {
-    slug: "is-it-normal-to-not-feel-pregnant",
+    slug: "is-it-normal-to-not-feel-pregnant-in-the-first-trimester",
     title: "is it normal to not feel pregnant in the first trimester?",
     description:
       "not having symptoms in early pregnancy is common. here's why you feel fine, when to worry, and why it doesn't mean anything is wrong.",
-    date: "2026-04-23",
     audience: "pregnant",
     content: `<p>you just found out you're pregnant. you expected... something. nausea, maybe. exhaustion. sore breasts. some kind of sign that your body is doing this massive thing.</p>
 <p>instead you feel... completely normal. and now you're worried that something is wrong.</p>
@@ -91,12 +87,11 @@ export const POSTS: BlogPost[] = [
 <p class="source"><em>sources: ACOG, American Pregnancy Association</em></p>`,
   },
   {
-    slug: "postpartum-hair-loss",
+    slug: "postpartum-hair-loss-why-it-happens-when-it-stops-and-what-helps",
     title:
       "postpartum hair loss: why it happens, when it stops, and what actually helps.",
     description:
       "postpartum hair loss affects 40-50% of women, peaks at 4-6 months, and is temporary. here's the timeline and what actually works.",
-    date: "2026-04-23",
     audience: "postpartum",
     content: `<p>you're standing in the shower watching clumps of hair circle the drain and wondering if you're going bald.</p>
 <p>you're not. but nobody warned you about this part.</p>
@@ -115,12 +110,11 @@ export const POSTS: BlogPost[] = [
 <p class="source"><em>sources: American Academy of Dermatology (AAD), Journal of the American Academy of Dermatology</em></p>`,
   },
   {
-    slug: "things-to-stop-googling-at-2am",
+    slug: "7-things-youre-googling-at-2am",
     title:
       "7 things you're googling at 2 am (and the answers so you can go back to sleep)",
     description:
       "honest answers to the pregnancy, ttc, and postpartum questions women search at 2 am. discharge, wine, sex drive, milestones, and more.",
-    date: "2026-04-23",
     audience: "all",
     content: `<p>we know you're doing it. phone under the covers, incognito mode, typing something you'd never say out loud.</p>
 <p>here are the honest answers to the most common 2 am searches — so you can put the phone down and get some rest.</p>
@@ -152,21 +146,13 @@ export function getPost(slug: string): BlogPost | null {
   return POSTS.find((p) => p.slug === slug) ?? null;
 }
 
+// Posts are evergreen, so we keep them in their declared order rather than
+// sorting by date (dates were removed — they read like a content dump when
+// everything shared one publish day).
 export function getAllPosts(): BlogPost[] {
-  return [...POSTS].sort((a, b) => (a.date < b.date ? 1 : -1));
+  return [...POSTS];
 }
 
 export function getRecentPosts(limit: number): BlogPost[] {
   return getAllPosts().slice(0, limit);
-}
-
-export function formatDate(iso: string): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  const date = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
 }
