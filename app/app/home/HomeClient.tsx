@@ -172,8 +172,25 @@ export default function HomeClient() {
         >
           2am
         </Link>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-semibold text-midnight">
-          {initial}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/blog"
+            aria-label="read the blog"
+            className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M12 6.5C12 6.5 9.5 5 6.5 5C5.4 5 4.4 5.2 3.5 5.5V18.5C4.4 18.2 5.4 18 6.5 18C9.5 18 12 19.5 12 19.5M12 6.5C12 6.5 14.5 5 17.5 5C18.6 5 19.6 5.2 20.5 5.5V18.5C19.6 18.2 18.6 18 17.5 18C14.5 18 12 19.5 12 19.5M12 6.5V19.5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-semibold text-midnight">
+            {initial}
+          </div>
         </div>
       </header>
 
