@@ -252,6 +252,47 @@ export default function Landing({
         </div>
       </section>
 
+      {/* how it works */}
+      <section className="landing-section landing-how">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">how it works</span>
+          <h2 className="landing-title">three steps. no forms. no judgment.</h2>
+          <div className="landing-how-grid">
+            <article className="landing-how-card">
+              <div className="landing-how-num" aria-hidden>
+                1
+              </div>
+              <h3>tell myla what’s on your mind.</h3>
+              <p>
+                whether it’s a question, a fear, or something you just need to
+                say out loud. no forms, no dropdown menus. just talk.
+              </p>
+            </article>
+            <article className="landing-how-card">
+              <div className="landing-how-num" aria-hidden>
+                2
+              </div>
+              <h3>she asks the right follow-ups.</h3>
+              <p>
+                myla doesn’t give generic answers. she asks what week you’re in,
+                what you’ve already tried, what’s actually worrying you — then
+                gives you the real answer.
+              </p>
+            </article>
+            <article className="landing-how-card">
+              <div className="landing-how-num" aria-hidden>
+                3
+              </div>
+              <h3>she remembers, so you never start over.</h3>
+              <p>
+                next time you come back, myla knows your name, your stage, and
+                what you talked about last. like a friend who actually listens.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       {/* question bubbles */}
       <section className="landing-section landing-bubbles">
         <div className="landing-container">
