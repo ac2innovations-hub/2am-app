@@ -5,13 +5,14 @@ const config: CapacitorConfig = {
   appName: "2AM",
   // www/index.html is the branded splash that ships in the bundle.
   // Capacitor loads server.url directly into the WebView. We point at
-  // the *post-redirect* host: hey2am.app/app 307-redirects to
-  // www.hey2am.app/app, and Capacitor treats the new host as external
-  // navigation and kicks out to Safari (the App Store rejection). Using
-  // the resolved www URL means there's no cross-host redirect at launch.
+  // the landing page (www host, no path) so the marketing landing page
+  // is the first thing users see; they tap "meet myla" to enter /app.
+  // Note the www host: hey2am.app 307-redirects to www.hey2am.app, and
+  // a cross-host redirect at launch gets kicked out to Safari (the App
+  // Store rejection), so we use the already-resolved www host directly.
   webDir: "www",
   server: {
-    url: "https://www.hey2am.app/app",
+    url: "https://www.hey2am.app",
     cleartext: false,
     // Keep both apex and www (and any subdomain) inside the WebView, so
     // any future cross-host link/redirect is handled in-app rather than
