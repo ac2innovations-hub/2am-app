@@ -4,6 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Brain,
+  CheckCircle,
+  Lock,
+  MessageCircle,
+  Moon,
+  Sprout,
+  type LucideIcon,
+} from "lucide-react";
+import {
   getProfile,
   hydrateProfileFromSupabase,
   clearProfile,
@@ -39,43 +48,50 @@ const MOODS: { key: string; label: string; emoji: string }[] = [
 ];
 
 const FEATURES: {
-  emoji: string;
+  icon: LucideIcon;
+  iconColor: "peach" | "coral";
   title: string;
   desc: string;
   accent: "peach" | "sage" | "lavender" | "gold";
 }[] = [
   {
-    emoji: "💬",
+    icon: MessageCircle,
+    iconColor: "coral",
     title: "ask anything anytime",
     desc: "no question too weird. no topic off-limits. always judgment-free.",
     accent: "peach",
   },
   {
-    emoji: "🧠",
+    icon: Brain,
+    iconColor: "peach",
     title: "she remembers you",
     desc: "your name, your week, your worries — myla holds the context so you never start over.",
     accent: "lavender",
   },
   {
-    emoji: "✅",
+    icon: CheckCircle,
+    iconColor: "coral",
     title: "can i…? instant answers",
     desc: "sushi, tylenol, hair dye — yes/no with the source, not a rabbit hole.",
     accent: "sage",
   },
   {
-    emoji: "🔒",
+    icon: Lock,
+    iconColor: "peach",
     title: "private by design",
     desc: "no google history. no targeted ads. your questions stay yours.",
     accent: "gold",
   },
   {
-    emoji: "🌙",
+    icon: Moon,
+    iconColor: "coral",
     title: "built for 2am",
     desc: "wide awake and scared to bother anyone? myla's up too.",
     accent: "peach",
   },
   {
-    emoji: "🌱",
+    icon: Sprout,
+    iconColor: "peach",
     title: "trying to first year",
     desc: "cycles, trimesters, milestones — one friend for every chapter.",
     accent: "sage",
@@ -387,7 +403,9 @@ export default function HomeClient() {
           </span>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {FEATURES.map((f) => (
+          {FEATURES.map((f) => {
+            const Icon = f.icon;
+            return (
             <div
               key={f.title}
               className={`rounded-2xl border bg-navy/50 p-4 ${
@@ -400,7 +418,12 @@ export default function HomeClient() {
                       : "border-gold/25"
               }`}
             >
-              <div className="text-xl">{f.emoji}</div>
+              <Icon
+                size={30}
+                strokeWidth={1.75}
+                className={f.iconColor === "coral" ? "text-coral" : "text-peach"}
+                aria-hidden
+              />
               <div className="mt-2 text-[13px] font-medium lowercase text-cream">
                 {f.title}
               </div>
@@ -408,7 +431,8 @@ export default function HomeClient() {
                 {f.desc}
               </p>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
