@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 // delete their account from within the app. CASCADE on auth.users wipes
 // profiles, conversations, and mood_logs — see supabase/schema.sql.
 export async function DELETE() {
+  console.log("ENV CHECK:", { hasServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY, keyPrefix: process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 10) });
   const supabase = createServerSupabase();
   const {
     data: { user },
