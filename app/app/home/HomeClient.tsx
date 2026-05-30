@@ -9,6 +9,7 @@ import {
   Lock,
   MessageCircle,
   Moon,
+  Settings,
   Sprout,
   type LucideIcon,
 } from "lucide-react";
@@ -207,6 +208,13 @@ export default function HomeClient() {
                 strokeLinejoin="round"
               />
             </svg>
+          </Link>
+          <Link
+            href="/app/settings"
+            aria-label="settings"
+            className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
+          >
+            <Settings size={19} strokeWidth={1.75} aria-hidden />
           </Link>
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-semibold text-midnight">
             {initial}
