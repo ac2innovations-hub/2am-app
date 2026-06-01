@@ -26,19 +26,9 @@
 .legal-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
   margin: 0 0 28px;
   text-decoration: none;
   width: fit-content;
-}
-.legal-logo-word {
-  font-size: 28px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .legal-title {
@@ -114,19 +104,10 @@
   text-transform: uppercase;
   color: rgba(255, 250, 245, 0.45);
 }
-.legal-poweredby {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+.legal-footer-brand {
+  display: inline-block;
   margin-bottom: 20px;
-  color: rgba(255, 250, 245, 0.7);
-  font-family: "DM Mono", ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  text-decoration: none;
 }
-.legal-poweredby strong { color: var(--peach); font-weight: 500; }
 
 .legal-footer-links {
   margin-top: 14px;

@@ -37,7 +37,6 @@ export default function BlogIndexPage() {
         </Link>
         <Link href="/" className="legal-logo" aria-label="2am — home">
           <BrandMark size={36} />
-          <span className="legal-logo-word">2am</span>
         </Link>
 
         <h1 className="legal-title">the 2am blog</h1>
@@ -61,9 +60,8 @@ export default function BlogIndexPage() {
         </div>
 
         <footer className="legal-footer">
-          <Link href="/" className="legal-poweredby" aria-label="powered by 2am">
-            <BrandMark size={26} />
-            <span>powered by <strong>2am</strong></span>
+          <Link href="/" className="legal-footer-brand" aria-label="2am — home">
+            <BrandMark size={28} />
           </Link>
           <div>built with care in florida. 💛</div>
           <div className="legal-footer-links">

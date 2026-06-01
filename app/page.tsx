@@ -110,7 +110,6 @@ export default function Landing({
       <header className="landing-header">
         <Link href="/" className="landing-navbrand" aria-label="2am — home">
           <BrandMark size={32} />
-          <span className="landing-navbrand-word">2am</span>
         </Link>
         <nav className="landing-topnav" aria-label="primary">
           <Link href="/about">about</Link>
@@ -129,8 +128,9 @@ export default function Landing({
           ))}
         </div>
         <div className="landing-container">
-          <BrandMark size={132} glow className="landing-hero-logo" />
-          <h1>2am</h1>
+          <h1 className="landing-hero-h1">
+            <BrandMark size={132} glow alt="2am" className="landing-hero-logo" />
+          </h1>
           <span className="landing-mono landing-hero-eyebrow">
             the brand · for every stage of motherhood
           </span>
@@ -165,12 +165,9 @@ export default function Landing({
       {/* problem */}
       <section className="landing-section landing-problem">
         <div className="landing-container">
-          <div className="landing-brandrow">
-            <BrandMark size={36} />
-            <span className="landing-eyebrow landing-mono">
-              the 2am google search
-            </span>
-          </div>
+          <span className="landing-eyebrow landing-mono">
+            the 2am google search
+          </span>
           <h2 className="landing-title">
             it’s 2am. you’re wide awake. and you have questions you don’t want
             anyone to hear you ask.
@@ -541,13 +538,10 @@ export default function Landing({
       <footer className="landing-footer">
         <Link
           href="/"
-          className="landing-poweredby"
-          aria-label="powered by 2am"
+          className="landing-footer-brand"
+          aria-label="2am — home"
         >
-          <BrandMark size={30} />
-          <span>
-            powered by <strong>2am</strong>
-          </span>
+          <BrandMark size={36} />
         </Link>
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>

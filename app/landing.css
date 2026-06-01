@@ -166,15 +166,7 @@ html { scroll-behavior: smooth; }
   height: clamp(96px, 18vw, 140px);
 }
 .landing-hero h1 {
-  position: relative;
-  margin: 24px 0 0;
-  font-size: clamp(72px, 14vw, 140px);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  margin: 0;
   line-height: 1;
 }
 .landing-hero-eyebrow {
@@ -239,14 +231,6 @@ html { scroll-behavior: smooth; }
   max-width: 44rem;
   font-size: 17px;
   color: rgba(255, 250, 245, 0.7);
-}
-
-/* a standalone brand mark sitting beside descriptive copy, so the
-   trademark "2am" reads distinctly from the time-of-day "2 am". */
-.landing-brandrow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 
 /* problem */
@@ -459,18 +443,9 @@ html { scroll-behavior: smooth; }
   text-align: center;
   color: rgba(255, 250, 245, 0.4);
 }
-.landing-poweredby {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+.landing-footer-brand {
+  display: inline-block;
   margin-bottom: 22px;
-  color: rgba(255, 250, 245, 0.75);
-  font-size: 14px;
-  text-decoration: none;
-}
-.landing-poweredby strong {
-  font-weight: 700;
-  color: var(--peach);
 }
 .landing-footer .dot {
   margin: 0 10px;
@@ -499,18 +474,8 @@ html { scroll-behavior: smooth; }
 .landing-navbrand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
   pointer-events: auto;
-}
-.landing-navbrand-word {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 /* top nav (about / blog) */

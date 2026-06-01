@@ -10,19 +10,22 @@ type BrandMarkProps = {
   size?: number;
   /** Adds a soft peach glow — use for the hero / large placements. */
   glow?: boolean;
+  /** Accessible text alternative. Defaults to "2am logo". */
+  alt?: string;
   className?: string;
 };
 
 export default function BrandMark({
   size = 40,
   glow = false,
+  alt = "2am logo",
   className,
 }: BrandMarkProps) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/icon.svg"
-      alt="2am logo"
+      alt={alt}
       width={size}
       height={size}
       className={className}
