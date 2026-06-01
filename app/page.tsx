@@ -8,6 +8,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
 import WaitlistForm from "@/components/WaitlistForm";
+import BrandMark from "@/components/BrandMark";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -105,14 +106,20 @@ export default function Landing({
 
   return (
     <>
-      {/* top nav */}
-      <nav className="landing-topnav" aria-label="primary">
-        <Link href="/about">about</Link>
-        <Link href="/blog">blog</Link>
-      </nav>
+      {/* persistent brand header */}
+      <header className="landing-header">
+        <Link href="/" className="landing-navbrand" aria-label="2am — home">
+          <BrandMark size={32} />
+          <span className="landing-navbrand-word">2am</span>
+        </Link>
+        <nav className="landing-topnav" aria-label="primary">
+          <Link href="/about">about</Link>
+          <Link href="/blog">blog</Link>
+        </nav>
+      </header>
 
       {/* hero */}
-      <header className="landing-hero">
+      <section className="landing-hero">
         <div className="landing-stars" aria-hidden>
           {STARS.map((s, i) => (
             <span
@@ -122,8 +129,13 @@ export default function Landing({
           ))}
         </div>
         <div className="landing-container">
-          <span className="landing-mono">for every stage of motherhood</span>
-          <h1>2am</h1>
+          <BrandMark size={132} glow className="landing-hero-logo" />
+          <h1>
+            2am<span className="landing-tm" aria-hidden>™</span>
+          </h1>
+          <span className="landing-mono landing-hero-eyebrow">
+            the brand · for every stage of motherhood
+          </span>
           <p className="landing-tag">myla’s always up.</p>
           <p className="landing-sub">
             the judgment-free friend for your journey — whether you’re
@@ -150,14 +162,17 @@ export default function Landing({
             />
           </div>
         </div>
-      </header>
+      </section>
 
       {/* problem */}
       <section className="landing-section landing-problem">
         <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            the 2am google search
-          </span>
+          <div className="landing-brandrow">
+            <BrandMark size={36} />
+            <span className="landing-eyebrow landing-mono">
+              the 2am google search
+            </span>
+          </div>
           <h2 className="landing-title">
             it’s 2am. you’re wide awake. and you have questions you don’t want
             anyone to hear you ask.
@@ -526,9 +541,20 @@ export default function Landing({
       </section>
 
       <footer className="landing-footer">
+        <Link
+          href="/"
+          className="landing-poweredby"
+          aria-label="powered by 2am"
+        >
+          <BrandMark size={30} />
+          <span>
+            powered by <strong>2am</strong>
+            <span className="landing-tm-sm" aria-hidden>™</span>
+          </span>
+        </Link>
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          © 2026 2AM. myla is an ai friend, not a medical provider.
+          © 2026 2am™. myla is an ai friend, not a medical provider.
           {" · "}
           <Link href="/about" className="landing-footer-link">
             about

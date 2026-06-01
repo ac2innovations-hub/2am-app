@@ -158,9 +158,16 @@ html { scroll-behavior: smooth; }
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.85; }
 }
+/* hero brand mark — the dominant, unmistakable logo. first thing seen. */
+.landing-hero-logo {
+  position: relative;
+  margin: 0 auto;
+  width: clamp(96px, 18vw, 140px);
+  height: clamp(96px, 18vw, 140px);
+}
 .landing-hero h1 {
   position: relative;
-  margin: 12px 0 0;
+  margin: 24px 0 0;
   font-size: clamp(72px, 14vw, 140px);
   font-weight: 900;
   letter-spacing: -0.04em;
@@ -169,6 +176,20 @@ html { scroll-behavior: smooth; }
   background-clip: text;
   color: transparent;
   line-height: 1;
+}
+/* trademark mark on the wordmark — signals "brand name," not "time of day" */
+.landing-tm {
+  -webkit-text-fill-color: var(--peach);
+  color: var(--peach);
+  font-size: 0.28em;
+  font-weight: 700;
+  vertical-align: super;
+  letter-spacing: 0;
+  margin-left: 0.06em;
+}
+.landing-hero-eyebrow {
+  display: inline-block;
+  margin-top: 18px;
 }
 .landing-tag {
   position: relative;
@@ -228,6 +249,14 @@ html { scroll-behavior: smooth; }
   max-width: 44rem;
   font-size: 17px;
   color: rgba(255, 250, 245, 0.7);
+}
+
+/* a standalone brand mark sitting beside descriptive copy, so the
+   trademark "2am" reads distinctly from the time-of-day "2 am". */
+.landing-brandrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 /* problem */
@@ -440,6 +469,25 @@ html { scroll-behavior: smooth; }
   text-align: center;
   color: rgba(255, 250, 245, 0.4);
 }
+.landing-poweredby {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  color: rgba(255, 250, 245, 0.75);
+  font-size: 14px;
+  text-decoration: none;
+}
+.landing-poweredby strong {
+  font-weight: 700;
+  color: var(--peach);
+}
+.landing-tm-sm {
+  font-size: 0.7em;
+  vertical-align: super;
+  color: var(--peach);
+  margin-left: 1px;
+}
 .landing-footer .dot {
   margin: 0 10px;
   color: rgba(255, 250, 245, 0.3);
@@ -450,14 +498,41 @@ html { scroll-behavior: smooth; }
   text-decoration: underline;
 }
 
+/* persistent brand header (logo left, nav right) */
+.landing-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  pointer-events: none;
+}
+.landing-navbrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  pointer-events: auto;
+}
+.landing-navbrand-word {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /* top nav (about / blog) */
 .landing-topnav {
-  position: absolute;
-  top: 20px;
-  right: 24px;
   display: flex;
   gap: 22px;
-  z-index: 10;
   font-family: "DM Mono", ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.22em;
