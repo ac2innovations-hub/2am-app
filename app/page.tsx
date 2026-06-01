@@ -1,7 +1,7 @@
-// BETA MODE (active): the "meet myla" CTA goes straight to /app/auth
-// (signup). A subdued secondary email capture under the hero collects
-// testers for the small-batch beta via the same /api/waitlist endpoint.
-// The bottom of the page is feedback + FAQ (not a second CTA).
+// The "meet myla" CTA goes straight to /app/auth (signup). A subdued
+// secondary email capture under the hero collects testers for small-batch
+// early access via the same /api/waitlist endpoint. The bottom of the page
+// is feedback + FAQ (not a second CTA).
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -480,10 +480,10 @@ export default function Landing({
           </h2>
           <div className="landing-faq-list">
             <details className="landing-faq-item">
-              <summary>is myla free?</summary>
+              <summary>is <span className="brand-name">2am</span> free?</summary>
               <div className="landing-faq-answer">
-                yes — free during beta. when we open public access, the core
-                experience will stay free. we may add a paid tier later for
+                yes — <span className="brand-name">2am</span> is free. the core
+                experience will always be free. we may add a paid tier later for
                 things like longer memory or extra features, but the questions
                 you’d never google will always be free to ask.
               </div>
@@ -491,9 +491,9 @@ export default function Landing({
             <details className="landing-faq-item">
               <summary>when does the app launch?</summary>
               <div className="landing-faq-answer">
-                right now we’re in private beta with a small group of testers.
-                we’re opening access in small batches. drop your email above
-                and we’ll let you know when there’s a spot.
+                right now we’re onboarding a small group of testers. we’re
+                opening access in small batches. drop your email above and
+                we’ll let you know when there’s a spot.
               </div>
             </details>
             <details className="landing-faq-item">
