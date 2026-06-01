@@ -638,12 +638,14 @@ html { scroll-behavior: smooth; }
   border: 1px solid rgba(255, 250, 245, 0.07);
   overflow: hidden;
 }
+/* Block layout (not flex) so the question text — including any inline
+   <span class="brand-name">2am</span> — flows as normal text. The toggle
+   icon is positioned on the right instead of being a flex sibling, which
+   would otherwise space-between the words and break the line. */
 .landing-faq-item summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 22px;
+  position: relative;
+  display: block;
+  padding: 18px 48px 18px 22px;
   cursor: pointer;
   list-style: none;
   font-size: 16.5px;
@@ -654,12 +656,14 @@ html { scroll-behavior: smooth; }
 .landing-faq-item summary::-webkit-details-marker { display: none; }
 .landing-faq-item summary::after {
   content: "+";
-  flex-shrink: 0;
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 20px;
   font-weight: 400;
   line-height: 1;
   color: var(--peach);
-  transition: transform 160ms ease;
 }
 .landing-faq-item[open] summary::after {
   content: "–";

@@ -41,8 +41,13 @@ body {
 /* the "2am" brand name when it appears inline in body copy — distinguishes
    trademark use of the brand from the descriptive "2 a.m." time of day. */
 .brand-name {
+  display: inline;
   color: #f8c8a8;
   font-weight: 900;
+  /* never alter the size or spacing of the surrounding text — only color
+     and weight distinguish the brand mark inline. */
+  font-size: inherit;
+  letter-spacing: inherit;
 }
 
 .stars {
