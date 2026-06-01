@@ -202,6 +202,12 @@ html { scroll-behavior: smooth; }
   text-decoration: none;
 }
 .landing-cta:active { transform: scale(0.98); }
+.landing-cta-secondary {
+  position: relative;
+  margin-top: 14px;
+  font-size: 14px;
+  color: rgba(255, 250, 245, 0.7);
+}
 .landing-tiny {
   position: relative;
   margin-top: 24px;
@@ -451,6 +457,12 @@ html { scroll-behavior: smooth; }
   height: 22px;
   width: auto;
 }
+.landing-footer-signoff {
+  margin: 0 0 18px;
+  font-size: 15px;
+  font-style: italic;
+  color: rgba(255, 250, 245, 0.7);
+}
 .landing-footer .dot {
   margin: 0 10px;
   color: rgba(255, 250, 245, 0.3);
@@ -601,6 +613,15 @@ html { scroll-behavior: smooth; }
 }
 
 /* faq */
+/* the 2am promise — trust statement */
+.landing-promise {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(162, 200, 162, 0.08), transparent 55%);
+}
+.landing-promise .landing-lede {
+  max-width: 40rem;
+}
+
 .landing-faq {
   background:
     radial-gradient(circle at 30% 80%, rgba(190, 178, 215, 0.06), transparent 55%);

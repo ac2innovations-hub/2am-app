@@ -135,12 +135,16 @@ export default function Landing({
           </h1>
           <p className="landing-tag">myla’s always up.</p>
           <p className="landing-sub">
-            the judgment-free friend for your journey — whether you’re
-            trying, expecting, or navigating life as a new mom.
+            <span className="brand-name">2am</span> is the judgment-free friend
+            for your journey — whether you’re trying, expecting, or navigating
+            life as a new mom.
           </p>
           <Link className="landing-cta" href="/app/auth">
             meet myla
           </Link>
+          <p className="landing-cta-secondary">
+            start your <span className="brand-name">2am</span> conversation
+          </p>
           <p className="landing-tiny landing-mono">
             no judgment · no google history · just answers
           </p>
@@ -191,7 +195,9 @@ export default function Landing({
       {/* stage cards */}
       <section className="landing-section landing-stages">
         <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">for every stage</span>
+          <span className="landing-eyebrow landing-mono">
+            what <span className="brand-name">2am</span> can do
+          </span>
           <h2 className="landing-title">three chapters, one friend.</h2>
           <p className="landing-lede">
             myla meets you where you are, and she remembers. no starting over,
@@ -264,7 +270,9 @@ export default function Landing({
       {/* how it works */}
       <section className="landing-section landing-how">
         <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">how it works</span>
+          <span className="landing-eyebrow landing-mono">
+            how <span className="brand-name">2am</span> works
+          </span>
           <h2 className="landing-title">three steps. no forms. no judgment.</h2>
           <div className="landing-how-grid">
             <article className="landing-how-card">
@@ -407,7 +415,7 @@ export default function Landing({
       <section className="landing-section landing-feedback">
         <div className="landing-container">
           <span className="landing-eyebrow landing-mono">
-            what early testers are telling us
+            what testers are saying about <span className="brand-name">2am</span>
           </span>
           <h2 className="landing-title">the feedback we keep hearing.</h2>
           <div className="landing-feedback-grid">
@@ -444,10 +452,29 @@ export default function Landing({
         </div>
       </section>
 
+      {/* the 2am promise */}
+      <section className="landing-section landing-promise">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">
+            the <span className="brand-name">2am</span> promise
+          </span>
+          <h2 className="landing-title">what <span className="brand-name">2am</span> stands for.</h2>
+          <p className="landing-lede">
+            <span className="brand-name">2am</span> exists for the questions you
+            can&rsquo;t ask anyone else. so the deal is simple:{" "}
+            <span className="brand-name">2am</span> will never run ads, never
+            sell your data, and never judge you. no exceptions. that&rsquo;s the{" "}
+            <span className="brand-name">2am</span> difference.
+          </p>
+        </div>
+      </section>
+
       {/* faq */}
       <section className="landing-section landing-faq">
         <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">common questions</span>
+          <span className="landing-eyebrow landing-mono">
+            questions about <span className="brand-name">2am</span>
+          </span>
           <h2 className="landing-title">
             what people ask before they meet myla.
           </h2>
@@ -539,6 +566,9 @@ export default function Landing({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/wordmark.svg" alt="2am" className="landing-footer-wordmark" />
         </Link>
+        <p className="landing-footer-signoff">
+          <span className="brand-name">2am</span> — myla’s always up.
+        </p>
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
           © 2026 <span className="brand-name">2am</span>. myla is an ai friend, not a medical provider.
