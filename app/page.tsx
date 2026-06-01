@@ -130,9 +130,7 @@ export default function Landing({
         </div>
         <div className="landing-container">
           <BrandMark size={132} glow className="landing-hero-logo" />
-          <h1>
-            2am<span className="landing-tm" aria-hidden>™</span>
-          </h1>
+          <h1>2am</h1>
           <span className="landing-mono landing-hero-eyebrow">
             the brand · for every stage of motherhood
           </span>
@@ -549,12 +547,11 @@ export default function Landing({
           <BrandMark size={30} />
           <span>
             powered by <strong>2am</strong>
-            <span className="landing-tm-sm" aria-hidden>™</span>
           </span>
         </Link>
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          © 2026 2am™. myla is an ai friend, not a medical provider.
+          © 2026 2am. myla is an ai friend, not a medical provider.
           {" · "}
           <Link href="/about" className="landing-footer-link">
             about

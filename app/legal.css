@@ -40,13 +40,6 @@
   background-clip: text;
   color: transparent;
 }
-.legal-logo-tm {
-  font-size: 0.42em;
-  font-weight: 700;
-  vertical-align: super;
-  color: var(--peach);
-  margin-left: 1px;
-}
 
 .legal-title {
   margin: 0 0 6px;

@@ -177,16 +177,6 @@ html { scroll-behavior: smooth; }
   color: transparent;
   line-height: 1;
 }
-/* trademark mark on the wordmark — signals "brand name," not "time of day" */
-.landing-tm {
-  -webkit-text-fill-color: var(--peach);
-  color: var(--peach);
-  font-size: 0.28em;
-  font-weight: 700;
-  vertical-align: super;
-  letter-spacing: 0;
-  margin-left: 0.06em;
-}
 .landing-hero-eyebrow {
   display: inline-block;
   margin-top: 18px;
@@ -481,12 +471,6 @@ html { scroll-behavior: smooth; }
 .landing-poweredby strong {
   font-weight: 700;
   color: var(--peach);
-}
-.landing-tm-sm {
-  font-size: 0.7em;
-  vertical-align: super;
-  color: var(--peach);
-  margin-left: 1px;
 }
 .landing-footer .dot {
   margin: 0 10px;

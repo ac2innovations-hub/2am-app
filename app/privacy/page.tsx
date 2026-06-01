@@ -18,9 +18,7 @@ export default function PrivacyPage() {
         </Link>
         <Link href="/" className="legal-logo" aria-label="2am — home">
           <BrandMark size={36} />
-          <span className="legal-logo-word">
-            2am<span className="legal-logo-tm" aria-hidden>™</span>
-          </span>
+          <span className="legal-logo-word">2am</span>
         </Link>
 
         <h1 className="legal-title">privacy policy</h1>
@@ -257,9 +255,9 @@ export default function PrivacyPage() {
         <footer className="legal-footer">
           <Link href="/" className="legal-poweredby" aria-label="powered by 2am">
             <BrandMark size={26} />
-            <span>powered by <strong>2am™</strong></span>
+            <span>powered by <strong>2am</strong></span>
           </Link>
-          <div>© 2026 2am™. built with care in florida.</div>
+          <div>© 2026 2am. built with care in florida.</div>
           <div className="legal-footer-links">
             <Link href="/about">about</Link>
             <Link href="/blog">blog</Link>
