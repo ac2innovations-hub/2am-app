@@ -127,10 +127,10 @@ export default function Landing({
           ))}
         </div>
         <div className="landing-container">
-          <h1>2am</h1>
           <span className="landing-mono landing-hero-eyebrow">
             the brand · for every stage of motherhood
           </span>
+          <h1>2am</h1>
           <p className="landing-tag">myla’s always up.</p>
           <p className="landing-sub">
             the judgment-free friend for your journey — whether you’re

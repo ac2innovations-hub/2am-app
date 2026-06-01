@@ -158,30 +158,31 @@ html { scroll-behavior: smooth; }
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.85; }
 }
-/* hero wordmark — the dominant visual element, a brand lockup. bold Outfit
-   at a far larger scale than anything around it, in brand peach with a soft
-   glow and deliberate tracking so it reads as a designed logo, not body copy. */
+/* hero wordmark — THE centerpiece. It towers over everything else: nearly
+   full viewport width on mobile, up to 300px on desktop, in brand peach with
+   a soft glow. Everything around it is deliberately small so nothing competes. */
 .landing-hero h1 {
   position: relative;
-  margin: 0;
+  margin: 6px 0 0;
   font-family: var(--font-outfit), system-ui, sans-serif;
-  font-size: clamp(104px, 18vw, 184px);
+  font-size: clamp(96px, 36vw, 300px);
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
+  letter-spacing: -0.03em;
+  line-height: 0.82;
   color: #f8c8a8;
-  text-shadow: 0 0 72px rgba(248, 200, 168, 0.35);
+  text-shadow: 0 0 90px rgba(248, 200, 168, 0.4);
 }
 .landing-hero-eyebrow {
-  display: inline-block;
-  margin-top: 18px;
+  display: block;
+  max-width: 92%;
+  margin: 18px auto 0;
 }
 .landing-tag {
   position: relative;
-  margin-top: 20px;
+  margin-top: 14px;
   font-style: italic;
-  font-size: 20px;
-  color: rgba(255, 250, 245, 0.9);
+  font-size: 16px;
+  color: rgba(255, 250, 245, 0.82);
 }
 .landing-sub {
   position: relative;
@@ -488,7 +489,7 @@ html { scroll-behavior: smooth; }
 .landing-navbrand {
   display: inline-block;
   font-family: var(--font-outfit), system-ui, sans-serif;
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1;
