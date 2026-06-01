@@ -24,9 +24,16 @@
 .legal-back:hover { color: var(--cream); }
 
 .legal-logo {
-  display: flex;
-  align-items: center;
+  display: block;
   margin: 0 0 28px;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   text-decoration: none;
   width: fit-content;
 }
@@ -107,6 +114,17 @@
 .legal-footer-brand {
   display: inline-block;
   margin-bottom: 20px;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-transform: none;
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-decoration: none;
 }
 
 .legal-footer-links {

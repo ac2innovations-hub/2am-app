@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AUDIENCE_LABEL, POSTS, getPost } from "@/lib/blog/posts";
-import BrandMark from "@/components/BrandMark";
 import "../../legal.css";
 
 type Props = { params: { slug: string } };
@@ -72,8 +71,8 @@ export default function BlogPostPage({ params }: Props) {
         <Link href="/blog" className="legal-back">
           ← back to blog
         </Link>
-        <Link href="/" className="legal-logo" aria-label="2am — home">
-          <BrandMark size={36} />
+        <Link href="/" className="legal-logo">
+          2am
         </Link>
 
         <h1 className="legal-title">{post.title}</h1>
@@ -95,8 +94,8 @@ export default function BlogPostPage({ params }: Props) {
         </section>
 
         <footer className="legal-footer">
-          <Link href="/" className="legal-footer-brand" aria-label="2am — home">
-            <BrandMark size={28} />
+          <Link href="/" className="legal-footer-brand">
+            2am
           </Link>
           <div>built with care in florida. 💛</div>
           <div className="legal-footer-links">

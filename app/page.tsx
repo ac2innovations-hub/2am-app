@@ -8,7 +8,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
 import WaitlistForm from "@/components/WaitlistForm";
-import BrandMark from "@/components/BrandMark";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -108,8 +107,8 @@ export default function Landing({
     <>
       {/* persistent brand header */}
       <header className="landing-header">
-        <Link href="/" className="landing-navbrand" aria-label="2am — home">
-          <BrandMark size={32} />
+        <Link href="/" className="landing-navbrand">
+          2am
         </Link>
         <nav className="landing-topnav" aria-label="primary">
           <Link href="/about">about</Link>
@@ -128,9 +127,7 @@ export default function Landing({
           ))}
         </div>
         <div className="landing-container">
-          <h1 className="landing-hero-h1">
-            <BrandMark size={132} glow alt="2am" className="landing-hero-logo" />
-          </h1>
+          <h1>2am</h1>
           <span className="landing-mono landing-hero-eyebrow">
             the brand · for every stage of motherhood
           </span>
@@ -536,12 +533,8 @@ export default function Landing({
       </section>
 
       <footer className="landing-footer">
-        <Link
-          href="/"
-          className="landing-footer-brand"
-          aria-label="2am — home"
-        >
-          <BrandMark size={36} />
+        <Link href="/" className="landing-footer-brand">
+          2am
         </Link>
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>

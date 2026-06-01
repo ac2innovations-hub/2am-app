@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AUDIENCE_LABEL, getAllPosts } from "@/lib/blog/posts";
-import BrandMark from "@/components/BrandMark";
 import "../legal.css";
 
 export const metadata: Metadata = {
@@ -35,8 +34,8 @@ export default function BlogIndexPage() {
         <Link href="/" className="legal-back">
           ← back to home
         </Link>
-        <Link href="/" className="legal-logo" aria-label="2am — home">
-          <BrandMark size={36} />
+        <Link href="/" className="legal-logo">
+          2am
         </Link>
 
         <h1 className="legal-title">the 2am blog</h1>
@@ -60,8 +59,8 @@ export default function BlogIndexPage() {
         </div>
 
         <footer className="legal-footer">
-          <Link href="/" className="legal-footer-brand" aria-label="2am — home">
-            <BrandMark size={28} />
+          <Link href="/" className="legal-footer-brand">
+            2am
           </Link>
           <div>built with care in florida. 💛</div>
           <div className="legal-footer-links">

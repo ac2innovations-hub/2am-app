@@ -158,16 +158,19 @@ html { scroll-behavior: smooth; }
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.85; }
 }
-/* hero brand mark — the dominant, unmistakable logo. first thing seen. */
-.landing-hero-logo {
-  position: relative;
-  margin: 0 auto;
-  width: clamp(96px, 18vw, 140px);
-  height: clamp(96px, 18vw, 140px);
-}
+/* hero wordmark — the dominant, unmistakable brand mark. first thing seen.
+   bold Outfit, large, peach→coral gradient — clearly a logo, not body copy. */
 .landing-hero h1 {
+  position: relative;
   margin: 0;
+  font-size: clamp(72px, 14vw, 140px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
   line-height: 1;
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .landing-hero-eyebrow {
   display: inline-block;
@@ -446,6 +449,15 @@ html { scroll-behavior: smooth; }
 .landing-footer-brand {
   display: inline-block;
   margin-bottom: 22px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-decoration: none;
 }
 .landing-footer .dot {
   margin: 0 10px;
@@ -472,8 +484,15 @@ html { scroll-behavior: smooth; }
   pointer-events: none;
 }
 .landing-navbrand {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   text-decoration: none;
   pointer-events: auto;
 }
