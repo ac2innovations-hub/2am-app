@@ -138,6 +138,42 @@ export default function PrivacyPage() {
         </section>
 
         <section className="legal-section">
+          <h2>third-party ai service</h2>
+          <ul>
+            <li>
+              myla&apos;s responses are powered by anthropic&apos;s claude ai.
+            </li>
+            <li>
+              when you send a message to myla, your conversation content —
+              including your name, your stage, and anything you share — is sent
+              to anthropic&apos;s api to generate a response.
+            </li>
+            <li>
+              anthropic does not use your conversations to train their ai
+              models.
+            </li>
+            <li>
+              anthropic&apos;s data protection practices meet or exceed the
+              protections described in this privacy policy.
+            </li>
+            <li>
+              you can read{" "}
+              <a
+                href="https://www.anthropic.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                anthropic&apos;s privacy policy
+              </a>
+              .
+            </li>
+            <li>
+              we do not share your data with any other third parties.
+            </li>
+          </ul>
+        </section>
+
+        <section className="legal-section">
           <h2>who we share your data with</h2>
           <ul>
             <li>
