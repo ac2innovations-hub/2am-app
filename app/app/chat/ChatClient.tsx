@@ -7,6 +7,7 @@ import MylaAvatar from "@/components/MylaAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import TypingDots from "@/components/TypingDots";
 import QuickChips from "@/components/QuickChips";
+import AiConsentScreen from "@/components/AiConsentScreen";
 import {
   appendMessages,
   createConversation,
@@ -545,6 +546,9 @@ export default function ChatClient() {
     async (rawText: string, opts?: { isRetry?: boolean }) => {
       const text = rawText.trim();
       if (!text || sending) return;
+      // Gate: no messages may be sent to Anthropic until the user has
+      // consented. The overlay normally blocks the input, but guard here too.
+      if (profile && !profile.aiConsent) return;
 
       let nextMessages: Msg[];
       if (opts?.isRetry) {
@@ -675,6 +679,17 @@ export default function ChatClient() {
     void send(retryableText, { isRetry: true });
   }, [retryableText, sending, send]);
 
+  // One-time AI data consent. Saved to the profile (mirrored to Supabase),
+  // so the screen only appears before the very first message.
+  const acceptConsent = useCallback(() => {
+    setProfile(updateProfile({ aiConsent: true }));
+  }, []);
+
+  // Show the consent screen once the profile has loaded and consent is
+  // still missing. `profile === null` means we're mid-hydrate — don't flash
+  // the screen before we know whether they've already accepted.
+  const needsConsent = profile !== null && !profile.aiConsent;
+
   const canSend = input.trim().length > 0 && !sending;
 
   // Has finished Myla's conversational onboarding — name + stage are the
@@ -685,6 +700,7 @@ export default function ChatClient() {
 
   return (
     <main className="relative flex min-h-[100svh] min-h-[100dvh] flex-col bg-midnight">
+      {needsConsent && <AiConsentScreen onAccept={acceptConsent} />}
       {/* Header */}
       <header className="safe-top sticky top-0 z-20 flex items-center justify-between border-b border-cream/5 bg-midnight/95 px-4 pb-3 backdrop-blur">
         <div className="flex items-center gap-3">

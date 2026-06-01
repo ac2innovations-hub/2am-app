@@ -8,6 +8,7 @@ create extension if not exists "pgcrypto";
 -- alter table public.profiles add column if not exists months_trying integer;
 -- alter table public.profiles add column if not exists baby_name text;
 -- alter table public.profiles add column if not exists baby_sex text;
+-- alter table public.profiles add column if not exists ai_consent boolean not null default false;
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -23,6 +24,9 @@ create table if not exists public.profiles (
   first_pregnancy boolean not null default true,
   concerns text[] not null default '{}',
   tone_preference text not null default 'warm',
+  -- one-time consent to Anthropic AI processing, captured before the
+  -- user's first message to Myla.
+  ai_consent boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -22,6 +22,7 @@ export type Profile = {
   first_pregnancy: boolean;
   concerns: string[];
   tone_preference: string;
+  ai_consent: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -56,6 +57,7 @@ type ProfileInsert = {
   first_pregnancy?: boolean;
   concerns?: string[];
   tone_preference?: string;
+  ai_consent?: boolean;
   created_at?: string;
   updated_at?: string;
 };

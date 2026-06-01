@@ -16,6 +16,7 @@ export type LocalProfile = {
   firstPregnancy: boolean;
   concerns: string[];
   onboardingComplete: boolean;
+  aiConsent: boolean;
   createdAt: string;
 };
 
@@ -35,6 +36,8 @@ export function getProfile(): LocalProfile | null {
     if (p.dueDate && (p.week === null || p.week === undefined)) {
       p.week = calcWeekFromDueDate(p.dueDate);
     }
+    // Profiles saved before the consent flow existed won't have the field.
+    if (p.aiConsent === undefined) p.aiConsent = false;
     return p;
   } catch {
     return null;
@@ -60,6 +63,7 @@ export function updateProfile(patch: Partial<LocalProfile>): LocalProfile {
     firstPregnancy: true,
     concerns: [],
     onboardingComplete: false,
+    aiConsent: false,
     createdAt: new Date().toISOString(),
   };
   const next = { ...current, ...patch };
@@ -152,6 +156,8 @@ function mergeProfile(
       : local.firstPregnancy,
     concerns: pick("concerns"),
     onboardingComplete: local.onboardingComplete || remote.onboardingComplete,
+    // Consent is sticky — once given on any device it stays given.
+    aiConsent: remote.aiConsent || local.aiConsent,
     // Keep the earliest known creation time.
     createdAt:
       local.createdAt && local.createdAt < remote.createdAt
@@ -182,6 +188,7 @@ function profileRowToLocal(row: Profile): LocalProfile {
     onboardingComplete:
       existing?.onboardingComplete ??
       Boolean(row.name && row.stage && row.concerns && row.concerns.length > 0),
+    aiConsent: row.ai_consent ?? existing?.aiConsent ?? false,
     createdAt: row.created_at ?? new Date().toISOString(),
   };
 }
@@ -204,6 +211,7 @@ async function mirrorToSupabase(p: LocalProfile) {
         months_trying: p.monthsTrying,
         first_pregnancy: p.firstPregnancy,
         concerns: p.concerns,
+        ai_consent: p.aiConsent,
       },
       { onConflict: "id" },
     );
