@@ -112,12 +112,12 @@ export const POSTS: BlogPost[] = [
   {
     slug: "7-things-youre-googling-at-2am",
     title:
-      "7 things you're googling at 2 am (and the answers so you can go back to sleep)",
+      "7 things you're googling at 2 a.m. (and the answers so you can go back to sleep)",
     description:
-      "honest answers to the pregnancy, ttc, and postpartum questions women search at 2 am. discharge, wine, sex drive, milestones, and more.",
+      "honest answers to the pregnancy, ttc, and postpartum questions women search at 2 a.m. discharge, wine, sex drive, milestones, and more.",
     audience: "all",
     content: `<p>we know you're doing it. phone under the covers, incognito mode, typing something you'd never say out loud.</p>
-<p>here are the honest answers to the most common 2 am searches — so you can put the phone down and get some rest.</p>
+<p>here are the honest answers to the most common 2 a.m. searches — so you can put the phone down and get some rest.</p>
 <h3>1. "is this discharge normal"</h3>
 <p>probably yes. vaginal discharge increases during pregnancy (it's called leukorrhea) and it's your body's way of keeping the birth canal clean. normal discharge is white or clear, mild-smelling, and not accompanied by itching or burning.</p>
 <p>call your provider if: it's green/yellow, has a strong odor, or comes with itching.</p>

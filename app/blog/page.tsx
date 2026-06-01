@@ -6,12 +6,12 @@ import "../legal.css";
 export const metadata: Metadata = {
   title: "2am blog — answers for the questions you'd never google",
   description:
-    "evidence-based answers to the questions women ask at 2 am. trying to conceive, pregnancy, and postpartum — no judgment, just information.",
+    "evidence-based answers to the questions women ask at 2 a.m. trying to conceive, pregnancy, and postpartum — no judgment, just information.",
   alternates: { canonical: "https://hey2am.app/blog" },
   openGraph: {
     title: "2am blog — answers for the questions you'd never google",
     description:
-      "evidence-based answers to the questions women ask at 2 am. trying to conceive, pregnancy, and postpartum — no judgment, just information.",
+      "evidence-based answers to the questions women ask at 2 a.m. trying to conceive, pregnancy, and postpartum — no judgment, just information.",
     url: "https://hey2am.app/blog",
     siteName: "2am",
     type: "website",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "2am blog",
     description:
-      "evidence-based answers to the questions women ask at 2 am.",
+      "evidence-based answers to the questions women ask at 2 a.m.",
     images: ["https://hey2am.app/og-image.png"],
   },
 };
@@ -39,7 +39,7 @@ export default function BlogIndexPage() {
           <img src="/wordmark.svg" alt="2am" className="legal-logo-img" />
         </Link>
 
-        <h1 className="legal-title">the 2am blog</h1>
+        <h1 className="legal-title">the <span className="brand-name">2am</span> blog</h1>
         <p className="legal-meta">answers for the questions you&apos;d never google</p>
 
         <div className="blog-index-list">

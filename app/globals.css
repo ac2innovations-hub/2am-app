@@ -38,6 +38,13 @@ body {
   color: transparent;
 }
 
+/* the "2am" brand name when it appears inline in body copy — distinguishes
+   trademark use of the brand from the descriptive "2 a.m." time of day. */
+.brand-name {
+  color: #f8c8a8;
+  font-weight: 900;
+}
+
 .stars {
   position: absolute;
   inset: 0;

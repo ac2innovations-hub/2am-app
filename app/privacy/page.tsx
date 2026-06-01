@@ -227,7 +227,7 @@ export default function PrivacyPage() {
         <section className="legal-section">
           <h2>children&apos;s privacy</h2>
           <p>
-            2am is designed for adults. we do not knowingly collect
+            <span className="brand-name">2am</span> is designed for adults. we do not knowingly collect
             information from anyone under 13. if we learn we&apos;ve collected
             data from a child, we will delete it immediately.
           </p>
@@ -256,7 +256,7 @@ export default function PrivacyPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wordmark.svg" alt="2am" className="legal-footer-wordmark" />
           </Link>
-          © 2026 2am. built with care in florida.
+          © 2026 <span className="brand-name">2am</span>. built with care in florida.
           <div className="legal-footer-links">
             <Link href="/about">about</Link>
             <Link href="/blog">blog</Link>

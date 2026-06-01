@@ -5,12 +5,12 @@ import "../legal.css";
 export const metadata: Metadata = {
   title: "why 2am exists — the judgment-free friend for your journey",
   description:
-    "2am is an ai-powered friend for the questions women have at 2 am. founded by ali miller. warm, evidence-based, judgment-free.",
+    "2am is an ai-powered friend for the questions women have at 2 a.m. founded by ali miller. warm, evidence-based, judgment-free.",
   alternates: { canonical: "https://hey2am.app/about" },
   openGraph: {
     title: "why 2am exists",
     description:
-      "2am is an ai-powered friend for the questions women have at 2 am. warm, evidence-based, judgment-free.",
+      "2am is an ai-powered friend for the questions women have at 2 a.m. warm, evidence-based, judgment-free.",
     url: "https://hey2am.app/about",
     siteName: "2am",
     type: "website",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "why 2am exists",
     description:
-      "2am is an ai-powered friend for the questions women have at 2 am.",
+      "2am is an ai-powered friend for the questions women have at 2 a.m.",
     images: ["https://hey2am.app/og-image.png"],
   },
 };
@@ -37,7 +37,7 @@ export default function AboutPage() {
           <img src="/wordmark.svg" alt="2am" className="legal-logo-img" />
         </Link>
 
-        <h1 className="legal-title">why 2am exists</h1>
+        <h1 className="legal-title">why <span className="brand-name">2am</span> exists</h1>
 
         <section className="legal-section about-prose">
           <p>
@@ -45,7 +45,7 @@ export default function AboutPage() {
             motherhood — has had the same moment.
           </p>
           <p>
-            it&apos;s late. maybe it&apos;s actually 2 am. you&apos;re lying in
+            it&apos;s late. maybe it&apos;s actually 2 a.m. you&apos;re lying in
             bed with a question you can&apos;t shake. something you noticed,
             something you felt, something someone said that you can&apos;t
             stop thinking about.
@@ -60,13 +60,13 @@ export default function AboutPage() {
             honestly, you&apos;re not sure you want to say it out loud.
           </p>
           <p>so you just... sit with it. alone. wondering.</p>
-          <p>that moment is why we built 2am.</p>
+          <p>that moment is why we built <span className="brand-name">2am</span>.</p>
         </section>
 
         <section className="legal-section about-prose">
           <h2>who we are</h2>
           <p>
-            2am was founded by ali miller in cape coral, florida. not by a
+            <span className="brand-name">2am</span> was founded by ali miller in cape coral, florida. not by a
             health tech conglomerate. not by a team of MBAs optimizing for ad
             revenue. by a person who saw a gap and decided to fill it.
           </p>
@@ -89,7 +89,7 @@ export default function AboutPage() {
           <h2>what we believe</h2>
           <p className="about-belief">
             <strong>&ldquo;every question is a good question.&rdquo;</strong>
-            especially at 2 am. especially the ones you&apos;d never say out
+            especially at 2 a.m. especially the ones you&apos;d never say out
             loud.
           </p>
           <p className="about-belief">
@@ -122,7 +122,7 @@ export default function AboutPage() {
           <p>
             myla is powered by ai. she&apos;s trained on real medical
             guidelines from organizations like ACOG, the CDC, and the AAP.
-            she&apos;s designed to be the friend you text at 2 am — warm,
+            she&apos;s designed to be the friend you text at 2 a.m. — warm,
             direct, judgment-free, and actually helpful.
           </p>
           <p>

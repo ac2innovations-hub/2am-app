@@ -165,10 +165,10 @@ export default function Landing({
       <section className="landing-section landing-problem">
         <div className="landing-container">
           <span className="landing-eyebrow landing-mono">
-            the 2am google search
+            the 2 a.m. google search
           </span>
           <h2 className="landing-title">
-            it’s 2am. you’re wide awake. and you have questions you don’t want
+            it’s 2 a.m. you’re wide awake. and you have questions you don’t want
             anyone to hear you ask.
           </h2>
           <p className="landing-lede">
@@ -224,7 +224,7 @@ export default function Landing({
                   “is this normal?” “can i eat this?” “why do i feel like
                   this?”
                 </em>
-                {" "}— the 2am questions about your body, your baby, and
+                {" "}— the 2 a.m. questions about your body, your baby, and
                 everything you’re too embarrassed to google.
               </p>
             </article>
@@ -477,7 +477,7 @@ export default function Landing({
                 answers are evidence-based rather than averaged across the
                 whole internet. two — she remembers your story, so you never
                 have to re-explain that you’re 14 weeks pregnant or that you’ve
-                been trying for 8 months. three — she’s built for the 2 am
+                been trying for 8 months. three — she’s built for the 2 a.m.
                 emotional register: warm, not clinical. she knows the
                 difference between someone asking a factual question and
                 someone asking because they’re scared.
@@ -503,7 +503,7 @@ export default function Landing({
               </div>
             </details>
             <details className="landing-faq-item">
-              <summary>what if i’m in a mental health crisis at 2 am?</summary>
+              <summary>what if i’m in a mental health crisis at 2 a.m.?</summary>
               <div className="landing-faq-answer">
                 myla is trained to recognize when something is beyond her
                 scope. if you mention thoughts of self-harm, severe postpartum
@@ -541,7 +541,7 @@ export default function Landing({
         </Link>
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          © 2026 2AM. myla is an ai friend, not a medical provider.
+          © 2026 <span className="brand-name">2am</span>. myla is an ai friend, not a medical provider.
           {" · "}
           <Link href="/about" className="landing-footer-link">
             about

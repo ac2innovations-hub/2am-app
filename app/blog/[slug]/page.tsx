@@ -88,7 +88,7 @@ export default function BlogPostPage({ params }: Props) {
 
         <section className="blog-cta">
           <p>
-            have a question you&apos;d never google? myla answers at 2 am
+            have a question you&apos;d never google? myla answers at 2 a.m.
             with zero judgment.
           </p>
           <Link href="/app/auth">meet myla →</Link>

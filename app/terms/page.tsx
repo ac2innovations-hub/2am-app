@@ -24,14 +24,14 @@ export default function TermsPage() {
         <p className="legal-meta">last updated: april 2026</p>
 
         <section className="legal-section">
-          <h2>what 2am is (and isn&apos;t)</h2>
+          <h2>what <span className="brand-name">2am</span> is (and isn&apos;t)</h2>
           <p>
-            2am is the judgment-free friend for your journey — whether
+            <span className="brand-name">2am</span> is the judgment-free friend for your journey — whether
             you&apos;re trying, expecting, or navigating life as a new mom.
             powered by an ai friend named myla.
           </p>
           <p>
-            2am is not a medical device, diagnostic tool, or substitute for
+            <span className="brand-name">2am</span> is not a medical device, diagnostic tool, or substitute for
             professional medical care. myla is powered by artificial
             intelligence. she is not a doctor, nurse, midwife, therapist, or
             licensed healthcare provider.
@@ -46,10 +46,10 @@ export default function TermsPage() {
         </section>
 
         <section className="legal-section">
-          <h2>using 2am</h2>
+          <h2>using <span className="brand-name">2am</span></h2>
           <p>
             <strong>eligibility:</strong> you must be at least 18 years old to
-            use 2am.
+            use <span className="brand-name">2am</span>.
           </p>
           <p>
             <strong>your account:</strong> you&apos;re responsible for keeping
@@ -57,7 +57,7 @@ export default function TermsPage() {
             account. one account per person. provide accurate information.
           </p>
           <p>
-            <strong>acceptable use:</strong> you agree not to use 2am for any
+            <strong>acceptable use:</strong> you agree not to use <span className="brand-name">2am</span> for any
             unlawful purpose, attempt to access other users&apos; accounts,
             reverse-engineer the app, use bots or scrapers, or attempt to
             bypass usage limits.
@@ -108,14 +108,14 @@ export default function TermsPage() {
           </p>
           <p>
             the app, its design, myla&apos;s character, and the &ldquo;can
-            i&rdquo; database are owned by 2am (ac2 innovations llc).
+            i&rdquo; database are owned by <span className="brand-name">2am</span> (ac2 innovations llc).
           </p>
         </section>
 
         <section className="legal-section">
           <h2>subscription and payment</h2>
           <p>
-            2am currently offers free access during our launch period. we
+            <span className="brand-name">2am</span> currently offers free access during our launch period. we
             plan to offer premium subscriptions in the future. safety-critical
             information will always remain free. no ads, ever.
           </p>
@@ -124,19 +124,19 @@ export default function TermsPage() {
         <section className="legal-section">
           <h2>disclaimers</h2>
           <p>
-            <strong>medical disclaimer:</strong> 2am and myla do not provide
+            <strong>medical disclaimer:</strong> <span className="brand-name">2am</span> and myla do not provide
             medical advice, diagnosis, or treatment. the information provided
             is for general informational purposes only. always seek the
             advice of your physician or other qualified health provider.
           </p>
           <p>
-            <strong>warranty disclaimer:</strong> 2am is provided &ldquo;as
+            <strong>warranty disclaimer:</strong> <span className="brand-name">2am</span> is provided &ldquo;as
             is&rdquo; and &ldquo;as available.&rdquo; we make no warranties
             regarding accuracy, reliability, or availability.
           </p>
           <p>
             <strong>limitation of liability:</strong> to the maximum extent
-            permitted by law, 2am (ac2 innovations llc) shall not be liable
+            permitted by law, <span className="brand-name">2am</span> (ac2 innovations llc) shall not be liable
             for any indirect, incidental, special, or consequential damages
             arising from your use of the app. our total liability shall not
             exceed the amount you paid us in the 12 months preceding the
@@ -183,7 +183,7 @@ export default function TermsPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wordmark.svg" alt="2am" className="legal-footer-wordmark" />
           </Link>
-          © 2026 2am (ac2 innovations llc). built with care in florida.
+          © 2026 <span className="brand-name">2am</span> (ac2 innovations llc). built with care in florida.
           <div className="legal-footer-links">
             <Link href="/about">about</Link>
             <Link href="/blog">blog</Link>
