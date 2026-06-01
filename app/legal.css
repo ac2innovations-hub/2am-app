@@ -26,14 +26,13 @@
 .legal-logo {
   display: block;
   margin: 0 0 28px;
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  color: #f8c8a8;
-  text-decoration: none;
   width: fit-content;
+}
+/* the wordmark SVG as the page's header logo image */
+.legal-logo-img {
+  display: block;
+  height: 28px;
+  width: auto;
 }
 
 .legal-title {
@@ -110,16 +109,14 @@
   color: rgba(255, 250, 245, 0.45);
 }
 .legal-footer-brand {
-  display: inline-block;
-  margin-bottom: 20px;
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  text-transform: none;
-  color: #f8c8a8;
-  text-decoration: none;
+  display: block;
+  width: fit-content;
+  margin-bottom: 16px;
+}
+.legal-footer-wordmark {
+  display: block;
+  height: 20px;
+  width: auto;
 }
 
 .legal-footer-links {

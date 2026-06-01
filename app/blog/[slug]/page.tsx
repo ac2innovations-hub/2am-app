@@ -71,8 +71,9 @@ export default function BlogPostPage({ params }: Props) {
         <Link href="/blog" className="legal-back">
           ← back to blog
         </Link>
-        <Link href="/" className="legal-logo">
-          2am
+        <Link href="/" className="legal-logo" aria-label="2am — home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/wordmark.svg" alt="2am" className="legal-logo-img" />
         </Link>
 
         <h1 className="legal-title">{post.title}</h1>
@@ -94,10 +95,11 @@ export default function BlogPostPage({ params }: Props) {
         </section>
 
         <footer className="legal-footer">
-          <Link href="/" className="legal-footer-brand">
-            2am
+          <Link href="/" className="legal-footer-brand" aria-label="2am — home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/wordmark.svg" alt="2am" className="legal-footer-wordmark" />
           </Link>
-          <div>built with care in florida. 💛</div>
+          built with care in florida. 💛
           <div className="legal-footer-links">
             <Link href="/about">about</Link>
             <Link href="/blog">blog</Link>

@@ -158,31 +158,25 @@ html { scroll-behavior: smooth; }
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.85; }
 }
-/* hero wordmark — THE centerpiece. It towers over everything else: nearly
-   full viewport width on mobile, up to 300px on desktop, in brand peach with
-   a soft glow. Everything around it is deliberately small so nothing competes. */
 .landing-hero h1 {
   position: relative;
-  margin: 6px 0 0;
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  font-size: clamp(96px, 36vw, 300px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 0.82;
-  color: #f8c8a8;
-  text-shadow: 0 0 90px rgba(248, 200, 168, 0.4);
+  margin: 12px 0 0;
+  line-height: 1;
 }
-.landing-hero-eyebrow {
+/* the wordmark SVG as the hero's brand focal point — large and centered */
+.landing-hero-wordmark {
   display: block;
-  max-width: 92%;
-  margin: 18px auto 0;
+  width: min(70vw, 420px);
+  height: auto;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 60px rgba(248, 200, 168, 0.28));
 }
 .landing-tag {
   position: relative;
-  margin-top: 14px;
+  margin-top: 20px;
   font-style: italic;
-  font-size: 16px;
-  color: rgba(255, 250, 245, 0.82);
+  font-size: 20px;
+  color: rgba(255, 250, 245, 0.9);
 }
 .landing-sub {
   position: relative;
@@ -450,14 +444,12 @@ html { scroll-behavior: smooth; }
 .landing-footer-brand {
   display: block;
   width: fit-content;
-  margin: 0 auto 14px;
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  color: #f8c8a8;
-  text-decoration: none;
+  margin: 0 auto 16px;
+}
+.landing-footer-wordmark {
+  display: block;
+  height: 22px;
+  width: auto;
 }
 .landing-footer .dot {
   margin: 0 10px;
@@ -469,7 +461,7 @@ html { scroll-behavior: smooth; }
   text-decoration: underline;
 }
 
-/* persistent brand header (logo left, nav right) */
+/* header bar — wordmark logo (left) + nav (right) */
 .landing-header {
   position: absolute;
   top: 0;
@@ -483,19 +475,15 @@ html { scroll-behavior: smooth; }
   padding: 18px 24px;
   pointer-events: none;
 }
-/* header wordmark — sized like a navbar logo, well above the body/nav
-   text scale, in brand peach with deliberate tracking so it reads as a
-   designed mark rather than another nav word. */
 .landing-navbrand {
-  display: inline-block;
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  color: #f8c8a8;
-  text-decoration: none;
+  display: inline-flex;
   pointer-events: auto;
+}
+/* the wordmark SVG rendered as a navbar-sized logo image */
+.landing-navbrand-img {
+  display: block;
+  height: 26px;
+  width: auto;
 }
 
 /* top nav (about / blog) */

@@ -105,10 +105,11 @@ export default function Landing({
 
   return (
     <>
-      {/* persistent brand header */}
+      {/* top nav */}
       <header className="landing-header">
-        <Link href="/" className="landing-navbrand">
-          2am
+        <Link href="/" className="landing-navbrand" aria-label="2am — home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/wordmark.svg" alt="2am" className="landing-navbrand-img" />
         </Link>
         <nav className="landing-topnav" aria-label="primary">
           <Link href="/about">about</Link>
@@ -117,7 +118,7 @@ export default function Landing({
       </header>
 
       {/* hero */}
-      <section className="landing-hero">
+      <header className="landing-hero">
         <div className="landing-stars" aria-hidden>
           {STARS.map((s, i) => (
             <span
@@ -127,10 +128,11 @@ export default function Landing({
           ))}
         </div>
         <div className="landing-container">
-          <span className="landing-mono landing-hero-eyebrow">
-            the brand · for every stage of motherhood
-          </span>
-          <h1>2am</h1>
+          <span className="landing-mono">for every stage of motherhood</span>
+          <h1 className="landing-hero-h1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/wordmark.svg" alt="2am" className="landing-hero-wordmark" />
+          </h1>
           <p className="landing-tag">myla’s always up.</p>
           <p className="landing-sub">
             the judgment-free friend for your journey — whether you’re
@@ -157,7 +159,7 @@ export default function Landing({
             />
           </div>
         </div>
-      </section>
+      </header>
 
       {/* problem */}
       <section className="landing-section landing-problem">
@@ -533,12 +535,13 @@ export default function Landing({
       </section>
 
       <footer className="landing-footer">
-        <Link href="/" className="landing-footer-brand">
-          2am
+        <Link href="/" className="landing-footer-brand" aria-label="2am — home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/wordmark.svg" alt="2am" className="landing-footer-wordmark" />
         </Link>
         <span className="landing-mono">hey2am.app</span>
         <div style={{ marginTop: 16 }}>
-          © 2026 2am. myla is an ai friend, not a medical provider.
+          © 2026 2AM. myla is an ai friend, not a medical provider.
           {" · "}
           <Link href="/about" className="landing-footer-link">
             about
