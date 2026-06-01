@@ -158,19 +158,19 @@ html { scroll-behavior: smooth; }
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.85; }
 }
-/* hero wordmark — the dominant, unmistakable brand mark. first thing seen.
-   bold Outfit, large, peach→coral gradient — clearly a logo, not body copy. */
+/* hero wordmark — the dominant visual element, a brand lockup. bold Outfit
+   at a far larger scale than anything around it, in brand peach with a soft
+   glow and deliberate tracking so it reads as a designed logo, not body copy. */
 .landing-hero h1 {
   position: relative;
   margin: 0;
-  font-size: clamp(72px, 14vw, 140px);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-size: clamp(104px, 18vw, 184px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: #f8c8a8;
+  text-shadow: 0 0 72px rgba(248, 200, 168, 0.35);
 }
 .landing-hero-eyebrow {
   display: inline-block;
@@ -447,16 +447,15 @@ html { scroll-behavior: smooth; }
   color: rgba(255, 250, 245, 0.4);
 }
 .landing-footer-brand {
-  display: inline-block;
-  margin-bottom: 22px;
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  display: block;
+  width: fit-content;
+  margin: 0 auto 14px;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   line-height: 1;
-  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f8c8a8;
   text-decoration: none;
 }
 .landing-footer .dot {
@@ -483,16 +482,17 @@ html { scroll-behavior: smooth; }
   padding: 18px 24px;
   pointer-events: none;
 }
+/* header wordmark — sized like a navbar logo, well above the body/nav
+   text scale, in brand peach with deliberate tracking so it reads as a
+   designed mark rather than another nav word. */
 .landing-navbrand {
   display: inline-block;
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   line-height: 1;
-  background: linear-gradient(135deg, #f8c8a8 0%, #ee9b78 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f8c8a8;
   text-decoration: none;
   pointer-events: auto;
 }
