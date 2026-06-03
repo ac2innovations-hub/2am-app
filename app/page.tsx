@@ -8,6 +8,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
 import WaitlistForm from "@/components/WaitlistForm";
+import AppStoreBadge from "@/components/AppStoreBadge";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -142,20 +143,7 @@ export default function Landing({
           <Link className="landing-cta" href="/app/auth">
             meet myla
           </Link>
-          <a
-            className="landing-appstore"
-            href="https://apps.apple.com/app/id6771104342"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Download 2am on the App Store"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/app-store-badge.svg"
-              alt="Download on the App Store"
-              className="landing-appstore-img"
-            />
-          </a>
+          <AppStoreBadge />
           <p className="landing-cta-secondary">
             start your <span className="brand-name">2am</span> conversation
           </p>
@@ -585,20 +573,7 @@ export default function Landing({
           <span className="brand-name">2am</span> — myla’s always up.
         </p>
         <span className="landing-mono">hey2am.app</span>
-        <a
-          className="landing-appstore landing-appstore-footer"
-          href="https://apps.apple.com/app/id6771104342"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Download 2am on the App Store"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/app-store-badge.svg"
-            alt="Download on the App Store"
-            className="landing-appstore-img"
-          />
-        </a>
+        <AppStoreBadge className="landing-appstore-footer" />
         <div style={{ marginTop: 16 }}>
           © 2026 <span className="brand-name">2am</span>. myla is an ai friend, not a medical provider.
           {" · "}
