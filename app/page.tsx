@@ -557,8 +557,9 @@ export default function Landing({
             <details className="landing-faq-item">
               <summary>what devices does this work on?</summary>
               <div className="landing-faq-answer">
-                right now myla lives in your browser — so it works on any
-                phone, tablet, or computer. a dedicated iOS app is coming soon.
+                myla works on any phone, tablet, or computer through your
+                browser at hey2am.app. the <span className="brand-name">2am</span>{" "}
+                iOS app is also available on the App Store.
               </div>
             </details>
             <details className="landing-faq-item">
