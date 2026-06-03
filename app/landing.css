@@ -214,20 +214,26 @@ html { scroll-behavior: smooth; }
   color: rgba(255, 250, 245, 0.42);
 }
 
-/* official Apple App Store badge */
+/* official Apple App Store badge — block + auto margins so it stacks
+   centered on its own line below the primary "meet myla" CTA. */
 .landing-appstore {
   position: relative;
-  display: inline-block;
-  margin-top: 20px;
+  display: block;
+  width: fit-content;
+  margin: 18px auto 0;
   line-height: 0;
   transition: transform 120ms ease, opacity 120ms ease;
 }
 .landing-appstore:hover { opacity: 0.85; }
 .landing-appstore:active { transform: scale(0.98); }
+/* sized a touch shorter than the "meet myla" button (~57px tall) so the
+   primary action stays dominant. max-width:none guards against the
+   Tailwind preflight img rule clamping the badge's natural width. */
 .landing-appstore-img {
   display: block;
-  height: 48px;
+  height: 44px;
   width: auto;
+  max-width: none;
 }
 .landing-appstore-footer {
   margin-top: 20px;
