@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import StarField from "@/components/StarField";
 import { createClient } from "@/lib/supabase/client";
+import { isInsideCapacitor } from "@/lib/isCapacitor";
 
 type Mode = "login" | "signup";
 type Step = "form" | "verify";
@@ -36,6 +37,15 @@ function AuthPageInner() {
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  // Inside the native app this page should read like a native login screen,
+  // not a scrollable landing page: tighter spacing, smaller logo, no big
+  // top gap. Detected on mount (same window.Capacitor check used elsewhere).
+  // Safe from hydration flash because the form only renders after the async
+  // session check above clears, well after this mount effect has run.
+  const [native, setNative] = useState(false);
+  useEffect(() => {
+    setNative(isInsideCapacitor());
+  }, []);
 
   // If the user already has a valid session (e.g. they got here from
   // an expired link but are actually still signed in, or they hit Back
@@ -191,22 +201,36 @@ function AuthPageInner() {
     return <main className="min-h-svh bg-midnight" />;
   }
 
+  // Compact native layout vs. the airy browser/landing layout. In the app we
+  // center the stack with a modest gap (instead of justify-between's large
+  // mid-page gap), trim the top inset, and shrink the logo + heading spacing
+  // so everything fits on one screen without scrolling.
+  const mainClass = native
+    ? "relative flex min-h-svh flex-col items-center justify-center gap-7 overflow-hidden bg-midnight px-6 pt-[max(env(safe-area-inset-top),1.5rem)] pb-8"
+    : "relative flex min-h-svh flex-col items-center justify-between overflow-hidden bg-midnight px-6 pt-24 pb-10";
+  const logoClass = `text-gradient-peach font-display ${
+    native ? "text-[44px]" : "text-[64px]"
+  } font-black leading-none tracking-tight`;
+  const taglineClass = `${
+    native ? "mt-2 text-base" : "mt-4 text-lg"
+  } italic text-cream/85`;
+  const subtitleClass = `${
+    native ? "mt-1.5" : "mt-3"
+  } max-w-[22rem] text-sm leading-relaxed text-cream/60`;
+
   return (
-    <main className="relative flex min-h-svh flex-col items-center justify-between overflow-hidden bg-midnight px-6 pt-24 pb-10">
+    <main className={mainClass}>
       <StarField count={40} />
       <div className="pointer-events-none absolute inset-0 bg-peach-radial" />
 
       <div className="relative z-10 flex w-full flex-col items-center text-center">
-        <Link
-          href="/app"
-          className="text-gradient-peach font-display text-[64px] font-black leading-none tracking-tight"
-        >
+        <Link href="/app" className={logoClass}>
           2am
         </Link>
-        <p className="mt-4 italic text-cream/85 text-lg">
+        <p className={taglineClass}>
           myla&apos;s always up.
         </p>
-        <p className="mt-3 max-w-[22rem] text-sm leading-relaxed text-cream/60">
+        <p className={subtitleClass}>
           {step === "verify"
             ? `we sent a verification code to ${email}. enter it to finish signing up.`
             : "sign in to keep your conversations with myla across all your devices."}
