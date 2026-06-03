@@ -214,6 +214,25 @@ html { scroll-behavior: smooth; }
   color: rgba(255, 250, 245, 0.42);
 }
 
+/* official Apple App Store badge */
+.landing-appstore {
+  position: relative;
+  display: inline-block;
+  margin-top: 20px;
+  line-height: 0;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+.landing-appstore:hover { opacity: 0.85; }
+.landing-appstore:active { transform: scale(0.98); }
+.landing-appstore-img {
+  display: block;
+  height: 48px;
+  width: auto;
+}
+.landing-appstore-footer {
+  margin-top: 20px;
+}
+
 /* sections */
 .landing-section { padding: 80px 0; }
 .landing-eyebrow {
