@@ -7,9 +7,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
-import WaitlistForm from "@/components/WaitlistForm";
 import AppStoreBadge from "@/components/AppStoreBadge";
-import BrowserOnly from "@/components/BrowserOnly";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -151,22 +149,6 @@ export default function Landing({
           <p className="landing-tiny landing-mono">
             no judgment · no google history · just answers
           </p>
-          <BrowserOnly>
-            <div className="landing-secondary-capture">
-              <p className="landing-secondary-capture-prompt">
-                we&rsquo;re inviting testers in small batches — drop your email
-                and we&rsquo;ll let you know when there&rsquo;s a spot. 💛
-              </p>
-              <WaitlistForm
-                source="hero-secondary"
-                variant="secondary"
-                placeholder="your email"
-                submitLabel="keep me posted"
-                submittingLabel="sending…"
-                successMessage={<>got it — we&rsquo;ll check in soon 💛</>}
-              />
-            </div>
-          </BrowserOnly>
         </div>
       </header>
 
