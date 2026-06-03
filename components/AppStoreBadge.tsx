@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { isInsideCapacitor } from "@/lib/isCapacitor";
 
 // The App Store download badge is meaningless once the page is already
 // running inside the native iOS app (Capacitor loads the live landing
@@ -11,22 +12,6 @@ import { useEffect, useState } from "react";
 // Default to hidden and reveal after we confirm we're NOT in Capacitor.
 // Hiding-by-default avoids a flash of the badge inside the native app;
 // the brief reveal-on-mount in a browser is imperceptible.
-function isInsideCapacitor(): boolean {
-  if (typeof window === "undefined") return false;
-  // The native bridge injects a global `Capacitor` object into the
-  // WebView. The marketing site never bundles @capacitor/core, so this
-  // global is present only when the page is hosted by the native app.
-  const cap = (window as { Capacitor?: { isNativePlatform?: () => boolean } })
-    .Capacitor;
-  if (cap) {
-    return typeof cap.isNativePlatform === "function"
-      ? cap.isNativePlatform()
-      : true;
-  }
-  // Fallback for builds that append a Capacitor token to the user agent.
-  return / Capacitor\//i.test(navigator.userAgent);
-}
-
 export default function AppStoreBadge({ className }: { className?: string }) {
   const [show, setShow] = useState(false);
 
