@@ -402,7 +402,7 @@ export default function Landing({
       <section className="landing-section landing-feedback">
         <div className="landing-container">
           <span className="landing-eyebrow landing-mono">
-            what testers are saying about <span className="brand-name">2am</span>
+            what women are saying about <span className="brand-name">2am</span>
           </span>
           <h2 className="landing-title">the feedback we keep hearing.</h2>
           <div className="landing-feedback-grid">
@@ -476,11 +476,12 @@ export default function Landing({
               </div>
             </details>
             <details className="landing-faq-item">
-              <summary>when does the app launch?</summary>
+              <summary>how do i start talking to myla?</summary>
               <div className="landing-faq-answer">
-                right now we’re onboarding a small group of testers. we’re
-                opening access in small batches. drop your email above and
-                we’ll let you know when there’s a spot.
+                she’s already live. tap “meet myla” at the top of this page to
+                talk in your browser right now, or download{" "}
+                <span className="brand-name">2am</span> on the app store —
+                search “2am myla.”
               </div>
             </details>
             <details className="landing-faq-item">
@@ -577,6 +578,24 @@ export default function Landing({
           <Link href="/terms" className="landing-footer-link">
             terms
           </Link>
+          {" · "}
+          <a
+            href="https://www.instagram.com/hey2amapp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing-footer-link"
+          >
+            instagram
+          </a>
+          {" · "}
+          <a
+            href="https://www.tiktok.com/@hey2am.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="landing-footer-link"
+          >
+            tiktok
+          </a>
         </div>
       </footer>
     </>
