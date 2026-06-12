@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { isInsideCapacitor } from "@/lib/isCapacitor";
+import { track } from "@/lib/analytics";
 
 // The App Store download badge is meaningless once the page is already
 // running inside the native iOS app (Capacitor loads the live landing
@@ -28,6 +29,7 @@ export default function AppStoreBadge({ className }: { className?: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Download 2am on the App Store"
+      onClick={() => track("appstore_badge_click")}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

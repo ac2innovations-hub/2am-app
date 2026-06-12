@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Mono, Outfit } from "next/font/google";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -99,6 +100,7 @@ export default function RootLayout({
       <body className="min-h-svh bg-midnight text-cream antialiased">
         {children}
         <ServiceWorkerRegister />
+        <AnalyticsProvider />
       </body>
     </html>
   );

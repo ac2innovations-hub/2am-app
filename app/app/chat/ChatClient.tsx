@@ -8,6 +8,7 @@ import ChatMessage from "@/components/ChatMessage";
 import TypingDots from "@/components/TypingDots";
 import QuickChips from "@/components/QuickChips";
 import AiConsentScreen from "@/components/AiConsentScreen";
+import { track } from "@/lib/analytics";
 import {
   appendMessages,
   createConversation,
@@ -528,6 +529,7 @@ export default function ChatClient() {
         const next = updateProfile({ concerns, onboardingComplete: true });
         setProfile(next);
         setOnboarding("done");
+        track("onboarding_completed", { stage: next.stage ?? "unknown" });
         return {
           updatedProfile: next,
           directive: `The user just shared what's been on their mind: "${text}". This is the end of onboarding. Acknowledge what they shared warmly and specifically (reference what they said — don't be generic). Then close the onboarding: let them know you're here whenever, day or night, no question too small. Never use canned phrases like "i've got you" — make it feel personal.`,
@@ -570,6 +572,15 @@ export default function ChatClient() {
       }
       setRetryableText(null);
       setSending(true);
+
+      // Analytics: counts only — message content is never sent.
+      if (!opts?.isRetry) {
+        track("message_sent", { during_onboarding: onboarding !== "done" });
+        if (typeof window !== "undefined" && !localStorage.getItem("2am_first_msg")) {
+          localStorage.setItem("2am_first_msg", "1");
+          track("first_message_sent");
+        }
+      }
 
       // Onboarding: parse + save + advance state. Let Myla write the reply.
       let directive: string | null = null;

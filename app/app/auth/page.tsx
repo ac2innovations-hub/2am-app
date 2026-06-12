@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import StarField from "@/components/StarField";
 import { createClient } from "@/lib/supabase/client";
 import { isInsideCapacitor } from "@/lib/isCapacitor";
+import { track, identify } from "@/lib/analytics";
 
 type Mode = "login" | "signup";
 type Step = "form" | "verify";
@@ -105,6 +106,7 @@ function AuthPageInner() {
         }
         // If email confirmations are on, session is null until verified.
         if (!data.session) {
+          track("signup_submitted");
           setStep("verify");
           setInfo(
             "check your email — we sent you a verification code. enter it below.",
@@ -112,10 +114,12 @@ function AuthPageInner() {
           return;
         }
         // Email confirmations off → already signed in.
+        if (data.user) identify(data.user.id);
+        track("signup_completed");
         router.replace(next);
         router.refresh();
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: trimmedEmail,
           password,
         });
@@ -123,6 +127,8 @@ function AuthPageInner() {
           setError(error.message.toLowerCase());
           return;
         }
+        if (data.user) identify(data.user.id);
+        track("login_completed");
         router.replace(next);
         router.refresh();
       }
@@ -148,7 +154,7 @@ function AuthPageInner() {
     setSubmitting(true);
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.verifyOtp({
+      const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token,
         type: "signup",
@@ -157,6 +163,8 @@ function AuthPageInner() {
         setError(error.message.toLowerCase());
         return;
       }
+      if (data.user) identify(data.user.id);
+      track("signup_completed");
       router.replace(next);
       router.refresh();
     } catch (err) {
