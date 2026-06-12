@@ -9,6 +9,7 @@ import TypingDots from "@/components/TypingDots";
 import QuickChips from "@/components/QuickChips";
 import AiConsentScreen from "@/components/AiConsentScreen";
 import { track } from "@/lib/analytics";
+import { maybeRequestReview } from "@/lib/rating";
 import {
   appendMessages,
   createConversation,
@@ -662,6 +663,15 @@ export default function ChatClient() {
         };
         setMessages((prev) => [...prev, reply]);
         if (conversationId) appendMessages(conversationId, [reply]);
+        // Native-only App Store rating prompt: fires after an engaged,
+        // non-crisis exchange. No-op on web and during onboarding.
+        if (onboarding === "done") {
+          maybeRequestReview({
+            userMessageCount: nextMessages.filter((m) => m.role === "user")
+              .length,
+            latestReply: reply.content,
+          });
+        }
       } catch {
         const reply: Msg = {
           role: "assistant",
