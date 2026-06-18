@@ -27,7 +27,15 @@ async function ping(model: string) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Secret gate: the caller must present HEALTHCHECK_SECRET in the
+  // x-healthcheck-secret header. Closed by default — if the env var is unset,
+  // the endpoint stays locked rather than open.
+  const secret = process.env.HEALTHCHECK_SECRET;
+  if (!secret || req.headers.get("x-healthcheck-secret") !== secret) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   try {
     await ping(PRIMARY_MODEL);
     return NextResponse.json({ status: "ok", model: PRIMARY_MODEL });

@@ -62,7 +62,7 @@ mood row: `/app/chat?new=1&mood=rough`
 
 `POST /api/chat` — body: `{ messages: [{role, content}], userProfile }`. Server prepends the Myla system prompt and a `[USER CONTEXT: ...]` line, then calls the model from `ANTHROPIC_MODEL` (default `claude-sonnet-4-6`) with `max_tokens: 800`. If the primary model call fails (e.g. a retired model returning a 404 `not_found_error`), it automatically retries with `ANTHROPIC_FALLBACK_MODEL` (default `claude-haiku-4-5-20251001`) and logs a warning, so a single model retirement degrades chat instead of taking it down. System prompt uses prompt caching (`cache_control: { type: 'ephemeral' }`) to avoid re-billing the long persona on every turn.
 
-`GET /api/health` — makes a tiny real Claude call (`max_tokens: 1`) against the primary model so the chat path can be monitored end to end. Returns `{ status: "ok" }` (200). If the primary is down but the fallback model answers, returns `{ status: "ok", degraded: true }` (200); if both fail, `{ status: "fail" }` (503).
+`GET /api/health` — makes a tiny real Claude call (`max_tokens: 1`) against the primary model so the chat path can be monitored end to end. Requires the `HEALTHCHECK_SECRET` value in the `x-healthcheck-secret` header (returns 401 otherwise, and is locked if the env var is unset). Returns `{ status: "ok" }` (200). If the primary is down but the fallback model answers, returns `{ status: "ok", degraded: true }` (200); if both fail, `{ status: "fail" }` (503).
 
 ## persistence
 
