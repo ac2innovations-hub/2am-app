@@ -60,7 +60,7 @@ mood row: `/app/chat?new=1&mood=rough`
 
 ## api
 
-`POST /api/chat` — body: `{ messages: [{role, content}], userProfile }`. Server prepends the Myla system prompt and a `[USER CONTEXT: ...]` line, then calls `claude-sonnet-4-20250514` with `max_tokens: 800`. System prompt uses prompt caching (`cache_control: { type: 'ephemeral' }`) to avoid re-billing the long persona on every turn.
+`POST /api/chat` — body: `{ messages: [{role, content}], userProfile }`. Server prepends the Myla system prompt and a `[USER CONTEXT: ...]` line, then calls `claude-sonnet-4-6` with `max_tokens: 800`. System prompt uses prompt caching (`cache_control: { type: 'ephemeral' }`) to avoid re-billing the long persona on every turn.
 
 ## persistence
 

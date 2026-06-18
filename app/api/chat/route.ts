@@ -27,7 +27,7 @@ type Body = {
   onboardingDirective?: string | null;
 };
 
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-sonnet-4-6";
 const MAX_TOKENS = 800;
 const ANTHROPIC_TIMEOUT_MS = 30_000;
 const RETRY_DELAY_MS = 2_000;
