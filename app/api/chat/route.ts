@@ -1,4 +1,4 @@
-import Anthropic, {
+import {
   APIConnectionError,
   APIError,
   APIUserAbortError,
@@ -12,6 +12,7 @@ import {
 } from "@/lib/myla/system-prompt";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { createClient as createServerSupabase } from "@/lib/supabase/server";
+import { getClient, PRIMARY_MODEL, FALLBACK_MODEL } from "@/lib/anthropic";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,17 +28,10 @@ type Body = {
   onboardingDirective?: string | null;
 };
 
-const MODEL = "claude-sonnet-4-6";
 const MAX_TOKENS = 800;
 const ANTHROPIC_TIMEOUT_MS = 30_000;
 const RETRY_DELAY_MS = 2_000;
 const DAILY_MESSAGE_LIMIT = 50;
-
-function getClient() {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error("ANTHROPIC_API_KEY is not set");
-  return new Anthropic({ apiKey: key });
-}
 
 function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get("x-forwarded-for");
@@ -202,7 +196,7 @@ export async function POST(req: NextRequest) {
       : []),
   ];
 
-  async function callOnce() {
+  async function callOnce(model: string) {
     const anthropic = getClient();
     const controller = new AbortController();
     const timer = setTimeout(
@@ -212,7 +206,7 @@ export async function POST(req: NextRequest) {
     try {
       return await anthropic.messages.create(
         {
-          model: MODEL,
+          model,
           max_tokens: MAX_TOKENS,
           system: systemBlocks,
           messages: cleaned,
@@ -224,24 +218,46 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let response;
-  try {
+  // One model attempt, with a single transient-error retry (the existing
+  // behaviour). Non-retryable errors (e.g. a 404 not_found_error from a retired
+  // model) throw immediately so the caller can fall back to another model.
+  async function callModelWithRetry(model: string) {
     try {
-      response = await callOnce();
+      return await callOnce(model);
     } catch (err) {
       if (!isRetryable(err)) throw err;
       console.warn(
-        "/api/chat first attempt failed, retrying in %dms: %s",
+        "/api/chat first attempt for %s failed, retrying in %dms: %s",
+        model,
         RETRY_DELAY_MS,
         err instanceof Error ? err.message : String(err),
       );
       await sleep(RETRY_DELAY_MS);
-      response = await callOnce();
+      return await callOnce(model);
+    }
+  }
+
+  let response;
+  try {
+    try {
+      response = await callModelWithRetry(PRIMARY_MODEL);
+    } catch (primaryErr) {
+      // Primary model failed (not_found_error/404 from a retirement, or
+      // transient errors that survived the retry). Degrade to the backup model
+      // so a single model retirement degrades chat instead of killing it.
+      if (FALLBACK_MODEL === PRIMARY_MODEL) throw primaryErr;
+      console.warn(
+        "/api/chat primary model %s failed, falling back to %s: %s",
+        PRIMARY_MODEL,
+        FALLBACK_MODEL,
+        primaryErr instanceof Error ? primaryErr.message : String(primaryErr),
+      );
+      response = await callModelWithRetry(FALLBACK_MODEL);
     }
   } catch (err) {
     const friendly = mapAnthropicError(err);
     console.error(
-      "/api/chat failed after retry: %s",
+      "/api/chat failed on primary and fallback models: %s",
       err instanceof Error ? err.message : String(err),
     );
     return NextResponse.json(friendly.body, { status: friendly.status });
