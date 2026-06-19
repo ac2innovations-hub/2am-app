@@ -191,11 +191,23 @@ export default function PrivacyPage() {
               <strong>formspree</strong> — waitlist email collection. email
               address only.
             </li>
+            <li>
+              <strong>resend</strong> — transactional email delivery (e.g. the
+              waitlist welcome email). email address only.
+            </li>
           </ul>
           <p>
             we never share data with advertisers, data brokers, social media
             platforms, or employers/insurers/government agencies (unless
             legally compelled).
+          </p>
+          <p>
+            joining the waitlist is separate from creating an account. waitlist
+            emails are held by formspree and delivered through resend; deleting
+            your in-app account removes your account data but does not remove
+            waitlist records held by these providers — email{" "}
+            <a href="mailto:privacy@hey2am.app">privacy@hey2am.app</a> to have
+            those removed.
           </p>
         </section>
 

@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+// Coarse per-IP cap so the endpoint can't be used to email-bomb arbitrary
+// addresses via the welcome send. Uses Vercel's x-real-ip (less spoofable than
+// the first x-forwarded-for entry); legitimate users sign up once.
+const WAITLIST_DAILY_LIMIT = 5;
+
+function clientIp(req: NextRequest): string {
+  const real = req.headers.get("x-real-ip");
+  if (real) return real.trim();
+  const fwd = req.headers.get("x-forwarded-for");
+  if (fwd) return fwd.split(",")[0].trim();
+  return "unknown";
+}
 
 const WELCOME_SUBJECT = "you're in 💛";
 
@@ -71,6 +85,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: "please enter a valid email." },
       { status: 400 },
+    );
+  }
+
+  const rl = await checkRateLimit(`waitlist:${clientIp(req)}`, WAITLIST_DAILY_LIMIT);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "too many signups from this network — try again later." },
+      { status: 429 },
     );
   }
 
