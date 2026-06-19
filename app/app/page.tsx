@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 // /app is no longer an intermediate landing screen — it's a transparent
 // router. The marketing landing page's "meet myla" CTA points straight at
 // /app/auth, and any direct hit on /app just forwards: signed-in users to
-// their home, everyone else to the auth/signup flow.
+// chat (entry-routing case #1 — onboarding runs in chat for new users; the
+// dashboard stays reachable via the home icon), everyone else to auth/signup.
 export default function AppEntry() {
   const router = useRouter();
 
@@ -20,7 +21,7 @@ export default function AppEntry() {
           data: { user },
         } = await supabase.auth.getUser();
         if (cancelled) return;
-        router.replace(user ? "/app/home" : "/app/auth");
+        router.replace(user ? "/app/chat" : "/app/auth");
       } catch {
         if (!cancelled) router.replace("/app/auth");
       }

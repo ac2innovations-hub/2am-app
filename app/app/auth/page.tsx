@@ -22,7 +22,9 @@ export default function AuthPage() {
 function AuthPageInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") ?? "/app/home";
+  // Default post-login landing is chat (entry-routing case #1); an explicit
+  // ?next= (e.g. a deep link the user was sent to login for) still wins.
+  const next = params.get("next") ?? "/app/chat";
   const initialError =
     params.get("error") === "verification_failed"
       ? "that verification link didn't work. try logging in, or sign up again to get a fresh link."

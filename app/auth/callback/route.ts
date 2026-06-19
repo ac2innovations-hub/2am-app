@@ -43,10 +43,11 @@ function redirectToAuthError(url: URL, reason: string) {
 
 type SupabaseClient = ReturnType<typeof createClient>;
 
-// Brand new users → /app/chat (Myla's conversational onboarding).
-// Returning, already-onboarded users → /app/home.
-// On any lookup failure, default to /app/chat so a new user is never
-// trapped on an empty home hub.
+// Entry-routing case #1: everyone lands in /app/chat. Un-onboarded users run
+// Myla's conversational onboarding there; already-onboarded users go straight
+// to chat instead of the /app/home dashboard (still reachable via the chat
+// home icon). The name/stage lookup is kept so onboarded vs un-onboarded can
+// diverge again later (e.g. spec #4) without re-plumbing this.
 async function pickDestination(supabase: SupabaseClient): Promise<string> {
   try {
     const {
@@ -76,7 +77,7 @@ async function pickDestination(supabase: SupabaseClient): Promise<string> {
     if (!data.name || !data.stage) {
       return "/app/chat";
     }
-    return "/app/home";
+    return "/app/chat";
   } catch (err) {
     console.error(
       "[auth/callback] pickDestination threw: %s",

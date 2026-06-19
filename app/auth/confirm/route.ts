@@ -72,7 +72,8 @@ async function pickDestination(supabase: SupabaseClient): Promise<string> {
     if (!data.name || !data.stage) {
       return "/app/chat";
     }
-    return "/app/home";
+    // Entry-routing case #1: onboarded users land in chat too (was /app/home).
+    return "/app/chat";
   } catch (err) {
     console.error(
       "[auth/confirm] pickDestination threw: %s",

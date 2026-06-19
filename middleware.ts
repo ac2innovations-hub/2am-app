@@ -49,8 +49,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (path === AUTH_PATH && user) {
+    // Already signed in → straight to chat (entry-routing case #1), not the
+    // dashboard. Un-onboarded users onboard in chat; the dashboard is reachable
+    // via the chat home icon.
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/app/home";
+    redirectUrl.pathname = "/app/chat";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
