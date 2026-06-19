@@ -16,7 +16,6 @@ import {
 import {
   getProfile,
   hydrateProfileFromSupabase,
-  clearProfile,
   type LocalProfile,
 } from "@/lib/profile";
 import {
@@ -25,7 +24,6 @@ import {
   setActiveConversationId,
   type LocalConversation,
 } from "@/lib/conversations";
-import { createClient } from "@/lib/supabase/client";
 import MylaAvatar from "@/components/MylaAvatar";
 import {
   formatDueDate,
@@ -134,23 +132,6 @@ export default function HomeClient() {
     };
   }, [router]);
 
-  async function handleSignOut() {
-    try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-    } catch {
-      // ignore — clear local state regardless so the next visit is clean.
-    }
-    clearProfile();
-    try {
-      localStorage.removeItem("2am:conversations");
-      localStorage.removeItem("2am:activeConversation");
-    } catch {
-      // ignore
-    }
-    router.replace("/app");
-    router.refresh();
-  }
 
   const greeting = useMemo(
     () => greetingFor(profile?.name ?? undefined, timeBand()),
@@ -452,16 +433,6 @@ export default function HomeClient() {
       <p className="mx-5 mt-2 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-cream/30">
         powered by ai
       </p>
-
-      <div className="mt-6 flex justify-center">
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/40 underline decoration-cream/20 underline-offset-4 hover:text-cream/70"
-        >
-          sign out
-        </button>
-      </div>
     </main>
   );
 }

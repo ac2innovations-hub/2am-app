@@ -92,6 +92,24 @@ export default function SettingsClient() {
     router.refresh();
   }
 
+  async function handleSignOut() {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // ignore — clear local state regardless so the next visit is clean.
+    }
+    clearProfile();
+    try {
+      localStorage.removeItem("2am:conversations");
+      localStorage.removeItem("2am:activeConversation");
+    } catch {
+      // ignore
+    }
+    router.replace("/app");
+    router.refresh();
+  }
+
   if (!mounted || !profile) {
     return <div className="p-6 text-cream/60">loading…</div>;
   }
@@ -122,6 +140,16 @@ export default function SettingsClient() {
           <Row label="email" value={email ?? "—"} />
           <Row label="stage" value={stageLabel} />
         </dl>
+      </section>
+
+      <section className="mx-5 mt-6">
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="flex w-full items-center justify-center rounded-full border border-cream/15 py-3.5 text-[14px] font-medium text-cream/80 transition hover:bg-cream/5 active:scale-[0.99]"
+        >
+          sign out
+        </button>
       </section>
 
       <section className="mx-5 mt-10">
