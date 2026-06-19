@@ -117,3 +117,44 @@ export async function checkRateLimit(
   }
   return checkMemory(key, limit);
 }
+
+// ---- generic atomic counter with an explicit TTL window -------------------
+// Used for the anonymous per-token message budget: the key expires when the
+// token does, so a fresh token gets a fresh budget. Returns the post-increment
+// count. Same shared-store-first, in-memory-fallback policy as checkRateLimit.
+const counterStore = new Map<string, Entry>();
+
+function incrMemory(key: string, ttlSeconds: number): number {
+  const now = Date.now();
+  for (const [k, e] of counterStore) {
+    if (e.resetAt <= now) counterStore.delete(k);
+  }
+  const existing = counterStore.get(key);
+  if (!existing || existing.resetAt <= now) {
+    counterStore.set(key, { count: 1, resetAt: now + ttlSeconds * 1000 });
+    return 1;
+  }
+  existing.count += 1;
+  return existing.count;
+}
+
+export async function incrementCounter(
+  key: string,
+  ttlSeconds: number,
+): Promise<number> {
+  const client = getRedis();
+  if (client) {
+    try {
+      const k = `cnt:${key}`;
+      const count = await client.incr(k);
+      if (count === 1) await client.expire(k, ttlSeconds);
+      return count;
+    } catch (err) {
+      console.warn(
+        "[rate-limiter] counter failed, using in-memory fallback: %s",
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+  }
+  return incrMemory(key, ttlSeconds);
+}
