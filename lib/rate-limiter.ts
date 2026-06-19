@@ -24,10 +24,22 @@ let redis: Redis | null | undefined;
 
 function getRedis(): Redis | null {
   if (redis !== undefined) return redis;
-  const url = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
-  const token =
-    process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
-  redis = url && token ? new Redis({ url, token }) : null;
+  try {
+    // Prefer the Upstash integration vars; also accept the Vercel KV names.
+    const url =
+      process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+    const token =
+      process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+    redis = url && token ? new Redis({ url, token }) : null;
+  } catch (err) {
+    // Never let client construction (e.g. a malformed URL) throw — degrade to
+    // the in-memory fallback instead of taking chat down.
+    console.warn(
+      "[rate-limiter] could not initialize shared store: %s",
+      err instanceof Error ? err.message : String(err),
+    );
+    redis = null;
+  }
   return redis;
 }
 
