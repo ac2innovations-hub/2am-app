@@ -193,6 +193,16 @@ function profileRowToLocal(row: Profile): LocalProfile {
   };
 }
 
+// Grant AI-processing consent and ensure it reaches the DB before returning,
+// so the server-side consent gate on /api/chat sees it on the user's first
+// message. Falls back to the local write if the remote upsert can't complete
+// (offline); the server gate then surfaces a retry rather than sending data.
+export async function acceptAiConsent(): Promise<LocalProfile> {
+  const next = updateProfile({ aiConsent: true });
+  await mirrorToSupabase(next);
+  return next;
+}
+
 async function mirrorToSupabase(p: LocalProfile) {
   try {
     const supabase = createClient();

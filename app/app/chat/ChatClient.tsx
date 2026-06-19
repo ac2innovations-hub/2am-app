@@ -19,6 +19,7 @@ import {
   setActiveConversationId,
 } from "@/lib/conversations";
 import {
+  acceptAiConsent,
   getProfile,
   hydrateProfileFromSupabase,
   updateProfile,
@@ -702,8 +703,11 @@ export default function ChatClient() {
 
   // One-time AI data consent. Saved to the profile (mirrored to Supabase),
   // so the screen only appears before the very first message.
-  const acceptConsent = useCallback(() => {
-    setProfile(updateProfile({ aiConsent: true }));
+  // Await the consent write so the DB has ai_consent=true before the consent
+  // screen dismisses and the user can send — otherwise the server-side consent
+  // gate on /api/chat could 403 the first message on a write race.
+  const acceptConsent = useCallback(async () => {
+    setProfile(await acceptAiConsent());
   }, []);
 
   // Show the consent screen once the profile has loaded and consent is
