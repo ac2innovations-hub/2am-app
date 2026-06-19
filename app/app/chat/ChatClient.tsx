@@ -732,12 +732,12 @@ export default function ChatClient() {
           {onboardingDone && (
             <button
               onClick={() => router.push("/app/home")}
-              aria-label="back"
+              aria-label="home"
               className="rounded-full p-1 text-cream/70 active:scale-95"
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path
-                  d="M12 4l-6 6 6 6"
+                  d="M5 12l-2 0l9 -9l9 9l-2 0M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"

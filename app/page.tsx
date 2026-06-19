@@ -8,6 +8,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
 import AppStoreBadge from "@/components/AppStoreBadge";
+import { createClient as createServerSupabase } from "@/lib/supabase/server";
 import "./landing.css";
 
 export const metadata: Metadata = {
@@ -74,7 +75,7 @@ const MOM_BUBBLES = [
   "how long will this postpartum bleeding last?",
 ];
 
-export default function Landing({
+export default async function Landing({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -99,6 +100,17 @@ export default function Landing({
     redirect(
       `/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${encodeURIComponent(type)}&next=${encodeURIComponent(next)}`,
     );
+  }
+
+  // Entry routing (Spec #4, case 1): a logged-in visitor goes straight to the
+  // Myla chat — not the marketing page or the dashboard. Logged-out visitors
+  // fall through to the landing page, where "meet myla" → signup/try-flow.
+  const supabase = createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    redirect("/app/chat");
   }
 
   const recentPosts = getRecentPosts(3);
