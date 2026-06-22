@@ -5,10 +5,10 @@ import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 // /app is no longer an intermediate landing screen — it's a transparent
-// router. The marketing landing page's "meet myla" CTA points straight at
-// /app/auth, and any direct hit on /app just forwards: signed-in users to
-// chat (entry-routing case #1 — onboarding runs in chat for new users; the
-// dashboard stays reachable via the home icon), everyone else to auth/signup.
+// router. Any direct hit on /app forwards: signed-in users to chat (entry-
+// routing case #1 — onboarding runs in chat for new users; the dashboard
+// stays reachable via the home icon), and logged-out visitors to the
+// anonymous try-Myla flow (which has its own "log in" escape hatch).
 export default function AppEntry() {
   const router = useRouter();
 
@@ -21,9 +21,9 @@ export default function AppEntry() {
           data: { user },
         } = await supabase.auth.getUser();
         if (cancelled) return;
-        router.replace(user ? "/app/chat" : "/app/auth");
+        router.replace(user ? "/app/chat" : "/app/try");
       } catch {
-        if (!cancelled) router.replace("/app/auth");
+        if (!cancelled) router.replace("/app/try");
       }
     })();
     return () => {

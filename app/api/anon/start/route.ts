@@ -22,6 +22,13 @@ function clientIp(req: NextRequest): string {
 
 type Body = { consent?: boolean };
 
+// Capability probe: lets the try-Myla UI fall through to signup when the
+// anonymous path isn't configured (ANON_CHAT_SECRET unset), so the "meet myla"
+// CTA never lands on a broken flow.
+export async function GET() {
+  return NextResponse.json({ enabled: !!process.env.ANON_CHAT_SECRET });
+}
+
 export async function POST(req: NextRequest) {
   if (!process.env.ANON_CHAT_SECRET) {
     console.error("/api/anon/start: ANON_CHAT_SECRET is not configured");

@@ -8,8 +8,12 @@ import MylaAvatar from "@/components/MylaAvatar";
 // so it never shows again. Styled in the 2am brand (midnight + peach).
 export default function AiConsentScreen({
   onAccept,
+  loginHref,
 }: {
   onAccept: () => void;
+  // When set (the anonymous try-Myla flow), show a persistent escape hatch to
+  // the login page so a returning user is never forced through the try flow.
+  loginHref?: string;
 }) {
   return (
     <div
@@ -57,6 +61,18 @@ export default function AiConsentScreen({
         >
           got it, let&rsquo;s chat
         </button>
+
+        {loginHref && (
+          <p className="mt-5 text-center text-[13px] text-cream/60">
+            already have an account?{" "}
+            <Link
+              href={loginHref}
+              className="text-peach underline underline-offset-2 hover:text-coral"
+            >
+              log in
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

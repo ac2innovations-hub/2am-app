@@ -1,7 +1,8 @@
-// The "meet myla" CTA goes straight to /app/auth (signup). A subdued
-// secondary email capture under the hero collects testers for small-batch
-// early access via the same /api/waitlist endpoint. The bottom of the page
-// is feedback + FAQ (not a second CTA).
+// The "meet myla" CTA goes to /app/try (the anonymous try-Myla flow, with a
+// persistent "log in" escape hatch); logged-in visitors are redirected to
+// /app/chat above. A subdued secondary email capture under the hero collects
+// testers for small-batch early access via the same /api/waitlist endpoint.
+// The bottom of the page is feedback + FAQ (not a second CTA).
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -151,7 +152,7 @@ export default async function Landing({
             for your journey — whether you’re trying, expecting, or navigating
             life as a new mom.
           </p>
-          <Link className="landing-cta" href="/app/auth">
+          <Link className="landing-cta" href="/app/try">
             meet myla
           </Link>
           <AppStoreBadge />
