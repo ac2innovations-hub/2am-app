@@ -17,6 +17,9 @@ import {
   getConversation,
   hydrateConversationsFromSupabase,
   setActiveConversationId,
+  getPendingAnonConversation,
+  clearPendingAnonConversation,
+  persistConversationNow,
 } from "@/lib/conversations";
 import {
   acceptAiConsent,
@@ -104,6 +107,10 @@ export default function ChatClient() {
   const [sending, setSending] = useState(false);
   const [onboarding, setOnboarding] = useState<OnboardingStep>("done");
   const [conversationId, setConversationId] = useState<string | null>(null);
+  // Set when a continued anonymous conversation has no stage yet — drives the
+  // one-time gentle stage ask woven into the continued thread (stage-first).
+  const [needsStage, setNeedsStage] = useState(false);
+  const stageAsked = useRef(false);
   // Last user message that didn't land a reply. When set, the Myla
   // error bubble is decorated with a "tap to retry" affordance. Cleared
   // on the next successful send or when a fresh user message is typed.
@@ -133,6 +140,30 @@ export default function ChatClient() {
       // as "onboarded". Advance mid-onboarding returners based on what
       // they've already answered.
       if (!p || !p.name || !p.stage) {
+        // Continue a conversation started in the anonymous try-Myla flow rather
+        // than burying it under a fresh onboarding thread. Re-own it to the new
+        // account so it survives and Myla keeps real context.
+        const pendingId = getPendingAnonConversation();
+        const pending = pendingId ? getConversation(pendingId) : null;
+        if (pending && pending.messages.some((m) => m.role === "user")) {
+          clearPendingAnonConversation();
+          setConversationId(pending.id);
+          setMessages(pending.messages);
+          setActiveConversationId(pending.id);
+          setOnboarding("done");
+          setNeedsStage(!p?.stage);
+          // Durably write consent (so the authed consent gate passes) and the
+          // transcript to the new user's rows — awaited and read-back verified.
+          await acceptAiConsent();
+          const ok = await persistConversationNow(pending.id);
+          if (!ok) {
+            console.warn(
+              "[chat] anon conversation did not fully persist to the new account",
+            );
+          }
+          return;
+        }
+
         setOnboarding(p?.name ? (p.stage ? "when" : "stage") : "name");
         const firstMsg = onboardingGreeting();
         const convo = createConversation(firstMsg);
@@ -610,6 +641,25 @@ export default function ChatClient() {
           setProfile(updated);
           profileForApi = updated;
         }
+
+        // Continued-anon: capture stage gently (prioritized over name). Try to
+        // read it from what they just said; otherwise, once, ask Myla to infer
+        // it from the conversation and confirm — a single woven-in ask, no
+        // questionnaire. If it's never captured, the dashboard nudge is the
+        // quiet fallback.
+        if (needsStage) {
+          const stage = detectStage(text);
+          if (stage) {
+            const updated = updateProfile({ stage });
+            setProfile(updated);
+            profileForApi = updated;
+            setNeedsStage(false);
+          } else if (!stageAsked.current) {
+            stageAsked.current = true;
+            directive =
+              'The user started this conversation before creating an account and just signed up — keep going naturally where they left off, and treat the messages above as real shared context. You don\'t yet know their stage (trying to conceive, pregnant, or postpartum / new mom). If the conversation already makes it reasonably clear, gently CONFIRM it in one short sentence (e.g. "sounds like you\'re expecting — want me to keep track of that for you?"). If it\'s genuinely unclear, gently ask once, with warm, loss-aware phrasing. Ask at most once, weave it into your reply, and never run a list of onboarding questions.';
+          }
+        }
       }
 
       try {
@@ -729,23 +779,23 @@ export default function ChatClient() {
       {/* Header */}
       <header className="safe-top sticky top-0 z-20 flex items-center justify-between border-b border-cream/5 bg-midnight/95 px-4 pb-3 backdrop-blur">
         <div className="flex items-center gap-3">
-          {onboardingDone && (
-            <button
-              onClick={() => router.push("/app/home")}
-              aria-label="home"
-              className="rounded-full p-1 text-cream/70 active:scale-95"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 12l-2 0l9 -9l9 9l-2 0M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          )}
+          {/* Always present so no one — including a continued-anon or a brand-
+              new user mid-onboarding — is left without navigation. */}
+          <button
+            onClick={() => router.push("/app/home")}
+            aria-label="home"
+            className="rounded-full p-1 text-cream/70 active:scale-95"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M5 12l-2 0l9 -9l9 9l-2 0M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
           <MylaAvatar size={36} />
           <div className="leading-tight">
             <div className="text-[15px] font-medium lowercase text-cream">

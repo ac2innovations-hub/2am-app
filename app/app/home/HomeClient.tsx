@@ -115,11 +115,11 @@ export default function HomeClient() {
       ]);
       if (cancelled) return;
       const p = remoteProfile ?? getProfile();
-      // Direct signal-based check: if there's no name or no stage, the
-      // user hasn't gone through Myla's onboarding yet. More reliable
-      // than the derived `onboardingComplete` flag, which can be stale
-      // or missing when the profile was hydrated from a fresh device.
-      if (!p || !p.name || !p.stage) {
+      // Only bounce if there's genuinely no profile to show (e.g. signed out).
+      // Un-onboarded users (missing name/stage — including someone who just
+      // continued an anonymous conversation) get a graceful minimal view below
+      // instead of being trapped or redirected.
+      if (!p) {
         router.replace("/app/chat");
         return;
       }
@@ -140,6 +140,79 @@ export default function HomeClient() {
 
   if (!mounted || !profile) {
     return <div className="p-6 text-cream/60">loading…</div>;
+  }
+
+  // Un-onboarded (e.g. just continued an anonymous conversation): render a
+  // graceful, stage-free view with working navigation and a gentle "finish your
+  // profile" nudge — never the trapped/blank dashboard.
+  if (!profile.name || !profile.stage) {
+    return (
+      <main className="relative min-h-svh bg-midnight pb-10">
+        <header className="safe-top flex items-center justify-between px-5 pb-3">
+          <span className="text-gradient-peach font-display text-2xl font-black -ml-2 px-2 py-1">
+            2am
+          </span>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/app/chat"
+              aria-label="chat with myla"
+              className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
+            >
+              <MessageCircle size={19} strokeWidth={1.75} aria-hidden />
+            </Link>
+            <Link
+              href="/app/settings"
+              aria-label="settings"
+              className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
+            >
+              <Settings size={19} strokeWidth={1.75} aria-hidden />
+            </Link>
+          </div>
+        </header>
+
+        <section className="px-5 pt-6">
+          <div className="rounded-3xl border border-cream/10 bg-navy/60 p-6">
+            <h1 className="font-display text-xl font-semibold text-cream">
+              finish setting up
+            </h1>
+            <p className="mt-2 text-[14px] leading-relaxed text-cream/70">
+              tell myla a little about where you are — trying, pregnant, or a new
+              mom — so she can tailor things to you. it only takes a sec in the
+              chat.
+            </p>
+            <Link
+              href="/app/chat"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-peach-gradient px-5 py-3 text-[14px] font-semibold text-midnight shadow-glow transition active:scale-[0.99]"
+            >
+              continue with myla
+            </Link>
+          </div>
+
+          {conversations.length > 0 && (
+            <div className="mt-8">
+              <h2 className="mb-2 font-mono text-[10px] uppercase tracking-[0.28em] text-cream/55">
+                recent
+              </h2>
+              <div className="flex flex-col gap-2">
+                {conversations.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveConversationId(c.id);
+                      router.push("/app/chat");
+                    }}
+                    className="truncate rounded-2xl border border-cream/10 bg-navy/60 px-4 py-3 text-left text-[14px] text-cream/80 transition hover:bg-navy active:scale-[0.99]"
+                  >
+                    {c.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      </main>
+    );
   }
 
   const initial = (profile.name ?? "m").charAt(0).toUpperCase();

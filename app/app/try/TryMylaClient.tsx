@@ -12,6 +12,7 @@ import {
   appendMessages,
   createConversation,
   getConversation,
+  setPendingAnonConversation,
 } from "@/lib/conversations";
 import type { ChatMessage as Msg } from "@/lib/supabase/types";
 
@@ -149,6 +150,9 @@ export default function TryMylaClient() {
       const opening: Msg = { role: "assistant", content: OPENING, timestamp: now() };
       const convo = createConversation();
       appendMessages(convo.id, [opening]);
+      // Tag it so ChatClient continues (and re-owns) THIS thread after signup
+      // instead of starting a fresh onboarding thread.
+      setPendingAnonConversation(convo.id);
 
       try {
         const stored: StoredToken = {

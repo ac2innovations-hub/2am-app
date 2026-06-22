@@ -54,6 +54,38 @@ export function setActiveConversationId(id: string | null) {
   else localStorage.setItem(ACTIVE_KEY, id);
 }
 
+// Hand-off marker: the anonymous try-Myla flow tags the conversation it created
+// so ChatClient knows, after signup, to continue THAT thread (and re-own it to
+// the new account) instead of starting a fresh onboarding thread on top of it.
+const PENDING_ANON_KEY = "2am:pendingAnonConversation";
+
+export function setPendingAnonConversation(id: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PENDING_ANON_KEY, id);
+  } catch {
+    // ignore
+  }
+}
+
+export function getPendingAnonConversation(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(PENDING_ANON_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function clearPendingAnonConversation() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(PENDING_ANON_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 function genId() {
   if (
     typeof crypto !== "undefined" &&
@@ -188,7 +220,7 @@ async function mirrorToSupabase(convo: LocalConversation) {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from("conversations").upsert(
+    const { error } = await supabase.from("conversations").upsert(
       {
         id: convo.id,
         user_id: user.id,
@@ -197,8 +229,85 @@ async function mirrorToSupabase(convo: LocalConversation) {
       },
       { onConflict: "id" },
     );
-  } catch {
-    // localStorage has the write; no-op.
+    if (error) {
+      // localStorage still has the write, but surface it — a silent failure
+      // here is how an anon transcript would fail to migrate.
+      console.warn(
+        "[conversations] mirror failed for %s: %s",
+        convo.id,
+        error.message,
+      );
+    }
+  } catch (err) {
+    console.warn(
+      "[conversations] mirror threw for %s: %s",
+      convo.id,
+      err instanceof Error ? err.message : String(err),
+    );
+  }
+}
+
+// Persist a conversation to the DB now, awaited, and confirm it landed by
+// reading the row back. Used when continuing an anonymous conversation after
+// signup so the transcript is durably written to — and owned by — the new user,
+// not just held in localStorage. RLS-correct: the row is inserted with
+// user_id = auth.uid(), which the "conversations self write" insert policy
+// requires (the anon row was never written, so this is the first insert under
+// the new owner — no cross-user ownership transfer, which RLS would reject).
+export async function persistConversationNow(id: string): Promise<boolean> {
+  const convo = getConversation(id);
+  if (!convo) return false;
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    const { error } = await supabase.from("conversations").upsert(
+      {
+        id: convo.id,
+        user_id: user.id,
+        title: convo.title,
+        messages: convo.messages,
+      },
+      { onConflict: "id" },
+    );
+    if (error) {
+      console.warn(
+        "[conversations] persist failed for %s: %s",
+        convo.id,
+        error.message,
+      );
+      return false;
+    }
+
+    // Verify: the messages actually landed on the new user's row.
+    const { data: check, error: checkErr } = await supabase
+      .from("conversations")
+      .select("id, messages")
+      .eq("id", convo.id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const landed = check && Array.isArray(check.messages) ? check.messages.length : 0;
+    if (checkErr || !check || landed < convo.messages.length) {
+      console.warn(
+        "[conversations] persist verify failed for %s: %s (%d/%d messages)",
+        convo.id,
+        checkErr?.message ?? (check ? "count mismatch" : "row not found for user"),
+        landed,
+        convo.messages.length,
+      );
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn(
+      "[conversations] persist threw for %s: %s",
+      id,
+      err instanceof Error ? err.message : String(err),
+    );
+    return false;
   }
 }
 
