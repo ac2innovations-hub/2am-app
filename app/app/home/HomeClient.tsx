@@ -142,10 +142,11 @@ export default function HomeClient() {
     return <div className="p-6 text-cream/60">loading…</div>;
   }
 
-  // Un-onboarded (e.g. just continued an anonymous conversation): render a
-  // graceful, stage-free view with working navigation and a gentle "finish your
-  // profile" nudge — never the trapped/blank dashboard.
-  if (!profile.name || !profile.stage) {
+  // No stage yet (e.g. a continued anon thread that hasn't revealed it): render
+  // a graceful, stage-free view with working navigation and a gentle "finish
+  // your profile" nudge — never the trapped/blank dashboard. Stage is the key
+  // signal for the dashboard/tracker; name is optional (falls back to defaults).
+  if (!profile.stage) {
     return (
       <main className="relative min-h-svh bg-midnight pb-10">
         <header className="safe-top flex items-center justify-between px-5 pb-3">

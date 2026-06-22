@@ -13,9 +13,11 @@ import { maybeRequestReview } from "@/lib/rating";
 import {
   appendMessages,
   createConversation,
+  deleteConversation,
   getActiveConversationId,
   getConversation,
   hydrateConversationsFromSupabase,
+  listConversations,
   setActiveConversationId,
   getPendingAnonConversation,
   clearPendingAnonConversation,
@@ -85,13 +87,28 @@ type OnboardingStep =
   | "concerns"
   | "done";
 
+// Exact text of the onboarding opener, shared so orphan-thread cleanup can
+// match a greeting-only conversation precisely.
+const ONBOARDING_GREETING_CONTENT =
+  "hey! i'm myla 💛\n\ni'm going to be here for you through this whole journey — day or night, no question too weird, no judgment ever.\n\nso tell me a little about yourself! what's your name?";
+
 function onboardingGreeting(): Msg {
   return {
     role: "assistant",
-    content:
-      "hey! i'm myla 💛\n\ni'm going to be here for you through this whole journey — day or night, no question too weird, no judgment ever.\n\nso tell me a little about yourself! what's your name?",
+    content: ONBOARDING_GREETING_CONTENT,
     timestamp: new Date().toISOString(),
   };
+}
+
+// A conversation that is ONLY the onboarding greeting with no user reply — an
+// abandoned onboarding thread (e.g. one the earlier bug spawned on top of a
+// continued conversation). Matched exactly so we never delete a real thread.
+function isOrphanOnboardingThread(messages: Msg[]): boolean {
+  return (
+    messages.length > 0 &&
+    !messages.some((m) => m.role === "user") &&
+    messages.some((m) => m.content === ONBOARDING_GREETING_CONTENT)
+  );
 }
 
 function now() {
@@ -111,6 +128,17 @@ export default function ChatClient() {
   // one-time gentle stage ask woven into the continued thread (stage-first).
   const [needsStage, setNeedsStage] = useState(false);
   const stageAsked = useRef(false);
+  // Set when a continued thread already revealed the user's stage — drives a
+  // one-time confirmation ("got you at 23 weeks 💛 — that right?") instead of a
+  // cold ask.
+  const [pendingConfirm, setPendingConfirm] = useState<{
+    name?: string | null;
+    stage: Stage;
+    week?: number | null;
+  } | null>(null);
+  // Short window after continuing where we still absorb stage/week the user
+  // states or corrects in the next turn or two.
+  const profileReview = useRef(0);
   // Last user message that didn't land a reply. When set, the Myla
   // error bubble is decorated with a "tap to retry" affordance. Cleared
   // on the next successful send or when a fresh user message is typed.
@@ -140,26 +168,74 @@ export default function ChatClient() {
       // as "onboarded". Advance mid-onboarding returners based on what
       // they've already answered.
       if (!p || !p.name || !p.stage) {
-        // Continue a conversation started in the anonymous try-Myla flow rather
-        // than burying it under a fresh onboarding thread. Re-own it to the new
-        // account so it survives and Myla keeps real context.
+        // Continue a real conversation (the just-migrated anon one, or an
+        // existing active thread) instead of starting onboarding on top of it.
         const pendingId = getPendingAnonConversation();
         const pending = pendingId ? getConversation(pendingId) : null;
-        if (pending && pending.messages.some((m) => m.role === "user")) {
-          clearPendingAnonConversation();
-          setConversationId(pending.id);
-          setMessages(pending.messages);
-          setActiveConversationId(pending.id);
+        const activeId = getActiveConversationId();
+        const active = activeId ? getConversation(activeId) : null;
+        const hasUserTurn = (c: typeof pending) =>
+          !!c && c.messages.some((m) => m.role === "user");
+        // Fall back to the most recent real (has-user-turn) conversation, so we
+        // recover a migrated thread even if the active pointer was left on an
+        // orphan onboarding thread by the earlier bug.
+        const recentReal =
+          listConversations().find((c) =>
+            c.messages.some((m) => m.role === "user"),
+          ) ?? null;
+        const continueConvo = hasUserTurn(pending)
+          ? pending!
+          : hasUserTurn(active)
+            ? active!
+            : recentReal;
+
+        if (continueConvo) {
+          const fromPending = continueConvo === pending;
+          if (fromPending) clearPendingAnonConversation();
+
+          // Capture name/stage/weeks from the transcript and persist them, so
+          // the dashboard/tracker work and Myla confirms rather than re-asks.
+          const patch = captureFromTranscript(continueConvo.messages, p);
+          const cp = Object.keys(patch).length > 0 ? updateProfile(patch) : p;
+          setProfile(cp);
+
+          setConversationId(continueConvo.id);
+          setMessages(continueConvo.messages);
+          setActiveConversationId(continueConvo.id);
           setOnboarding("done");
-          setNeedsStage(!p?.stage);
-          // Durably write consent (so the authed consent gate passes) and the
-          // transcript to the new user's rows — awaited and read-back verified.
-          await acceptAiConsent();
-          const ok = await persistConversationNow(pending.id);
-          if (!ok) {
-            console.warn(
-              "[chat] anon conversation did not fully persist to the new account",
-            );
+          profileReview.current = 2;
+
+          if (cp?.stage) {
+            setPendingConfirm({
+              name: cp.name ?? undefined,
+              stage: cp.stage,
+              week: cp.week ?? undefined,
+            });
+            setNeedsStage(false);
+          } else {
+            setNeedsStage(true);
+          }
+
+          // Remove any orphan onboarding thread the earlier bug spawned.
+          for (const c of listConversations()) {
+            if (
+              c.id !== continueConvo.id &&
+              isOrphanOnboardingThread(c.messages)
+            ) {
+              deleteConversation(c.id);
+            }
+          }
+
+          // First continuation: durably re-own consent + the captured profile +
+          // the transcript to the new user's rows — awaited and read-back verified.
+          if (fromPending) {
+            await acceptAiConsent();
+            const ok = await persistConversationNow(continueConvo.id);
+            if (!ok) {
+              console.warn(
+                "[chat] anon conversation did not fully persist to the new account",
+              );
+            }
           }
           return;
         }
@@ -642,23 +718,30 @@ export default function ChatClient() {
           profileForApi = updated;
         }
 
-        // Continued-anon: capture stage gently (prioritized over name). Try to
-        // read it from what they just said; otherwise, once, ask Myla to infer
-        // it from the conversation and confirm — a single woven-in ask, no
-        // questionnaire. If it's never captured, the dashboard nudge is the
-        // quiet fallback.
-        if (needsStage) {
-          const stage = detectStage(text);
-          if (stage) {
-            const updated = updateProfile({ stage });
+        // Continued-anon profile completion. For a couple of turns after
+        // continuing, absorb any stage/weeks the user states or corrects
+        // (guarded so a throwaway line doesn't mis-set stage).
+        if (profileReview.current > 0) {
+          profileReview.current -= 1;
+          const cap = captureFromText(text, profileForApi);
+          if (Object.keys(cap).length > 0) {
+            const updated = updateProfile(cap);
             setProfile(updated);
             profileForApi = updated;
-            setNeedsStage(false);
-          } else if (!stageAsked.current) {
-            stageAsked.current = true;
-            directive =
-              'The user started this conversation before creating an account and just signed up — keep going naturally where they left off, and treat the messages above as real shared context. You don\'t yet know their stage (trying to conceive, pregnant, or postpartum / new mom). If the conversation already makes it reasonably clear, gently CONFIRM it in one short sentence (e.g. "sounds like you\'re expecting — want me to keep track of that for you?"). If it\'s genuinely unclear, gently ask once, with warm, loss-aware phrasing. Ask at most once, weave it into your reply, and never run a list of onboarding questions.';
+            if (cap.stage) setNeedsStage(false);
           }
+        }
+
+        // One-time woven-in moment: confirm what we already captured, or — if
+        // stage is still unknown — ask for it gently (loss-aware), never a
+        // questionnaire. If never captured, the dashboard nudge is the fallback.
+        if (pendingConfirm) {
+          directive = buildConfirmDirective(pendingConfirm);
+          setPendingConfirm(null);
+        } else if (needsStage && !stageAsked.current) {
+          stageAsked.current = true;
+          directive =
+            "The user started this conversation before creating an account and just signed up — keep going naturally where they left off, and treat the messages above as real shared context. You don't yet know their stage (trying to conceive, pregnant, or postpartum / new mom). If the conversation makes it reasonably clear, gently CONFIRM it in one short sentence. If it's genuinely unclear, gently ask once, with warm, loss-aware phrasing. Ask at most once, weave it into your reply, and never run a list of onboarding questions.";
         }
       }
 
@@ -1339,4 +1422,101 @@ export function parseMonths(text: string): number | null {
   if (bare) return clampMonths(parseFloat(bare[1]));
 
   return null;
+}
+
+// ---- continued-anon profile capture --------------------------------------
+// detectStage() always returns a stage (defaults to "pregnant"), so only treat
+// a message as carrying a stage when it has an explicit signal — otherwise a
+// throwaway line like "hi" would silently set stage=pregnant.
+const EXPLICIT_STAGE_RE =
+  /\b(pregnant|pregnancy|expecting|trimester|postpartum|postnatal|newborn|new\s+mom|gave\s+birth|delivered|had\s+(?:my|the|a)\s+(?:baby|son|daughter|little|boy|girl)|breastfeed|nursing|trying\s+to\s+conceive|ttc|conceiv|fertility|ovulat|weeks?\s+(?:pregnant|along|postpartum)|due\s+(?:date|in|on)|baby\s+(?:is\s+)?\d|\d+\s*(?:weeks?|months?|mos?|mo)\s+old)\b/i;
+const NAME_INTRO_RE =
+  /\b(?:my\s+name'?s?|my\s+name\s+is|call\s+me|i'?m\s+called|i'?m|i\s+am|it'?s)\b/i;
+const NAME_STRONG_RE = /\b(?:my\s+name|call\s+me|i'?m\s+called|name'?s)\b/i;
+const NOT_A_NAME_RE =
+  /\b(anxious|scared|nervous|worried|tired|exhausted|excited|fine|okay|ok|good|great|stressed|overwhelmed|sad|happy|here|new|pregnant|expecting|trying|postpartum|done|bleeding|cramping|spotting|feeling|hoping|hopeful|so|really|just|not|sure)\b/i;
+
+// Extract a name only when we're fairly sure. Strong cues ("my name is X",
+// "call me X") trust the parser; a weak "i'm X" requires X to look like a name
+// (capitalized in the original) so we don't capture "i'm bleeding".
+function extractName(text: string): string | null {
+  if (!NAME_INTRO_RE.test(text)) return null;
+  const candidate = parseName(text).trim();
+  if (!/^[a-zA-Z][a-zA-Z'’-]{1,19}$/.test(candidate)) return null;
+  if (NOT_A_NAME_RE.test(candidate)) return null;
+  if (NAME_STRONG_RE.test(text)) return candidate;
+  const cap = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+  return new RegExp(`\\b${cap}\\b`).test(text) ? candidate : null;
+}
+
+function captureFromText(
+  text: string,
+  current: LocalProfile | null,
+): Partial<LocalProfile> {
+  const out: Partial<LocalProfile> = {};
+  if (EXPLICIT_STAGE_RE.test(text)) {
+    const s = detectStage(text);
+    out.stage = s;
+    if (s === "pregnant") {
+      const w = parseWeek(text);
+      if (w !== null) out.week = w;
+      else {
+        const d = parseDueDate(text);
+        if (d) out.dueDate = d;
+      }
+    }
+  } else if (current?.stage === "pregnant") {
+    // Already known pregnant — allow a bare "24 weeks" correction.
+    const w = parseWeek(text);
+    if (w !== null) out.week = w;
+  }
+  const n = extractName(text);
+  if (n) out.name = n;
+  return out;
+}
+
+// Scan a migrated transcript for the first confident name / stage / weeks,
+// returning only fields the profile doesn't already have.
+function captureFromTranscript(
+  messages: Msg[],
+  current: LocalProfile | null,
+): Partial<LocalProfile> {
+  const found: Partial<LocalProfile> = {};
+  for (const m of messages) {
+    if (m.role !== "user") continue;
+    const cap = captureFromText(m.content, {
+      ...(current ?? {}),
+      ...found,
+    } as LocalProfile);
+    if (found.name === undefined && cap.name !== undefined) found.name = cap.name;
+    if (found.stage === undefined && cap.stage !== undefined) found.stage = cap.stage;
+    if (found.week === undefined && cap.week !== undefined) found.week = cap.week;
+    if (found.dueDate === undefined && cap.dueDate !== undefined)
+      found.dueDate = cap.dueDate;
+    if (found.name !== undefined && found.stage !== undefined) break;
+  }
+  const patch: Partial<LocalProfile> = {};
+  if (found.name && !current?.name) patch.name = found.name;
+  if (found.stage && !current?.stage) patch.stage = found.stage;
+  if (found.week !== undefined && (current?.week ?? null) === null)
+    patch.week = found.week;
+  if (found.dueDate && !current?.dueDate) patch.dueDate = found.dueDate;
+  return patch;
+}
+
+// One-time directive that confirms what we already gathered, instead of asking
+// cold. Used when a continued anon thread already revealed the user's stage.
+function buildConfirmDirective(s: {
+  name?: string | null;
+  stage: Stage;
+  week?: number | null;
+}): string {
+  const stageWord =
+    s.stage === "pregnant"
+      ? `pregnant${s.week ? `, around ${s.week} weeks` : ""}`
+      : s.stage === "postpartum"
+        ? "a new mom (postpartum)"
+        : "trying to conceive";
+  const example = `got you${s.name ? `, ${s.name}` : ""}${s.week ? ` at ${s.week} weeks` : ""} 💛 — that right?`;
+  return `From the earlier conversation — before she made an account — you already know ${s.name ? `her name is ${s.name} and ` : ""}she's ${stageWord}. Warmly CONFIRM this in one short sentence as part of your reply (for example: "${example}"), then keep going naturally. Don't ask as if you don't know — just confirm. If she corrects anything, roll with it.`;
 }
