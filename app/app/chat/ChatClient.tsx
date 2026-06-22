@@ -139,6 +139,9 @@ export default function ChatClient() {
   // Short window after continuing where we still absorb stage/week the user
   // states or corrects in the next turn or two.
   const profileReview = useRef(0);
+  // True after Myla has woven in "what should I call you?" — her next reply is
+  // parsed as the name answer (a bare "sarah" is safe in that context).
+  const awaitingNameReply = useRef(false);
   // Last user message that didn't land a reply. When set, the Myla
   // error bubble is decorated with a "tap to retry" affordance. Cleared
   // on the next successful send or when a fresh user message is typed.
@@ -718,9 +721,20 @@ export default function ChatClient() {
           profileForApi = updated;
         }
 
-        // Continued-anon profile completion. For a couple of turns after
-        // continuing, absorb any stage/weeks the user states or corrects
-        // (guarded so a throwaway line doesn't mis-set stage).
+        // Continued-anon profile completion.
+        // (a) If Myla just asked her name, this reply is the answer — capture it
+        //     (bare "sarah" is safe here; the question gave the context).
+        if (awaitingNameReply.current) {
+          awaitingNameReply.current = false;
+          const nm = extractNameFromAnswer(text);
+          if (nm && !profileForApi?.name) {
+            const updated = updateProfile({ name: nm });
+            setProfile(updated);
+            profileForApi = updated;
+          }
+        }
+        // (b) For a couple of turns, absorb any stage/weeks the user states or
+        //     corrects (guarded so a throwaway line doesn't mis-set stage).
         if (profileReview.current > 0) {
           profileReview.current -= 1;
           const cap = captureFromText(text, profileForApi);
@@ -732,11 +746,12 @@ export default function ChatClient() {
           }
         }
 
-        // One-time woven-in moment: confirm what we already captured, or — if
-        // stage is still unknown — ask for it gently (loss-aware), never a
-        // questionnaire. If never captured, the dashboard nudge is the fallback.
+        // One-time woven-in moment: confirm what we already captured (and, if we
+        // don't have her name, gently ask it), or — if stage is still unknown —
+        // ask for stage gently (loss-aware), never a questionnaire.
         if (pendingConfirm) {
           directive = buildConfirmDirective(pendingConfirm);
+          if (!profileForApi?.name) awaitingNameReply.current = true;
           setPendingConfirm(null);
         } else if (needsStage && !stageAsked.current) {
           stageAsked.current = true;
@@ -1449,6 +1464,26 @@ function extractName(text: string): string | null {
   return new RegExp(`\\b${cap}\\b`).test(text) ? candidate : null;
 }
 
+// Parse a name from a direct reply to "what should I call you?" — the question
+// supplies the context, so a bare "sarah" is safe here (no intro cue needed).
+// Still sanity-checked so a deflection ("why?") isn't saved as a name.
+function extractNameFromAnswer(text: string): string | null {
+  const t = text.trim().toLowerCase();
+  // A question or deflection isn't a name — don't save "why" / "idk" etc.
+  if (t.includes("?")) return null;
+  if (
+    /^(why|what|who|how|idk|dunno|i\s+dunno|i\s+don'?t|i'?d\s+rather|rather\s+not|prefer\s+not|no\b|nah|nope|nothing|whatever)/.test(
+      t,
+    )
+  ) {
+    return null;
+  }
+  const candidate = parseName(text).trim();
+  if (!/^[a-zA-Z][a-zA-Z'’-]{1,19}$/.test(candidate)) return null;
+  if (NOT_A_NAME_RE.test(candidate)) return null;
+  return candidate;
+}
+
 function captureFromText(
   text: string,
   current: LocalProfile | null,
@@ -1518,5 +1553,9 @@ function buildConfirmDirective(s: {
         ? "a new mom (postpartum)"
         : "trying to conceive";
   const example = `got you${s.name ? `, ${s.name}` : ""}${s.week ? ` at ${s.week} weeks` : ""} 💛 — that right?`;
-  return `From the earlier conversation — before she made an account — you already know ${s.name ? `her name is ${s.name} and ` : ""}she's ${stageWord}. Warmly CONFIRM this in one short sentence as part of your reply (for example: "${example}"), then keep going naturally. Don't ask as if you don't know — just confirm. If she corrects anything, roll with it.`;
+  const confirm = `From the earlier conversation — before she made an account — you already know ${s.name ? `her name is ${s.name} and ` : ""}she's ${stageWord}. Warmly CONFIRM this in one short sentence as part of your reply (for example: "${example}"), then keep going naturally. Don't ask as if you don't know — just confirm. If she corrects anything, roll with it.`;
+  const nameAsk = s.name
+    ? ""
+    : ` You don't know her name yet — in the same breath, gently ask what you should call her (something like "…and what should i call you? 💛"). Keep it light: one quick question, not a form.`;
+  return confirm + nameAsk;
 }
