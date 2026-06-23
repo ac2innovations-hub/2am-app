@@ -348,6 +348,18 @@ html { scroll-behavior: smooth; }
   margin-top: 4px;
 }
 
+/* clinical endorsement — reuses the .landing-testimonial card, centered as a
+   single prominent quote */
+.landing-endorsement-card {
+  max-width: 44rem;
+  margin: 36px auto 0;
+}
+.landing-endorsement-card blockquote {
+  font-size: 17px;
+  font-style: italic;
+  line-height: 1.6;
+}
+
 /* final cta */
 .landing-final {
   text-align: center;

@@ -162,6 +162,12 @@ export default async function Landing({
           <p className="landing-tiny landing-mono">
             no judgment · no google history · just answers
           </p>
+          <p
+            className="landing-tiny landing-mono"
+            style={{ color: "var(--peach)", marginTop: 12 }}
+          >
+            reviewed by a board-certified ob-gyn 💛
+          </p>
         </div>
       </header>
 
@@ -307,6 +313,30 @@ export default async function Landing({
               </p>
             </article>
           </div>
+        </div>
+      </section>
+
+      {/* clinical endorsement */}
+      <section className="landing-section landing-endorsement">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">
+            reviewed by a board-certified ob-gyn
+          </span>
+          <h2 className="landing-title">an independent clinical review.</h2>
+          <figure className="landing-testimonial landing-endorsement-card">
+            <blockquote>
+              “As a board-certified OB/GYN with over a decade of clinical
+              experience, I would recommend 2am to all of my patients. It does
+              an excellent job of providing patients with honest and accurate
+              medical information in a manner that is non-judgmental and allows
+              patients to make educated decisions about their care during an
+              important and vulnerable period in their lives.”
+            </blockquote>
+            <cite>Jill Palko, MD, OB-GYN</cite>
+            <div className="who">
+              a one-time independent review — not ongoing medical supervision
+            </div>
+          </figure>
         </div>
       </section>
 
