@@ -40,6 +40,12 @@ function getRedis(): Redis | null {
     );
     redis = null;
   }
+  // One-time log (per process/cold start) so the active backend is visible in
+  // the deploy logs — confirms whether Upstash is wired up.
+  console.info(
+    "[rate-limiter] store: %s",
+    redis ? "upstash redis (shared)" : "in-memory (per-instance fallback)",
+  );
   return redis;
 }
 
