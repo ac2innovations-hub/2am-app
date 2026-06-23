@@ -6,22 +6,22 @@ export const metadata: Metadata = {
   title: "why 2am exists — the judgment-free friend for your journey",
   description:
     "2am is an ai-powered friend for the questions women have at 2 a.m. founded by ali miller. warm, evidence-based, judgment-free.",
-  alternates: { canonical: "https://hey2am.app/about" },
+  alternates: { canonical: "https://www.hey2am.app/about" },
   openGraph: {
     title: "why 2am exists",
     description:
       "2am is an ai-powered friend for the questions women have at 2 a.m. warm, evidence-based, judgment-free.",
-    url: "https://hey2am.app/about",
+    url: "https://www.hey2am.app/about",
     siteName: "2am",
     type: "website",
-    images: [{ url: "https://hey2am.app/og-image.png" }],
+    images: [{ url: "https://www.hey2am.app/og-image.png" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "why 2am exists",
     description:
       "2am is an ai-powered friend for the questions women have at 2 a.m.",
-    images: ["https://hey2am.app/og-image.png"],
+    images: ["https://www.hey2am.app/og-image.png"],
   },
 };
 

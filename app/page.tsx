@@ -23,12 +23,12 @@ export const metadata: Metadata = {
       "2am — the judgment-free pregnancy, ttc & postpartum friend",
     description:
       "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
-    url: "https://hey2am.app",
+    url: "https://www.hey2am.app",
     siteName: "2am",
     type: "website",
     images: [
       {
-        url: "https://hey2am.app/og-image.png",
+        url: "https://www.hey2am.app/og-image.png",
       },
     ],
   },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
       "2am — the judgment-free pregnancy, ttc & postpartum friend",
     description:
       "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
-    images: ["https://hey2am.app/og-image.png"],
+    images: ["https://www.hey2am.app/og-image.png"],
   },
 };
 

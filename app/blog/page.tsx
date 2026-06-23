@@ -7,22 +7,22 @@ export const metadata: Metadata = {
   title: "2am blog — answers for the questions you'd never google",
   description:
     "evidence-based answers to the questions women ask at 2 a.m. trying to conceive, pregnancy, and postpartum — no judgment, just information.",
-  alternates: { canonical: "https://hey2am.app/blog" },
+  alternates: { canonical: "https://www.hey2am.app/blog" },
   openGraph: {
     title: "2am blog — answers for the questions you'd never google",
     description:
       "evidence-based answers to the questions women ask at 2 a.m. trying to conceive, pregnancy, and postpartum — no judgment, just information.",
-    url: "https://hey2am.app/blog",
+    url: "https://www.hey2am.app/blog",
     siteName: "2am",
     type: "website",
-    images: [{ url: "https://hey2am.app/og-image.png" }],
+    images: [{ url: "https://www.hey2am.app/og-image.png" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "2am blog",
     description:
       "evidence-based answers to the questions women ask at 2 a.m.",
-    images: ["https://hey2am.app/og-image.png"],
+    images: ["https://www.hey2am.app/og-image.png"],
   },
 };
 

@@ -6,7 +6,7 @@ import "../../legal.css";
 
 type Props = { params: { slug: string } };
 
-const SITE = "https://hey2am.app";
+const SITE = "https://www.hey2am.app";
 const OG_IMAGE = `${SITE}/og-image.png`;
 
 export function generateStaticParams() {

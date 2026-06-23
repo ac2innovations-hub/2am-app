@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "2am — myla's always up",
   description:
     "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom. no judgment. no google history. just answers.",
-  metadataBase: new URL("https://hey2am.app"),
+  metadataBase: new URL("https://www.hey2am.app"),
   manifest: "/manifest.json",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title: "2am — myla's always up",
     description:
       "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
-    url: "https://hey2am.app",
+    url: "https://www.hey2am.app",
     siteName: "2am",
     type: "website",
     images: [
@@ -64,8 +64,8 @@ const ORG_JSONLD = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "2am",
-  url: "https://hey2am.app",
-  logo: "https://hey2am.app/icon.svg",
+  url: "https://www.hey2am.app",
+  logo: "https://www.hey2am.app/icon.svg",
   sameAs: [
     "https://www.instagram.com/hey2amapp",
     "https://www.tiktok.com/@hey2am.app",
@@ -76,7 +76,7 @@ const WEBSITE_JSONLD = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "2am",
-  url: "https://hey2am.app",
+  url: "https://www.hey2am.app",
 };
 
 export const viewport: Viewport = {
