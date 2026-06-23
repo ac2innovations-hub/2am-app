@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
+import { createHash, timingSafeEqual } from "crypto";
 import { getClient, PRIMARY_MODEL, FALLBACK_MODEL } from "@/lib/anthropic";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+// Constant-time secret comparison. Hashing both sides to a fixed 32 bytes keeps
+// it constant-time regardless of length (timingSafeEqual requires equal-length
+// buffers) and avoids leaking the secret length.
+function secretMatches(provided: string | null, expected: string): boolean {
+  if (!provided) return false;
+  const a = createHash("sha256").update(provided).digest();
+  const b = createHash("sha256").update(expected).digest();
+  return timingSafeEqual(a, b);
+}
 
 // Tiny real Claude call so monitoring can verify the whole chat path end to
 // end — API key valid, model reachable, network egress working — not just that
@@ -28,11 +39,15 @@ async function ping(model: string) {
 }
 
 export async function GET(req: Request) {
-  // Secret gate: the caller must present HEALTHCHECK_SECRET in the
-  // x-healthcheck-secret header. Closed by default — if the env var is unset,
-  // the endpoint stays locked rather than open.
+  // Secret gate: the caller must present HEALTHCHECK_SECRET via the
+  // x-healthcheck-secret header OR a ?key= query param (for uptime monitors
+  // that can't send custom headers), constant-time compared. Closed by default
+  // — if the env var is unset, the endpoint stays locked rather than open.
   const secret = process.env.HEALTHCHECK_SECRET;
-  if (!secret || req.headers.get("x-healthcheck-secret") !== secret) {
+  const provided =
+    req.headers.get("x-healthcheck-secret") ??
+    new URL(req.url).searchParams.get("key");
+  if (!secret || !secretMatches(provided, secret)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
