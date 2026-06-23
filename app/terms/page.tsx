@@ -113,6 +113,21 @@ export default function TermsPage() {
         </section>
 
         <section className="legal-section">
+          <h2>copyright and dmca</h2>
+          <p>
+            we respect intellectual property rights and respond to valid notices
+            of alleged copyright infringement under the Digital Millennium
+            Copyright Act (DMCA).
+          </p>
+          <p>
+            if you believe content on <span className="brand-name">2am</span>{" "}
+            infringes your copyright, our full DMCA policy — including how to
+            submit a takedown notice and how to reach our designated agent — is
+            available at <Link href="/dmca">hey2am.app/dmca</Link>.
+          </p>
+        </section>
+
+        <section className="legal-section">
           <h2>subscription and payment</h2>
           <p>
             <span className="brand-name">2am</span> currently offers free access during our launch period. we

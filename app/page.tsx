@@ -592,6 +592,10 @@ export default async function Landing({
             terms
           </Link>
           {" · "}
+          <Link href="/dmca" className="landing-footer-link">
+            dmca
+          </Link>
+          {" · "}
           <a
             href="https://www.instagram.com/hey2amapp"
             target="_blank"
