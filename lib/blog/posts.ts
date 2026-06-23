@@ -18,6 +18,42 @@ export const AUDIENCE_LABEL: Record<Audience, string> = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "how-to-survive-the-two-week-wait",
+    title: "how to survive the two-week wait without losing your mind",
+    description:
+      "the two-week wait is the longest two weeks in the world. here's how to get through it — the symptom-spotting trap, the anxiety, and what actually helps.",
+    audience: "ttc",
+    date: "2026-06-23",
+    content: `<p>you ovulated. you did everything right. and now you wait. fourteen days that somehow last longer than any two weeks have ever lasted, where every twinge means something and nothing, and you refresh the same three forums at 2am looking for someone whose body is doing exactly what yours is doing.</p>
+<p>the two-week wait is the longest two weeks in the world. every time. if you're in it right now, white-knuckling your way to test day — this is for you.</p>
+<h2>why the two-week wait is so hard</h2>
+<p>it's not just the waiting. it's that the waiting is full of <em>hope</em>, and hope is heavy. you can't do anything to change the outcome now, and there's no in-between answer to hold onto — just two weeks of not knowing, while a part of you is already imagining a future you can't let yourself believe in yet.</p>
+<p>that mix of hope, fear, and total lack of control is genuinely hard. so if you feel a little unhinged right now, you're not. you're just in one of the most emotionally loaded stretches of the whole journey.</p>
+<h2>the symptom-spotting trap</h2>
+<p>here's the cruel part: you will analyze every single sensation. sore breasts? could be it. cramping? could be it. tired, bloated, weepy, weirdly hungry? could be it. you'll google "[symptom] + DPO" more times than you'd ever admit.</p>
+<p>the trap is that the early symptoms everyone obsesses over overlap almost completely with the lead-up to your period — same hormones, same feelings. so symptom-spotting rarely gives you a real answer; it mostly gives you a roller coaster. knowing that doesn't make you stop (nobody fully stops), but it can help you hold it more loosely: <em>this twinge is information about nothing yet.</em></p>
+<h2>"can i just test early?"</h2>
+<p>everyone wants to. the honest answer most people land on: testing too early is how you end up heartbroken over a result that wasn't final. tests are most reliable once you've actually missed your period, and an early negative can mean "too soon" far more often than "no." follow the instructions on your specific test, and if you want guidance for your situation, your provider can help — but if you can make it to test day without taking five tests at 9 days past ovulation, future-you will thank you.</p>
+<h2>things that actually help</h2>
+<p>no one can make two weeks shorter, but these make them more survivable:</p>
+<p><strong>set a "no testing until ___" rule.</strong> pick a date and tell someone, so you're accountable to it. boundaries help.</p>
+<p><strong>starve the spiral.</strong> put a limit on the symptom-googling — even "only at night for 10 minutes." the endless searching feeds the anxiety more than it answers it.</p>
+<p><strong>fill the calendar.</strong> make plans, especially around the days you know will be hardest. distraction isn't avoidance — it's mercy.</p>
+<p><strong>move your body</strong> in whatever way feels good. it burns off some of the restless energy.</p>
+<p><strong>tell one safe person</strong> where you are. not the whole group chat — just someone who gets it and won't say "just relax."</p>
+<p><strong>be gentle with yourself.</strong> lower the bar. this is not the two weeks to also overhaul your life. survival counts.</p>
+<h2>it's okay to not be okay</h2>
+<p>some days in the wait, the strongest thing you'll do is get through the day. if you find yourself anxious, weepy, snappy, or quietly grieving a result that hasn't even happened yet — that's normal, and you're allowed to feel all of it. the two-week wait can stir up real anxiety, and naming it ("i'm scared") usually helps more than pretending you're fine.</p>
+<h2>you don't have to wait alone</h2>
+<p>the hardest part of the two-week wait is how <em>lonely</em> it is — the people around you are living normal weeks while yours is consumed by something you might not even be talking about. you don't have to white-knuckle it by yourself.</p>
+<h2>frequently asked questions</h2>
+<p><strong>why does the two-week wait feel so long?</strong> because it's full of hope you can't act on and an answer you can't get yet. the lack of control plus the emotional stakes makes time crawl — it's not in your head, and it's not just you.</p>
+<p><strong>is it normal to feel anxious during the two-week wait?</strong> completely. anxiety, mood swings, and even a sense of grief before you know anything are all common in the wait. it's one of the most emotionally intense parts of trying to conceive.</p>
+<p><strong>can early pregnancy symptoms tell me if it worked?</strong> generally, no — the early signs people watch for overlap heavily with normal pre-period symptoms, so they rarely give a clear answer. everyone's body is different; your provider can help with what's specific to you.</p>
+<p><strong>should i test early?</strong> it's tempting, but early testing often produces false negatives because it's simply too soon, which can be crushing. most people find waiting until after a missed period gives a more reliable result and spares them some heartbreak.</p>
+<p><strong>how do i stop obsessing over symptoms?</strong> you probably won't stop completely — but limiting how often you google, setting a test date, and keeping yourself busy all take some of the power out of the spiral.</p>`,
+  },
+  {
     slug: "can-i-eat-sushi-while-pregnant",
     date: "2026-04-23",    title: "can i eat sushi while pregnant? here's the real answer.",
     description:
