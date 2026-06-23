@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "terms of service — 2am",
   description:
     "the terms of service for 2am. myla is an ai friend, not a medical provider. always consult your healthcare provider for medical decisions.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

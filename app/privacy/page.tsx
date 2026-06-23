@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "privacy policy — 2am",
   description:
     "how 2am collects, uses, and protects your data. we collect only what we need, never sell your information, and your conversations are yours.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

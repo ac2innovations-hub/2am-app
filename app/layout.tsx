@@ -41,7 +41,42 @@ export const metadata: Metadata = {
     url: "https://hey2am.app",
     siteName: "2am",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "2am — myla's always up",
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "2am — myla's always up",
+    description:
+      "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
+    images: ["/og-image.png"],
+  },
+};
+
+// Sitewide structured data (E-E-A-T / brand identity in search).
+const ORG_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "2am",
+  url: "https://hey2am.app",
+  logo: "https://hey2am.app/icon.svg",
+  sameAs: [
+    "https://www.instagram.com/hey2amapp",
+    "https://www.tiktok.com/@hey2am.app",
+  ],
+};
+
+const WEBSITE_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "2am",
+  url: "https://hey2am.app",
 };
 
 export const viewport: Viewport = {
@@ -88,6 +123,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${dmMono.variable}`}>
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSONLD) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSONLD) }}
+        />
         {APPLE_SPLASH_SIZES.map((media) => (
           <link
             key={media}

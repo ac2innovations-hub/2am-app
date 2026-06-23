@@ -159,6 +159,7 @@
   line-height: 1.75;
   color: rgba(255, 250, 245, 0.88);
 }
+.blog-article h2,
 .blog-article h3 {
   margin: 36px 0 12px;
   font-size: 18px;

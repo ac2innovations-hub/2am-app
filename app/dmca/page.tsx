@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "dmca copyright policy — 2am",
   description:
     "the dmca copyright policy for 2am — how to submit a takedown notice, how we respond, and how to reach our designated agent.",
+  alternates: { canonical: "/dmca" },
 };
 
 export default function DmcaPage() {

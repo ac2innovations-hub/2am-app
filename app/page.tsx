@@ -14,12 +14,13 @@ import "./landing.css";
 
 export const metadata: Metadata = {
   title:
-    "2am — myla's always up. | the judgment-free friend for trying, pregnancy & new motherhood",
+    "2am — the judgment-free pregnancy, ttc & postpartum friend",
   description:
     "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom. no google history. no embarrassment. just answers.",
+  alternates: { canonical: "/" },
   openGraph: {
     title:
-      "2am — myla's always up. | the judgment-free friend for trying, pregnancy & new motherhood",
+      "2am — the judgment-free pregnancy, ttc & postpartum friend",
     description:
       "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
     url: "https://hey2am.app",
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title:
-      "2am — myla's always up. | the judgment-free friend for trying, pregnancy & new motherhood",
+      "2am — the judgment-free pregnancy, ttc & postpartum friend",
     description:
       "the judgment-free friend for your journey — whether you're trying, expecting, or navigating life as a new mom.",
     images: ["https://hey2am.app/og-image.png"],
@@ -141,11 +142,17 @@ export default async function Landing({
           ))}
         </div>
         <div className="landing-container">
+          {/* The single page h1 carries the core topic for SEO/screen readers;
+              the wordmark below is the visual brand lockup, not the heading. */}
+          <h1 className="sr-only">
+            2am — the judgment-free ai friend for trying to conceive, pregnancy,
+            and new motherhood
+          </h1>
           <span className="landing-mono">for every stage of motherhood</span>
-          <h1 className="landing-hero-h1">
+          <div className="landing-hero-h1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wordmark.svg" alt="2am" className="landing-hero-wordmark" />
-          </h1>
+          </div>
           <p className="landing-tag">myla’s always up.</p>
           <p className="landing-sub">
             <span className="brand-name">2am</span> is the judgment-free friend

@@ -50,6 +50,8 @@ export default function BlogPostPage({ params }: Props) {
     "@type": "Article",
     headline: post.title,
     description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
     author: { "@type": "Organization", name: "2am", url: SITE },
     publisher: {
       "@type": "Organization",
