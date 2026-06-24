@@ -6,7 +6,9 @@ export type BlogPost = {
   description: string;
   audience: Audience;
   date: string; // ISO publish date (YYYY-MM-DD)
+  updated?: string; // ISO last-modified date (YYYY-MM-DD); falls back to `date`
   content: string; // HTML
+  faqs?: { q: string; a: string }[]; // drives the FAQPage JSON-LD
 };
 
 export const AUDIENCE_LABEL: Record<Audience, string> = {
@@ -14,6 +16,16 @@ export const AUDIENCE_LABEL: Record<Audience, string> = {
   pregnant: "pregnancy",
   postpartum: "postpartum",
   all: "for everyone",
+};
+
+// Default author for all blog posts (named person for E-E-A-T). If a post ever
+// needs a different author, add an optional `author` to BlogPost and fall back
+// to this.
+export const AUTHOR = {
+  name: "Ali Miller",
+  role: "Founder",
+  url: "https://www.hey2am.app/about",
+  bio: "Ali Miller is the founder of 2am, a judgment-free support app for the trying-to-conceive, pregnancy, and postpartum journey. She built 2am — and its AI friend, Myla — to meet women in the hardest, loneliest moments, with honesty and zero judgment.",
 };
 
 export const POSTS: BlogPost[] = [
@@ -52,130 +64,215 @@ export const POSTS: BlogPost[] = [
 <p><strong>can early pregnancy symptoms tell me if it worked?</strong> generally, no — the early signs people watch for overlap heavily with normal pre-period symptoms, so they rarely give a clear answer. everyone's body is different; your provider can help with what's specific to you.</p>
 <p><strong>should i test early?</strong> it's tempting, but early testing often produces false negatives because it's simply too soon, which can be crushing. most people find waiting until after a missed period gives a more reliable result and spares them some heartbreak.</p>
 <p><strong>how do i stop obsessing over symptoms?</strong> you probably won't stop completely — but limiting how often you google, setting a test date, and keeping yourself busy all take some of the power out of the spiral.</p>`,
+    faqs: [
+      { q: "why does the two-week wait feel so long?", a: "because it's full of hope you can't act on and an answer you can't get yet. the lack of control plus the emotional stakes makes time crawl — it's not in your head, and it's not just you." },
+      { q: "is it normal to feel anxious during the two-week wait?", a: "completely. anxiety, mood swings, and even a sense of grief before you know anything are all common in the wait. it's one of the most emotionally intense parts of trying to conceive." },
+      { q: "can early pregnancy symptoms tell me if it worked?", a: "generally, no — the early signs people watch for overlap heavily with normal pre-period symptoms, so they rarely give a clear answer. everyone's body is different; your provider can help with what's specific to you." },
+      { q: "should i test early?", a: "it's tempting, but early testing often produces false negatives because it's simply too soon, which can be crushing. most people find waiting until after a missed period gives a more reliable result and spares them some heartbreak." },
+      { q: "how do i stop obsessing over symptoms?", a: "you probably won't stop completely — but limiting how often you google, setting a test date, and keeping yourself busy all take some of the power out of the spiral." },
+    ],
   },
   {
     slug: "can-i-eat-sushi-while-pregnant",
-    date: "2026-04-23",    title: "can i eat sushi while pregnant? here's the real answer.",
+    title: "can i eat sushi while pregnant? here's the real answer.",
     description:
-      "cooked sushi is fine during pregnancy. here's what ACOG and the FDA actually say about raw fish, mercury, and what to order.",
+      "cooked sushi is fine in pregnancy — raw is the part to skip. here's exactly what ACOG and the FDA say about rolls, mercury, and what to order.",
     audience: "pregnant",
+    date: "2026-04-23",
+    updated: "2026-06-24",
     content: `<p>you're staring at a menu. your friend just ordered a spicy tuna roll. and now you're doing that thing where you pretend to study the menu while frantically trying to remember what the internet said about raw fish.</p>
-<p>let's clear this up.</p>
+<p>let's clear it up — the real answer is more reassuring than the panic-googling suggests.</p>
 <h2>the short answer</h2>
-<p>cooked sushi is totally fine. raw sushi is where it gets complicated.</p>
-<h2>what the experts say</h2>
-<p>the FDA and ACOG (the American College of Obstetricians and Gynecologists) both recommend avoiding raw fish during pregnancy. the concern isn't the fish itself — it's the small risk of parasites and bacteria like listeria that can be more dangerous during pregnancy because your immune system is slightly suppressed.</p>
-<p>but here's what often gets lost: <strong>cooked sushi is perfectly safe.</strong> that means shrimp tempura rolls, california rolls (imitation crab is cooked), eel/unagi (always cooked), fully cooked salmon rolls, and veggie rolls are all fine.</p>
-<h2>what about the fish itself?</h2>
-<p>even outside of sushi, fish is actually <em>recommended</em> during pregnancy. the FDA and ACOG suggest eating 2-3 servings of low-mercury fish per week for the omega-3s, which support your baby's brain development. good options: salmon, shrimp, tilapia, cod, and sardines.</p>
-<p>the ones to avoid (high mercury): shark, swordfish, king mackerel, tilefish, and bigeye tuna.</p>
+<p><strong>cooked sushi is totally fine. raw sushi is the part to skip.</strong> you don't have to avoid the sushi restaurant — you just order a little differently for a while.</p>
+<h2>why raw fish is the concern (it's not the fish)</h2>
+<p>the worry isn't sushi itself — it's that raw and undercooked fish can carry parasites and bacteria like <strong>listeria</strong>, and pregnancy slightly suppresses your immune system, so an infection that would be minor otherwise can be more serious. that's why the <a href="https://www.fda.gov/food/consumers/advice-about-eating-fish">FDA</a> and <a href="https://www.acog.org/womens-health/faqs/nutrition-during-pregnancy">ACOG</a> recommend avoiding raw fish during pregnancy. it's a precaution about <em>raw</em>, not a ban on sushi.</p>
+<h2>which sushi rolls are safe? (the cooked ones — and there are a lot)</h2>
+<p>anything fully cooked is on the table:</p>
+<p><strong>california rolls</strong> (imitation crab is cooked)<br><strong>shrimp tempura rolls</strong><br><strong>eel / unagi</strong> (always served cooked)<br><strong>fully cooked salmon or tuna rolls</strong><br><strong>veggie rolls</strong> (cucumber, avocado, sweet potato)<br>the sides: <strong>edamame, miso soup, seaweed salad, rice</strong></p>
+<p>soy sauce, wasabi, and pickled ginger are all fine too.</p>
+<h2>which to skip for now</h2>
+<p>the raw stuff: <strong>sashimi, raw tuna or salmon nigiri, and any roll built around raw fish.</strong> when in doubt, ask the server "is this cooked?" — sushi staff get this question constantly and won't blink.</p>
+<h2>what about mercury — and fish in general?</h2>
+<p>here's the part that surprises people: <strong>fish is actually recommended in pregnancy.</strong> the FDA and ACOG suggest <strong>2–3 servings of low-mercury fish per week</strong> for the omega-3s that support your baby's brain development.</p>
+<p><strong>lower-mercury, go-ahead options:</strong> salmon, shrimp, tilapia, cod, sardines, canned light tuna.</p>
+<p><strong>high-mercury, avoid:</strong> shark, swordfish, king mackerel, tilefish, and bigeye tuna. (limit albacore/white tuna to about one serving a week.)</p>
+<p>so the goal isn't "no fish" — it's "the right fish, cooked."</p>
+<h2>"i ate raw fish before i knew i was pregnant — should i worry?"</h2>
+<p>take a breath. a piece of raw salmon or a few bites of sashimi before you knew is <strong>very unlikely</strong> to cause a problem — the actual risk from any single exposure is low. stop eating raw fish going forward, and if you develop symptoms like fever, severe diarrhea, or body aches in the days after, call your provider. otherwise, this is a "mention it at your next appointment for peace of mind" situation, not an emergency. your body is more resilient than the internet makes it sound.</p>
 <h2>the bottom line</h2>
-<p>you don't need to avoid sushi restaurants entirely. order the cooked rolls, enjoy the edamame, and skip the sashimi platter for now. your baby is going to be fine.</p>
-<p>and if you accidentally ate a piece of raw salmon before you knew you were pregnant? take a breath. the actual risk is very low. your body is more resilient than the internet makes it sound.</p>
-<p class="source"><em>sources: FDA food safety guidelines for pregnant women, ACOG committee opinion on nutrition during pregnancy</em></p>`,
+<p>you don't need to avoid sushi restaurants. order the cooked rolls, enjoy the edamame, skip the sashimi platter for now, and you're following the guidance exactly. nine months of california rolls is not a hardship — and your baby's going to be fine.</p>
+<h2>frequently asked questions</h2>
+<p><strong>are california rolls safe during pregnancy?</strong> yes — california rolls use imitation crab, which is cooked, so they're considered safe. same goes for other cooked rolls like shrimp tempura and eel.</p>
+<p><strong>is cooked salmon sushi okay?</strong> yes. fully cooked salmon (and cooked tuna) rolls are fine. it's specifically <em>raw</em> fish that's recommended against.</p>
+<p><strong>can i eat imitation crab while pregnant?</strong> yes — imitation crab is fully cooked, so it's safe in pregnancy.</p>
+<p><strong>how much tuna is safe in pregnancy?</strong> canned light tuna is a lower-mercury option you can eat within the 2–3 servings of fish per week. limit albacore ("white") tuna to about one serving a week, and skip high-mercury bigeye tuna (often used in sashimi).</p>
+<p><strong>what if i already ate raw sushi?</strong> one exposure carries a low risk. stop going forward, watch for fever or stomach illness over the next few days, and mention it to your provider if you're worried.</p>
+<p>related: <a href="/blog/is-it-normal-to-not-feel-pregnant-in-the-first-trimester">is it normal to not feel pregnant in the first trimester?</a> · <a href="/blog/7-things-youre-googling-at-2am">7 things you're googling at 2am</a></p>
+<p class="source"><em>sources: <a href="https://www.fda.gov/food/consumers/advice-about-eating-fish">FDA — Advice About Eating Fish</a> · <a href="https://www.acog.org/womens-health/faqs/nutrition-during-pregnancy">ACOG — Nutrition During Pregnancy</a></em></p>`,
+    faqs: [
+      { q: "are california rolls safe during pregnancy?", a: "yes — california rolls use imitation crab, which is cooked, so they're considered safe. same goes for other cooked rolls like shrimp tempura and eel." },
+      { q: "is cooked salmon sushi okay?", a: "yes. fully cooked salmon (and cooked tuna) rolls are fine. it's specifically raw fish that's recommended against." },
+      { q: "can i eat imitation crab while pregnant?", a: "yes — imitation crab is fully cooked, so it's safe in pregnancy." },
+      { q: "how much tuna is safe in pregnancy?", a: "canned light tuna is a lower-mercury option you can eat within the 2–3 servings of fish per week. limit albacore (\"white\") tuna to about one serving a week, and skip high-mercury bigeye tuna (often used in sashimi)." },
+      { q: "what if i already ate raw sushi?", a: "one exposure carries a low risk. stop going forward, watch for fever or stomach illness over the next few days, and mention it to your provider if you're worried." },
+    ],
   },
   {
     slug: "how-long-does-it-take-to-get-pregnant",
-    date: "2026-04-23",    title:
-      "how long does it take to get pregnant? the real numbers nobody tells you.",
+    title: "how long does it take to get pregnant? the real numbers",
     description:
-      "85% of couples conceive within 12 months. here's what the research says about timelines, when to see a specialist, and what actually matters.",
+      "85% of couples conceive within a year. here's the real month-by-month timeline, when to see a specialist by age, and what actually affects how long it takes.",
     audience: "ttc",
-    content: `<p>you've been trying for a few months. or maybe longer. and every time your period shows up, the same thought creeps in: <em>is something wrong with me?</em></p>
-<p>before you spiral, let's look at what the numbers actually say.</p>
+    date: "2026-04-23",
+    updated: "2026-06-24",
+    content: `<p>you've been trying for a few months — or maybe longer. and every time your period shows up, the same thought creeps in: <em>is something wrong with me?</em> before you spiral, here's what the numbers actually say.</p>
 <h2>the real timeline</h2>
-<p>according to ASRM (the American Society for Reproductive Medicine), here's what the data shows for healthy couples with no known fertility issues:</p>
-<p><strong>after 1 month:</strong> about 30% of couples conceive<br><strong>after 3 months:</strong> about 60%<br><strong>after 6 months:</strong> about 80%<br><strong>after 12 months:</strong> about 85%</p>
-<p>that means <strong>1 in 5 couples with no fertility problems will still not be pregnant after 6 months of trying.</strong> that's not a problem — that's normal.</p>
+<p>for healthy couples with no known fertility issues, the data (via <a href="https://www.reproductivefacts.org">ASRM</a>) looks like this:</p>
+<p><strong>after 1 month:</strong> ~30% conceive<br><strong>after 3 months:</strong> ~60%<br><strong>after 6 months:</strong> ~80%<br><strong>after 12 months:</strong> ~85%</p>
+<p>read that again: <strong>1 in 5 couples with no fertility problems still won't be pregnant after 6 months.</strong> that's not a problem — that's the normal spread. conception is more of a "most months it doesn't happen, even when everything's fine" process than anyone tells you.</p>
+<h2>why each month is lower-odds than you'd think</h2>
+<p>even with perfect timing, a healthy couple has roughly a <strong>15–25% chance</strong> of conceiving in any given cycle. so several months of negatives is mathematically expected, not a red flag. it doesn't <em>feel</em> that way at 2 a.m., but the odds are on your side over time.</p>
 <h2>when should you see a specialist?</h2>
-<p><strong>under 35:</strong> see a reproductive endocrinologist (RE) if you've been trying for 12 months<br><strong>35-39:</strong> see an RE after 6 months<br><strong>40+:</strong> see an RE after 3 months, or before you start trying</p>
-<p>these aren't deadlines or failure points — they're just the point where it makes sense to get some data.</p>
+<p>these aren't failure points — just the sensible moment to get data:</p>
+<p><strong>under 35:</strong> see a reproductive endocrinologist (RE) after <strong>12 months</strong> of trying<br><strong>35–39:</strong> after <strong>6 months</strong><br><strong>40+:</strong> after <strong>3 months</strong>, or even before you start</p>
+<p>and at any age: if something feels off — very irregular cycles, no periods, known conditions, pelvic pain — don't wait for the calendar. make the appointment.</p>
 <h2>what actually affects how long it takes</h2>
-<p><strong>age</strong> — fertility declines gradually after 30 and more noticeably after 35, but plenty of women conceive naturally in their late 30s and early 40s</p>
-<p><strong>ovulation regularity</strong> — irregular cycles can mean irregular ovulation, which makes timing harder</p>
-<p><strong>underlying conditions</strong> — PCOS, endometriosis, thyroid issues, and blocked tubes can all play a role</p>
-<p><strong>sperm factors</strong> — male factor accounts for about 30-40% of fertility challenges. it's not always about you.</p>
-<p><strong>timing</strong> — you're most fertile in the 5 days before ovulation and the day of. outside that window, pregnancy isn't possible that cycle.</p>
+<p><strong>age</strong> — fertility declines gradually after 30 and more noticeably after 35, though plenty of women conceive naturally into their late 30s and early 40s.<br><strong>ovulation regularity</strong> — irregular cycles can mean irregular or absent ovulation, which makes timing harder.<br><strong>timing</strong> — you're most fertile in the ~5 days before ovulation and the day of. outside that window, pregnancy isn't possible that cycle, so knowing roughly when you ovulate matters more than frequency.<br><strong>underlying conditions</strong> — PCOS, endometriosis, thyroid issues, and blocked tubes can all play a role.<br><strong>sperm factors</strong> — male factor accounts for about <strong>30–40%</strong> of fertility challenges. it is genuinely not always about you.</p>
+<h2>what you can actually do</h2>
+<p>track your cycle to learn your fertile window, have sex every 1–2 days during it, and take a prenatal with folic acid. beyond that, a lot of this isn't in your control — and "just relax" is not a fertility treatment. if you're past your age-based timeline, getting evaluated is information, not failure.</p>
 <h2>the bottom line</h2>
-<p>if you're under 12 months and everything checks out, you're likely in the normal range — even though it doesn't feel like it. the waiting is genuinely one of the hardest parts of this journey, and you're not alone in feeling that way.</p>
-<p>if something feels off, trust your gut. you don't need to wait 12 months to ask questions.</p>
-<p class="source"><em>sources: ASRM practice committee, ACOG FAQ on evaluating infertility</em></p>`,
+<p>if you're under your timeline and everything checks out, you're very likely in the normal range — even though the waiting is one of the hardest parts of this whole journey. and if your gut says something's off, you don't need to hit 12 months to ask. → <em>while you wait: <a href="/blog/how-to-survive-the-two-week-wait">how to survive the two-week wait</a></em></p>
+<h2>frequently asked questions</h2>
+<p><strong>how long is it normal to try before getting pregnant?</strong> up to 12 months is considered normal if you're under 35 (6 months if you're 35+). about 85% of couples conceive within a year.</p>
+<p><strong>what are my chances of getting pregnant each month?</strong> roughly 15–25% per cycle for a healthy couple with good timing — which is why several months of trying without success is expected, not alarming.</p>
+<p><strong>does it take longer to get pregnant after 35?</strong> on average, yes — fertility declines more noticeably after 35 — but many women conceive naturally in their late 30s and 40s. the main change is the recommendation to get evaluated sooner (after 6 months at 35–39, 3 months at 40+).</p>
+<p><strong>am i infertile if it's been 6 months?</strong> not necessarily — 1 in 5 couples with no fertility issues aren't pregnant at 6 months. "infertility" is generally defined as 12 months of trying (6 if you're 35+). if you're worried sooner, an evaluation is reasonable.</p>
+<p><strong>how often should we have sex to conceive?</strong> every 1–2 days during your fertile window (the ~5 days before ovulation and the day of) is plenty.</p>
+<p>related: <a href="/blog/7-things-youre-googling-at-2am">7 things you're googling at 2am</a></p>
+<p class="source"><em>sources: <a href="https://www.reproductivefacts.org">ASRM / ReproductiveFacts</a> · <a href="https://www.acog.org/womens-health/faqs/evaluating-infertility">ACOG — Evaluating Infertility</a></em></p>`,
+    faqs: [
+      { q: "how long is it normal to try before getting pregnant?", a: "up to 12 months is considered normal if you're under 35 (6 months if you're 35+). about 85% of couples conceive within a year." },
+      { q: "what are my chances of getting pregnant each month?", a: "roughly 15–25% per cycle for a healthy couple with good timing — which is why several months of trying without success is expected, not alarming." },
+      { q: "does it take longer to get pregnant after 35?", a: "on average, yes — fertility declines more noticeably after 35 — but many women conceive naturally in their late 30s and 40s. the main change is the recommendation to get evaluated sooner (after 6 months at 35–39, 3 months at 40+)." },
+      { q: "am i infertile if it's been 6 months?", a: "not necessarily — 1 in 5 couples with no fertility issues aren't pregnant at 6 months. \"infertility\" is generally defined as 12 months of trying (6 if you're 35+). if you're worried sooner, an evaluation is reasonable." },
+      { q: "how often should we have sex to conceive?", a: "every 1–2 days during your fertile window (the ~5 days before ovulation and the day of) is plenty." },
+    ],
   },
   {
     slug: "is-it-normal-to-not-feel-pregnant-in-the-first-trimester",
-    date: "2026-04-23",    title: "is it normal to not feel pregnant in the first trimester?",
+    title: "is it normal to not feel pregnant in the first trimester?",
     description:
-      "not having symptoms in early pregnancy is common. here's why you feel fine, when to worry, and why it doesn't mean anything is wrong.",
+      "having no symptoms in early pregnancy is common and usually means nothing is wrong. here's why you feel fine, what's happening inside, and when to call.",
     audience: "pregnant",
-    content: `<p>you just found out you're pregnant. you expected... something. nausea, maybe. exhaustion. sore breasts. some kind of sign that your body is doing this massive thing.</p>
-<p>instead you feel... completely normal. and now you're worried that something is wrong.</p>
-<h2>you're not alone. and nothing is wrong.</h2>
-<p>not having symptoms in early pregnancy is incredibly common. despite what social media and pregnancy forums would have you believe, plenty of women sail through the first trimester feeling basically fine.</p>
+    date: "2026-04-23",
+    updated: "2026-06-24",
+    content: `<p>you just found out you're pregnant. you expected <em>something</em> — nausea, exhaustion, sore breasts, some sign your body is doing this enormous thing. instead you feel… completely normal. and now you're worried that means something's wrong.</p>
+<p>it almost always doesn't. here's why.</p>
+<h2>you're not alone, and nothing is wrong</h2>
+<p>having little to no early symptoms is incredibly common. despite what pregnancy forums and social media suggest, plenty of women move through the first trimester feeling basically fine — and go on to have perfectly healthy pregnancies.</p>
 <h2>what the research says</h2>
-<p>about <strong>20-30% of women</strong> experience little to no nausea in the first trimester. symptoms typically peak between <strong>weeks 8-10</strong> — so if you're at 5 or 6 weeks and feel nothing, you might just not be there yet. some women never get morning sickness at all and have perfectly healthy pregnancies. symptom intensity has <strong>no correlation</strong> with how healthy your pregnancy is.</p>
+<p>about <strong>20–30% of women</strong> experience little to no nausea in the first trimester. symptoms typically <strong>peak around weeks 8–10</strong>, so if you're at 5 or 6 weeks and feel nothing, you may simply not be there yet. and crucially: <strong>symptom intensity has no correlation with how healthy your pregnancy is.</strong> feeling great is not a warning sign.</p>
 <h2>why does this cause so much anxiety?</h2>
-<p>because we've been conditioned to believe that symptoms = proof. if you're not throwing up, you must not really be pregnant. if you feel fine, something must be wrong.</p>
-<p>this is not true. your body is doing an enormous amount of work behind the scenes — building a placenta, increasing blood volume, restructuring hormone levels — and some bodies just do it more quietly than others.</p>
-<h2>when to actually worry</h2>
-<p>symptoms or no symptoms, these are the things worth calling your provider about: heavy bleeding (soaking a pad in an hour), severe cramping that doesn't let up, sharp one-sided pain, or fever over 100.4°F.</p>
-<p>not having nausea is not on that list.</p>
+<p>because we've been conditioned to believe symptoms = proof. if you're not throwing up, you must not "really" be pregnant; if you feel fine, something must be wrong. neither is true. behind the scenes your body is doing enormous work — building a placenta, increasing blood volume, restructuring hormones — and some bodies just do it more quietly.</p>
+<h2>"my symptoms disappeared — should i worry?"</h2>
+<p>this is one of the most-googled early-pregnancy fears, so let's be honest and clear. early pregnancy symptoms naturally <strong>come and go</strong> — a day of feeling fine after a week of nausea is normal, and many people get waves rather than constant symptoms. a sudden, complete disappearance of symptoms <em>can</em> occasionally matter, but on its own it's usually nothing. what actually warrants a call is <strong>symptoms plus a warning sign</strong> (below) — not a quiet day.</p>
+<h2>when to actually call your provider</h2>
+<p>symptoms or not, these are worth a call: <strong>heavy bleeding</strong> (soaking a pad in an hour), <strong>severe or one-sided cramping or pain</strong>, <strong>sharp shoulder-tip pain</strong>, or a <strong>fever over 100.4°F</strong>. not having nausea is not on that list. if you're anxious between appointments, it's also completely fine to call for reassurance or ask about an earlier ultrasound — that's what they're there for.</p>
 <h2>the bottom line</h2>
-<p>you're pregnant. your body is doing its job. the absence of symptoms doesn't mean the absence of a baby. try to take the win — you're one of the lucky ones who gets to eat breakfast without running to the bathroom.</p>
-<p class="source"><em>sources: ACOG, American Pregnancy Association</em></p>`,
+<p>you're pregnant, and your body is doing its job — sometimes quietly. the absence of symptoms isn't the absence of a baby. if it helps, try to take the win: you're one of the people who gets to eat breakfast without sprinting to the bathroom.</p>
+<h2>frequently asked questions</h2>
+<p><strong>can you be pregnant and have no symptoms?</strong> yes — about 20–30% of women have little to no nausea, and some have almost no symptoms at all, with completely healthy pregnancies.</p>
+<p><strong>does no morning sickness mean something is wrong?</strong> no. symptom intensity doesn't correlate with pregnancy health. plenty of healthy pregnancies come with no morning sickness.</p>
+<p><strong>is it normal for early pregnancy symptoms to come and go?</strong> yes — fluctuating symptoms, including days where you feel totally normal, are common and usually mean nothing.</p>
+<p><strong>when do first-trimester symptoms usually start?</strong> often around weeks 5–6 and peaking around weeks 8–10, though it varies a lot person to person.</p>
+<p><strong>when should i actually worry?</strong> heavy bleeding, severe or one-sided pain, shoulder-tip pain, or fever over 100.4°F — those warrant a call. a quiet symptom day on its own does not.</p>
+<p>related: <a href="/blog/can-i-eat-sushi-while-pregnant">can i eat sushi while pregnant?</a> · <a href="/blog/7-things-youre-googling-at-2am">7 things you're googling at 2am</a></p>
+<p class="source"><em>sources: <a href="https://www.acog.org/womens-health/faqs">ACOG — Morning Sickness / Pregnancy FAQs</a> · <a href="https://americanpregnancy.org">American Pregnancy Association</a></em></p>`,
+    faqs: [
+      { q: "can you be pregnant and have no symptoms?", a: "yes — about 20–30% of women have little to no nausea, and some have almost no symptoms at all, with completely healthy pregnancies." },
+      { q: "does no morning sickness mean something is wrong?", a: "no. symptom intensity doesn't correlate with pregnancy health. plenty of healthy pregnancies come with no morning sickness." },
+      { q: "is it normal for early pregnancy symptoms to come and go?", a: "yes — fluctuating symptoms, including days where you feel totally normal, are common and usually mean nothing." },
+      { q: "when do first-trimester symptoms usually start?", a: "often around weeks 5–6 and peaking around weeks 8–10, though it varies a lot person to person." },
+      { q: "when should i actually worry?", a: "heavy bleeding, severe or one-sided pain, shoulder-tip pain, or fever over 100.4°F — those warrant a call. a quiet symptom day on its own does not." },
+    ],
   },
   {
     slug: "postpartum-hair-loss-why-it-happens-when-it-stops-and-what-helps",
-    date: "2026-04-23",    title:
-      "postpartum hair loss: why it happens, when it stops, and what actually helps.",
+    title: "postpartum hair loss: why it happens & when it stops",
     description:
-      "postpartum hair loss affects 40-50% of women, peaks at 4-6 months, and is temporary. here's the timeline and what actually works.",
+      "postpartum hair loss hits 40–50% of women, peaks around 4 months, and is temporary. here's the real timeline, what actually helps, and when to see a doctor.",
     audience: "postpartum",
-    content: `<p>you're standing in the shower watching clumps of hair circle the drain and wondering if you're going bald.</p>
-<p>you're not. but nobody warned you about this part.</p>
+    date: "2026-04-23",
+    updated: "2026-06-24",
+    content: `<p>you're standing in the shower watching clumps of hair circle the drain, wondering if you're going bald. you're not — but nobody warned you about this part. here's what's actually happening and when it ends.</p>
 <h2>what's happening</h2>
-<p>during pregnancy, elevated estrogen keeps your hair in its growth phase longer than usual. that's why pregnancy hair feels so thick and amazing — you're literally shedding less.</p>
-<p>after delivery, estrogen drops. all that hair that should have fallen out over the past 9 months starts falling out at once. it's called <strong>telogen effluvium</strong>, and it affects an estimated <strong>40-50% of women.</strong></p>
+<p>during pregnancy, elevated estrogen keeps more of your hair in its growth phase, so you shed less than usual — that's the famous thick, glossy pregnancy hair. after delivery, estrogen drops sharply, and all the hair that <em>would</em> have shed over those nine months falls out over a few weeks instead. it's called <strong>telogen effluvium</strong>, it's hormonal and normal, and it affects an estimated <strong>40–50% of women</strong>.</p>
+<p>it's a shift in <em>timing</em>, not your hair actually thinning permanently — which is why it feels dramatic but is temporary.</p>
 <h2>the timeline</h2>
-<p><strong>starts:</strong> typically 2-4 months postpartum<br><strong>peaks:</strong> around 4-6 months postpartum (this is when it feels the worst)<br><strong>resolves:</strong> by 12 months postpartum for most women</p>
-<h2>what actually helps</h2>
-<p>nothing will stop the shedding completely — it's hormonal and it has to run its course. but these things can support the regrowth:</p>
-<p><strong>keep taking your prenatal vitamins</strong> — the biotin, iron, and folate support hair health. <strong>eat enough protein</strong> — hair is made of protein. postpartum is not the time to diet. <strong>be gentle with your hair</strong> — avoid tight ponytails, heavy styling, and heat. <strong>biotin supplements</strong> — some women find these help, though the evidence is mixed.</p>
+<p><strong>starts:</strong> ~2–4 months postpartum<br><strong>peaks:</strong> ~4–6 months postpartum (when it feels the worst)<br><strong>resolves:</strong> by around 12 months postpartum for most women</p>
+<p>if you're breastfeeding, the timing can stretch a little, but the same pattern holds.</p>
+<h2>what actually helps (and what doesn't)</h2>
+<p>nothing stops the shedding entirely — it's hormonal and has to run its course. but you can support regrowth and avoid making it worse:</p>
+<p><strong>do:</strong></p>
+<p><strong>keep taking your prenatal</strong> — the iron, biotin, and folate support hair and overall recovery.<br><strong>eat enough protein</strong> — hair is protein; postpartum is not the season to under-eat or diet.<br><strong>be gentle</strong> — loose styles over tight ponytails, easy on heat and harsh brushing.<br><strong>a volumizing cut or product</strong> can help it <em>feel</em> better while you wait.</p>
+<p><strong>don't bother / be wary of:</strong></p>
+<p><strong>"miracle" hair-growth supplements</strong> — evidence is mixed at best; biotin helps some people but isn't a cure, and megadoses aren't recommended.<br><strong>stressing about it</strong> — easier said than done, but stress doesn't speed regrowth, and this genuinely resolves on its own.</p>
 <h2>when to see a doctor</h2>
-<p>if the shedding hasn't slowed down by 12 months postpartum, or if you notice bald patches (not just thinning), check in with your provider. occasionally postpartum hair loss can unmask an underlying thyroid issue or iron deficiency that's worth treating.</p>
+<p>check in with your provider if the shedding <strong>hasn't slowed by ~12 months</strong>, if you see <strong>distinct bald patches</strong> (not just overall thinning), or if it comes with fatigue, weight changes, or feeling off — postpartum hair loss can occasionally unmask a <strong>thyroid issue or iron deficiency</strong> that's very treatable.</p>
 <h2>the bottom line</h2>
-<p>your hair will come back. it might come back differently (some women notice a change in texture or curl pattern), but it will come back. in the meantime, messy buns were invented for this exact season of life.</p>
-<p class="source"><em>sources: American Academy of Dermatology (AAD), Journal of the American Academy of Dermatology</em></p>`,
+<p>your hair will come back. it might come back a little different — some women notice new texture or a curl change, and lots of people get those funny short "regrowth halo" baby hairs around the hairline — but it comes back. messy buns were invented for exactly this season.</p>
+<h2>frequently asked questions</h2>
+<p><strong>when does postpartum hair loss stop?</strong> for most women it peaks around 4–6 months postpartum and resolves by about 12 months. if it's still going strong past a year, check with your provider.</p>
+<p><strong>will my hair grow back after pregnancy?</strong> yes — postpartum shedding is temporary. your hair returns to its normal cycle, though the texture or thickness can change slightly.</p>
+<p><strong>how much hair loss is normal postpartum?</strong> it can feel alarming — handfuls in the shower, hair all over your clothes — and that's still within the normal range for telogen effluvium. distinct bald patches are the exception worth getting checked.</p>
+<p><strong>what vitamins help with postpartum hair loss?</strong> keeping up your prenatal (iron, biotin, folate) and eating enough protein supports regrowth. standalone "hair" supplements have mixed evidence — food and your prenatal matter more.</p>
+<p><strong>can postpartum hair loss be a sign of something else?</strong> occasionally — if it's severe, comes with fatigue or weight changes, or doesn't slow by 12 months, it's worth checking for a thyroid issue or iron deficiency.</p>
+<p>related: <a href="/blog/7-things-youre-googling-at-2am">7 things you're googling at 2am</a></p>
+<p class="source"><em>sources: <a href="https://www.aad.org/public/diseases/hair-loss/insider/new-moms">American Academy of Dermatology — hair loss in new moms</a> · <a href="https://www.acog.org/womens-health/faqs">ACOG — postpartum FAQs</a></em></p>`,
+    faqs: [
+      { q: "when does postpartum hair loss stop?", a: "for most women it peaks around 4–6 months postpartum and resolves by about 12 months. if it's still going strong past a year, check with your provider." },
+      { q: "will my hair grow back after pregnancy?", a: "yes — postpartum shedding is temporary. your hair returns to its normal cycle, though the texture or thickness can change slightly." },
+      { q: "how much hair loss is normal postpartum?", a: "it can feel alarming — handfuls in the shower, hair all over your clothes — and that's still within the normal range for telogen effluvium. distinct bald patches are the exception worth getting checked." },
+      { q: "what vitamins help with postpartum hair loss?", a: "keeping up your prenatal (iron, biotin, folate) and eating enough protein supports regrowth. standalone \"hair\" supplements have mixed evidence — food and your prenatal matter more." },
+      { q: "can postpartum hair loss be a sign of something else?", a: "occasionally — if it's severe, comes with fatigue or weight changes, or doesn't slow by 12 months, it's worth checking for a thyroid issue or iron deficiency." },
+    ],
   },
   {
     slug: "7-things-youre-googling-at-2am",
-    date: "2026-04-23",    title:
-      "7 things you're googling at 2 a.m. (and the answers so you can go back to sleep)",
+    title: "7 things you're googling at 2 a.m. (and the answers)",
     description:
-      "honest answers to the pregnancy, ttc, and postpartum questions women search at 2 a.m. discharge, wine, sex drive, milestones, and more.",
+      "honest answers to the ttc, pregnancy, and postpartum questions women search at 2 a.m. — discharge, wine, sex drive, ppd, milestones, and more.",
     audience: "all",
-    content: `<p>we know you're doing it. phone under the covers, incognito mode, typing something you'd never say out loud.</p>
-<p>here are the honest answers to the most common 2 a.m. searches — so you can put the phone down and get some rest.</p>
-<h2>1. "is this discharge normal"</h2>
-<p>probably yes. vaginal discharge increases during pregnancy (it's called leukorrhea) and it's your body's way of keeping the birth canal clean. normal discharge is white or clear, mild-smelling, and not accompanied by itching or burning.</p>
-<p>call your provider if: it's green/yellow, has a strong odor, or comes with itching.</p>
+    date: "2026-04-23",
+    updated: "2026-06-24",
+    content: `<p>we know you're doing it. phone under the covers, incognito mode, typing something you'd never say out loud. here are honest answers to the most common 2 a.m. searches — so you can put the phone down and rest. (and where there's a fuller answer, we've linked it.)</p>
+<h2>1. "is this discharge normal?"</h2>
+<p>probably yes. discharge increases during pregnancy (it's called leukorrhea) — it's your body keeping the birth canal clean. normal discharge is white or clear, mild-smelling, with no itching or burning. <strong>call your provider if</strong> it's green or yellow, has a strong odor, or comes with itching or burning.</p>
 <h2>2. "i had a sip of wine before i knew i was pregnant"</h2>
-<p>your baby is fine. in the very earliest weeks, before the placenta is fully established, exposure is minimal. the medical consensus is that occasional, small amounts of alcohol before you knew are extremely unlikely to cause any harm. stop punishing yourself. you didn't know.</p>
-<h2>3. "is it normal to not want to have sex during pregnancy"</h2>
-<p>yes. sex drive fluctuates wildly during pregnancy due to hormones, exhaustion, body changes, and anxiety. some women want more, some want less, some want none. all of this is normal.</p>
+<p>your baby is almost certainly fine. in the earliest weeks, before the placenta is fully established, exposure is minimal, and the consensus is that occasional small amounts before you knew are very unlikely to cause harm. stop punishing yourself — you didn't know. (going forward, no amount of alcohol is considered "safe," so this is about the past, not permission.)</p>
+<h2>3. "is it normal to not want sex during pregnancy?"</h2>
+<p>yes. sex drive swings wildly in pregnancy — hormones, exhaustion, body changes, anxiety. some want more, some want less, some want none. all normal, and it usually shifts as you move through the trimesters.</p>
 <h2>4. "my baby isn't crawling yet"</h2>
-<p>the normal range for crawling is 6-10 months. some babies skip it entirely and go straight to pulling up or walking. developmental milestones are ranges, not deadlines.</p>
-<h2>5. "do i have postpartum depression or am i just tired"</h2>
-<p><strong>baby blues</strong> (normal): mood swings, crying spells, anxiety, difficulty sleeping. starts within 2-3 days, resolves within 2 weeks.</p>
-<p><strong>postpartum depression</strong> (needs support): persistent sadness, hopelessness, difficulty bonding, loss of interest, lasting longer than 2 weeks.</p>
-<p>if it's been more than 2 weeks and the fog isn't lifting, please talk to your provider. PPD affects 1 in 7 women, it's treatable, and asking for help is one of the strongest things you can do.</p>
-<h2>6. "how long is too long trying to conceive"</h2>
-<p>under 35: 12 months. over 35: 6 months. but if something feels off sooner, trust your instincts and make the appointment.</p>
-<h2>7. "why do i feel like i hate my partner during pregnancy"</h2>
-<p>hormones. the combination of progesterone surges, exhaustion, anxiety, and feeling physically uncomfortable can make even the most loving relationship feel strained. you're not a bad person. you're a pregnant person. it's temporary.</p>
+<p>the normal range for crawling is <strong>6–10 months</strong>, and some babies skip it entirely and go straight to pulling up or walking. milestones are ranges, not deadlines.</p>
+<h2>5. "do i have postpartum depression or am i just tired?"</h2>
+<p><strong>baby blues</strong> (normal): mood swings, crying, anxiety, trouble sleeping — starts within 2–3 days and resolves within 2 weeks. <strong>postpartum depression</strong> (needs support): persistent sadness, hopelessness, trouble bonding, loss of interest, lasting beyond 2 weeks. if it's been more than 2 weeks and the fog isn't lifting, please talk to your provider — PPD affects about <strong>1 in 7</strong> women, it's treatable, and asking for help is a strength. <em>(if you ever have thoughts of harming yourself or the baby, seek help right away — call or text 988.)</em></p>
+<h2>6. "how long is too long trying to conceive?"</h2>
+<p>under 35: about 12 months. 35–39: about 6 months. 40+: about 3 months. but if something feels off sooner, trust your gut and make the appointment. → <em>more: <a href="/blog/how-long-does-it-take-to-get-pregnant">how long does it take to get pregnant</a></em></p>
+<h2>7. "why do i feel like i hate my partner during pregnancy?"</h2>
+<p>hormones, exhaustion, anxiety, and physical discomfort can strain even the most loving relationship. you're not a bad person — you're a pregnant person, and it's temporary.</p>
 <h2>the bottom line</h2>
-<p>you're not the only one lying awake googling these things. you're normal. you're okay. now put the phone down.</p>
-<p>or don't — and ask myla instead. she's up too. 💛</p>
-<p class="source"><em>sources: ACOG, AAP, American Pregnancy Association, Postpartum Support International</em></p>`,
+<p>you're not the only one lying awake googling these. you're normal, you're okay — now put the phone down. or don't, and ask myla instead. she's up too. 💛</p>
+<h2>frequently asked questions</h2>
+<p><strong>is it normal to google pregnancy symptoms constantly?</strong> extremely. the uncertainty plus the stakes makes 2 a.m. searching almost universal — you're not being dramatic, and you're not alone.</p>
+<p><strong>what pregnancy symptoms are actually worth calling about?</strong> heavy bleeding (soaking a pad in an hour), severe or one-sided pain, a fever over 100.4°F, decreased fetal movement later in pregnancy, or signs of preeclampsia (bad headache, vision changes). when in doubt, call — providers would rather hear from you.</p>
+<p><strong>is it normal to feel anxious or not bonded right away?</strong> yes — bonding isn't always instant, and pregnancy and postpartum anxiety are common. if it's persistent or distressing, it's worth talking to your provider.</p>
+<p>related: <a href="/blog/how-to-survive-the-two-week-wait">how to survive the two-week wait</a></p>
+<p class="source"><em>sources: <a href="https://www.acog.org/womens-health/faqs">ACOG</a> · <a href="https://www.healthychildren.org">AAP — HealthyChildren</a> · <a href="https://www.postpartum.net">Postpartum Support International</a> · <a href="https://988lifeline.org">988 Suicide & Crisis Lifeline</a></em></p>`,
+    faqs: [
+      { q: "is it normal to google pregnancy symptoms constantly?", a: "extremely. the uncertainty plus the stakes makes 2 a.m. searching almost universal — you're not being dramatic, and you're not alone." },
+      { q: "what pregnancy symptoms are actually worth calling about?", a: "heavy bleeding (soaking a pad in an hour), severe or one-sided pain, a fever over 100.4°F, decreased fetal movement later in pregnancy, or signs of preeclampsia (bad headache, vision changes). when in doubt, call — providers would rather hear from you." },
+      { q: "is it normal to feel anxious or not bonded right away?", a: "yes — bonding isn't always instant, and pregnancy and postpartum anxiety are common. if it's persistent or distressing, it's worth talking to your provider." },
+    ],
   },
 ];
 

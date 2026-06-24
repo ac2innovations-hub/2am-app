@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AUDIENCE_LABEL, POSTS, getPost } from "@/lib/blog/posts";
+import { AUDIENCE_LABEL, AUTHOR, POSTS, getPost } from "@/lib/blog/posts";
 import "../../legal.css";
 
 type Props = { params: { slug: string } };
@@ -28,7 +28,7 @@ export function generateMetadata({ params }: Props): Metadata {
       url,
       siteName: "2am",
       type: "article",
-      authors: ["2am"],
+      authors: [AUTHOR.name],
       images: [{ url: OG_IMAGE }],
     },
     twitter: {
@@ -51,8 +51,14 @@ export default function BlogPostPage({ params }: Props) {
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    dateModified: post.date,
-    author: { "@type": "Organization", name: "2am", url: SITE },
+    dateModified: post.updated ?? post.date,
+    author: {
+      "@type": "Person",
+      name: AUTHOR.name,
+      jobTitle: AUTHOR.role,
+      url: AUTHOR.url,
+      description: AUTHOR.bio,
+    },
     publisher: {
       "@type": "Organization",
       name: "2am",
@@ -63,12 +69,31 @@ export default function BlogPostPage({ params }: Props) {
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
   };
 
+  const faqJsonLd =
+    post.faqs && post.faqs.length
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: post.faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }
+      : null;
+
   return (
     <main className="legal-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <div className="legal-container">
         <Link href="/blog" className="legal-back">
           ← back to blog
@@ -81,12 +106,22 @@ export default function BlogPostPage({ params }: Props) {
         <h1 className="legal-title">{post.title}</h1>
         <div className="blog-meta-row">
           <span className="blog-tag">{AUDIENCE_LABEL[post.audience]}</span>
+          <span className="blog-byline">
+            by {AUTHOR.name}, {AUTHOR.role}
+          </span>
         </div>
 
         <article
           className="blog-article"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
+
+        <aside className="blog-author">
+          <div className="blog-author-name">
+            {AUTHOR.name}, {AUTHOR.role}
+          </div>
+          <p>{AUTHOR.bio}</p>
+        </aside>
 
         <section className="blog-cta">
           <p>
