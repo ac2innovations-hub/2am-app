@@ -9,16 +9,8 @@ create extension if not exists "pgcrypto";
 -- alter table public.profiles add column if not exists baby_name text;
 -- alter table public.profiles add column if not exists baby_sex text;
 -- alter table public.profiles add column if not exists ai_consent boolean not null default false;
--- Re-engagement notifications state model (Phase 1) — run these on existing deploys:
--- alter table public.profiles add column if not exists notifications_enabled boolean not null default false;
--- alter table public.profiles add column if not exists push_paused boolean not null default false;
--- alter table public.profiles add column if not exists loss_at timestamptz;
--- alter table public.profiles add column if not exists last_distress_at timestamptz;
--- alter table public.profiles add column if not exists last_active_at timestamptz;
--- alter table public.profiles add column if not exists timezone text;
--- alter table public.profiles add column if not exists notify_window_start smallint;
--- alter table public.profiles add column if not exists notify_window_end smallint;
--- alter table public.profiles add column if not exists push_prompt_state text not null default 'unseen';
+-- Phase 1 re-engagement notification columns are migrated unconditionally in the
+-- "Re-engagement notifications" ALTER block just below the create-table.
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -52,6 +44,36 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Re-engagement notifications state model (Phase 1). The columns above are the
+-- source of truth for a fresh DB; these ALTERs migrate an already-existing
+-- profiles table. Every statement is `add column if not exists`, so the whole
+-- block is safe to re-run and is a no-op on a fresh DB.
+alter table public.profiles add column if not exists notifications_enabled boolean not null default false;
+alter table public.profiles add column if not exists push_paused boolean not null default false;
+alter table public.profiles add column if not exists loss_at timestamptz;
+alter table public.profiles add column if not exists last_distress_at timestamptz;
+alter table public.profiles add column if not exists last_active_at timestamptz;
+alter table public.profiles add column if not exists timezone text;
+alter table public.profiles add column if not exists notify_window_start smallint;
+alter table public.profiles add column if not exists notify_window_end smallint;
+alter table public.profiles add column if not exists push_prompt_state text not null default 'unseen';
+
+-- push_prompt_state CHECK. Postgres has no ADD CONSTRAINT IF NOT EXISTS, so guard
+-- on pg_constraint to stay re-runnable. The name matches what Postgres auto-
+-- assigns to the inline column check on a fresh DB, so the guard also no-ops there.
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.profiles'::regclass
+      and conname = 'profiles_push_prompt_state_check'
+  ) then
+    alter table public.profiles
+      add constraint profiles_push_prompt_state_check
+      check (push_prompt_state in ('unseen','asked','granted','denied','dismissed'));
+  end if;
+end $$;
 
 -- conversations
 create table if not exists public.conversations (
