@@ -208,6 +208,30 @@
 }
 .blog-cta a:active { transform: scale(0.98); }
 
+/* author byline + bio (E-E-A-T) */
+.blog-byline {
+  font-size: 14px;
+  color: rgba(255, 250, 245, 0.6);
+}
+.blog-author {
+  margin-top: 40px;
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(22, 34, 54, 0.6);
+  border: 1px solid rgba(255, 250, 245, 0.08);
+}
+.blog-author-name {
+  font-weight: 600;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+.blog-author p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 250, 245, 0.7);
+}
+
 .blog-index-list {
   display: grid;
   gap: 16px;
