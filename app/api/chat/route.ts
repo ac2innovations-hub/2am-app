@@ -8,6 +8,7 @@ import {
   MYLA_SYSTEM_PROMPT,
   ONBOARDING_SYSTEM_ADDITION,
   ANON_FIRST_CHAT_ADDITION,
+  ESCALATION_SENTINEL,
   buildUserContextLine,
   type UserProfileContext,
 } from "@/lib/myla/system-prompt";
@@ -385,14 +386,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(friendly.body, { status: friendly.status });
   }
 
-  const text = response.content
+  const rawText = response.content
     .map((b) => (b.type === "text" ? b.text : ""))
     .join("");
+
+  // Distress signal: Myla appends a fixed sentinel when (and only when) her
+  // reply escalates for safety/immediate care. Detect it off that stable
+  // marker — never a regex over her prose — then strip it so the user never
+  // sees it. Stripping runs for everyone, including anonymous callers.
+  const escalated = rawText.includes(ESCALATION_SENTINEL);
+  const text = escalated
+    ? rawText.split(ESCALATION_SENTINEL).join("").replace(/\s+$/, "")
+    : rawText;
 
   if (!text.trim()) {
     return NextResponse.json(ERRORS.emptyResponse.body, {
       status: ERRORS.emptyResponse.status,
     });
+  }
+
+  // For signed-in users, record engagement (feeds inactivity + the loss
+  // "engaged since" check) and, when Myla escalated, the distress timestamp the
+  // notification gate reads. Fire-and-forget under the profiles self-update RLS
+  // policy; never block the reply on it.
+  if (user) {
+    const patch: Record<string, unknown> = {
+      last_active_at: new Date().toISOString(),
+    };
+    if (escalated) patch.last_distress_at = new Date().toISOString();
+    void supabase.from("profiles").update(patch).eq("id", user.id);
   }
 
   return NextResponse.json({

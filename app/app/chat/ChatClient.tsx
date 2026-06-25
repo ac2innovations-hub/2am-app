@@ -11,6 +11,10 @@ import AiConsentScreen from "@/components/AiConsentScreen";
 import { track } from "@/lib/analytics";
 import { maybeRequestReview } from "@/lib/rating";
 import {
+  markFirstChatMood,
+  markFirstMessageSent,
+} from "@/lib/push/signals";
+import {
   appendMessages,
   createConversation,
   deleteConversation,
@@ -260,6 +264,9 @@ export default function ChatClient() {
       // mood emoji tap. Start a new convo with Myla's opening message
       // already visible; the user types their reply directly.
       if (fresh && (checkinParam || moodParam)) {
+        // Record the first conversation's seeding mood for the push pre-prompt
+        // gate (a hard mood suppresses the opt-in). Only the first one sticks.
+        if (moodParam) markFirstChatMood(moodParam);
         const seedText = checkinParam
           ? checkinParam
           : MOOD_OPENERS[moodParam!]?.(p.name ?? "you");
@@ -681,6 +688,9 @@ export default function ChatClient() {
         setMessages(nextMessages);
         setInput("");
         if (conversationId) appendMessages(conversationId, [userMsg]);
+        // Signal for the push pre-prompt: the first real (post-onboarding)
+        // message marks a "moment of value" we can ask after.
+        if (onboarding === "done") markFirstMessageSent();
       }
       setRetryableText(null);
       setSending(true);

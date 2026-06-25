@@ -9,6 +9,16 @@ create extension if not exists "pgcrypto";
 -- alter table public.profiles add column if not exists baby_name text;
 -- alter table public.profiles add column if not exists baby_sex text;
 -- alter table public.profiles add column if not exists ai_consent boolean not null default false;
+-- Re-engagement notifications state model (Phase 1) — run these on existing deploys:
+-- alter table public.profiles add column if not exists notifications_enabled boolean not null default false;
+-- alter table public.profiles add column if not exists push_paused boolean not null default false;
+-- alter table public.profiles add column if not exists loss_at timestamptz;
+-- alter table public.profiles add column if not exists last_distress_at timestamptz;
+-- alter table public.profiles add column if not exists last_active_at timestamptz;
+-- alter table public.profiles add column if not exists timezone text;
+-- alter table public.profiles add column if not exists notify_window_start smallint;
+-- alter table public.profiles add column if not exists notify_window_end smallint;
+-- alter table public.profiles add column if not exists push_prompt_state text not null default 'unseen';
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -27,6 +37,18 @@ create table if not exists public.profiles (
   -- one-time consent to Anthropic AI processing, captured before the
   -- user's first message to Myla.
   ai_consent boolean not null default false,
+  -- re-engagement notifications state model (Phase 1). Every send is gated on
+  -- these by lib/push/state.ts canSend(); see Spec #2.
+  notifications_enabled boolean not null default false, -- master switch
+  push_paused boolean not null default false,           -- user-initiated pause → support-only
+  loss_at timestamptz,                                   -- set on a loss → quiet period, then support-only
+  last_distress_at timestamptz,                          -- set when Myla escalates (988/immediate care)
+  last_active_at timestamptz,                            -- last chat engagement (inactivity + loss "engaged since")
+  timezone text,                                         -- IANA tz for quiet hours (captured at register)
+  notify_window_start smallint,                          -- local hour, inclusive (default 9 via app)
+  notify_window_end smallint,                            -- local hour, exclusive (default 21 via app)
+  push_prompt_state text not null default 'unseen'
+    check (push_prompt_state in ('unseen','asked','granted','denied','dismissed')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -55,6 +77,28 @@ create table if not exists public.mood_logs (
 create index if not exists mood_logs_user_id_created_at_idx
   on public.mood_logs (user_id, created_at desc);
 
+-- push_devices — one row per device APNs token, tied to the user. Token health
+-- (disabled_at) is maintained by the server send path on 410/BadDeviceToken.
+create table if not exists public.push_devices (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  token text not null unique,
+  platform text not null default 'ios',
+  environment text not null default 'production'
+    check (environment in ('sandbox','production')),
+  last_seen_at timestamptz not null default now(),
+  disabled_at timestamptz,        -- non-null once APNs reported the token dead
+  disabled_reason text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists push_devices_user_id_idx
+  on public.push_devices (user_id);
+-- Fast lookup of a user's live tokens at send time.
+create index if not exists push_devices_active_idx
+  on public.push_devices (user_id) where disabled_at is null;
+
 -- updated_at trigger
 create or replace function public.tg_set_updated_at()
 returns trigger
@@ -74,6 +118,11 @@ create trigger profiles_set_updated_at
 drop trigger if exists conversations_set_updated_at on public.conversations;
 create trigger conversations_set_updated_at
   before update on public.conversations
+  for each row execute function public.tg_set_updated_at();
+
+drop trigger if exists push_devices_set_updated_at on public.push_devices;
+create trigger push_devices_set_updated_at
+  before update on public.push_devices
   for each row execute function public.tg_set_updated_at();
 
 -- auto-provision a profile row when a new auth user signs up
@@ -100,6 +149,7 @@ create trigger on_auth_user_created
 alter table public.profiles enable row level security;
 alter table public.conversations enable row level security;
 alter table public.mood_logs enable row level security;
+alter table public.push_devices enable row level security;
 
 drop policy if exists "profiles self read" on public.profiles;
 create policy "profiles self read" on public.profiles
@@ -136,3 +186,14 @@ create policy "mood self read" on public.mood_logs
 drop policy if exists "mood self write" on public.mood_logs;
 create policy "mood self write" on public.mood_logs
   for insert with check (auth.uid() = user_id);
+
+-- push_devices: a user may see and remove their own devices. Inserts/updates
+-- (token upsert, environment self-heal, disabling dead tokens) go through the
+-- server's service-role client in /api/push/* — see app/api/push/register.
+drop policy if exists "push_devices self read" on public.push_devices;
+create policy "push_devices self read" on public.push_devices
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "push_devices self delete" on public.push_devices;
+create policy "push_devices self delete" on public.push_devices
+  for delete using (auth.uid() = user_id);
