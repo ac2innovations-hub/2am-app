@@ -17,8 +17,10 @@
 //   - only inside the native app
 //   - only after the user has sent at least MIN_MESSAGES messages
 //   - never during onboarding (caller's responsibility)
+//   - never when Myla escalated this turn (the authoritative distress signal,
+//     `escalated`, is the same [[ESCALATE]] marker that sets last_distress_at)
 //   - never if the latest myla reply looks like a crisis/escalation
-//     conversation (caller passes the reply text for a cheap check)
+//     conversation (a secondary word-list net over the reply text)
 //   - at most once every 120 days, tracked in localStorage
 import { isInsideCapacitor } from "@/lib/isCapacitor";
 import { track } from "@/lib/analytics";
@@ -57,10 +59,15 @@ function getPlugin(): InAppReviewPlugin | null {
 export function maybeRequestReview(opts: {
   userMessageCount: number;
   latestReply: string;
+  // The authoritative distress signal for this turn (server-derived from the
+  // [[ESCALATE]] sentinel). When true, Myla escalated — never ask for a review
+  // on the heels of a hard message.
+  escalated?: boolean;
 }): void {
   try {
     if (!isInsideCapacitor()) return;
     if (opts.userMessageCount < MIN_MESSAGES) return;
+    if (opts.escalated) return;
     if (looksLikeCrisisReply(opts.latestReply)) return;
 
     const last = localStorage.getItem(STORAGE_KEY);

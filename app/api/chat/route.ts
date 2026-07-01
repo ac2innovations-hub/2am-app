@@ -421,6 +421,11 @@ export async function POST(req: NextRequest) {
     message: text,
     usage: response.usage,
     stopReason: response.stop_reason,
+    // The authoritative distress signal (same marker that set last_distress_at
+    // above), surfaced so the client can suppress non-essential prompts — e.g.
+    // the App Store review sheet — right after Myla escalates. The sentinel
+    // itself is already stripped from `message`; this is just the boolean.
+    escalated,
     // Anonymous flow only: how many free messages remain, so the client can
     // surface the soft gate before the next request 402s.
     ...(anonRemaining !== null ? { anonRemaining } : {}),

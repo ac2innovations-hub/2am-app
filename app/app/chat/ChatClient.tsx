@@ -797,6 +797,7 @@ export default function ChatClient() {
         const data = (await res.json().catch(() => ({}))) as {
           message?: string;
           error?: string;
+          escalated?: boolean;
         };
         if (!res.ok) {
           // Friendly error bubble. Held in React state only — not
@@ -823,12 +824,16 @@ export default function ChatClient() {
         setMessages((prev) => [...prev, reply]);
         if (conversationId) appendMessages(conversationId, [reply]);
         // Native-only App Store rating prompt: fires after an engaged,
-        // non-crisis exchange. No-op on web and during onboarding.
+        // non-crisis exchange. No-op on web and during onboarding. Suppressed
+        // whenever Myla escalated this turn — the same distress signal that
+        // drives last_distress_at — so we never ask for a review after a hard
+        // message.
         if (onboarding === "done") {
           maybeRequestReview({
             userMessageCount: nextMessages.filter((m) => m.role === "user")
               .length,
             latestReply: reply.content,
+            escalated: data.escalated === true,
           });
         }
       } catch {
