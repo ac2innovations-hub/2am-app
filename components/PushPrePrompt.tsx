@@ -21,6 +21,7 @@ import {
   prePromptDecided,
   PUSH_RECHECK_EVENT,
 } from "@/lib/push/signals";
+import { pushDebugLog } from "@/lib/push/debug";
 
 export default function PushPrePrompt() {
   const [show, setShow] = useState(false);
@@ -39,14 +40,18 @@ export default function PushPrePrompt() {
       // Gate on actual plugin availability, not just "is native" — older live
       // binaries are inside Capacitor but lack the push plugin. Showing the
       // sheet there would burn the one-shot opt-in on a call that can only fail.
-      if (!isPushPluginAvailable()) return;
-      if (prePromptDecided()) return;
+      // (pushDebugLog is inert unless ?pushdebug=1 — it changes no behavior.)
+      if (!isPushPluginAvailable()) return void pushDebugLog("plugin_unavailable");
+      if (prePromptDecided()) return void pushDebugLog("already_decided");
       const profile = getProfile();
-      if (!profile?.onboardingComplete) return;
-      if (!hasSentFirstMessage()) return;
+      if (!profile?.onboardingComplete)
+        return void pushDebugLog("onboarding_incomplete");
+      if (!hasSentFirstMessage()) return void pushDebugLog("no_first_message");
 
       const eligible = await fetchPrePromptEligibility(firstChatMood());
-      if (!cancelled && eligible) setShow(true);
+      if (cancelled) return;
+      pushDebugLog(eligible ? "all_passed" : "eligibility_false");
+      if (eligible) setShow(true);
     };
 
     void evaluate();
