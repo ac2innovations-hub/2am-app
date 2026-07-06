@@ -157,9 +157,10 @@ const HARD_MOODS: ReadonlySet<Mood> = new Set<Mood>(["rough", "anxious"]);
 /**
  * Pre-prompt suppression gate — a STRICTER superset of canSend. We only offer
  * the "want gentle check-ins from myla?" sheet at a genuinely light moment.
- * Suppress after a loss, a pause, a recent escalation, or a hard/!known first
- * message. Unknown signals suppress (fail-safe): a missed prompt is cheap, a
- * prompt on the heels of a hard moment is not. Note this does NOT require
+ * Suppress after a loss, a pause, a recent escalation, or a KNOWN hard first
+ * mood (rough / anxious). An unknown mood does NOT suppress — it just means the
+ * user typed into chat directly instead of seeding from a mood emoji, which is
+ * a neutral moment, not a hard one. Note this does NOT require
  * notifications_enabled (it's how the user gets there) — instead it requires a
  * clean, first-time prompt state.
  */
@@ -186,9 +187,13 @@ export function canShowPrePrompt(
     return deny("recent_distress");
   }
 
-  // Mood must be present AND light. Unknown (null) or hard → suppress.
-  if (signals.firstChatMood === null) return deny("mood_unknown");
-  if (HARD_MOODS.has(signals.firstChatMood)) return deny("mood_hard");
+  // Only a KNOWN hard mood suppresses. Unknown (null) means the user opened
+  // chat and typed directly rather than seeding from a mood emoji — that's not
+  // a hard moment, so it must not block the opt-in. (The loss / pause / 72h
+  // distress gates above still protect the genuinely sensitive cases.)
+  if (signals.firstChatMood !== null && HARD_MOODS.has(signals.firstChatMood)) {
+    return deny("mood_hard");
+  }
 
   return ALLOW;
 }

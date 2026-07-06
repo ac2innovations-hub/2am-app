@@ -9,6 +9,20 @@ export const PUSH_DECIDED_KEY = "2am:push:decided"; // user answered the soft pr
 export const FIRST_MOOD_KEY = "2am:chat:firstMood"; // seeding mood of first convo
 export const FIRST_SENT_KEY = "2am:chat:sentFirst"; // first post-onboarding send
 
+// Dispatched whenever a signal the pre-prompt depends on changes (the first
+// post-onboarding message is sent, or the profile finishes hydrating from
+// Supabase). PushPrePrompt listens for this and re-evaluates, so the sheet is
+// reactive instead of mount-once — no polling.
+export const PUSH_RECHECK_EVENT = "2am:push:recheck";
+
+export function notifyPushRecheck(): void {
+  try {
+    window.dispatchEvent(new Event(PUSH_RECHECK_EVENT));
+  } catch {
+    /* ignore (SSR / no window) */
+  }
+}
+
 // Record the first conversation's seeding mood, once. Later moods don't
 // overwrite it — the gate cares about the FIRST conversation.
 export function markFirstChatMood(mood: string): void {
@@ -26,6 +40,7 @@ export function markFirstMessageSent(): void {
   try {
     if (!localStorage.getItem(FIRST_SENT_KEY)) {
       localStorage.setItem(FIRST_SENT_KEY, "1");
+      notifyPushRecheck();
     }
   } catch {
     /* ignore */

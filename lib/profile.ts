@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import type { Profile, Stage } from "@/lib/supabase/types";
 import { calcWeekFromDueDate } from "@/lib/utils";
+import { notifyPushRecheck } from "@/lib/push/signals";
 
 export type LocalProfile = {
   name: string | null;
@@ -101,6 +102,10 @@ export async function hydrateProfileFromSupabase(): Promise<LocalProfile | null>
     const remoteLocal = profileRowToLocal(data);
     const merged = mergeProfile(remoteLocal, getProfile());
     localStorage.setItem(KEY, JSON.stringify(merged));
+    // The pre-prompt's onboarding gate reads getProfile() synchronously and can
+    // run before this write lands on a fresh re-login device. Nudge it to
+    // re-evaluate now that the hydrated profile is in localStorage.
+    notifyPushRecheck();
 
     // Onboarded-before-signup: the signup trigger creates an empty profiles
     // row, so `data` has no name/stage but local does. The merge keeps the

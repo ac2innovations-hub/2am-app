@@ -19,6 +19,7 @@ import {
   hasSentFirstMessage,
   markPrePromptDecided,
   prePromptDecided,
+  PUSH_RECHECK_EVENT,
 } from "@/lib/push/signals";
 
 export default function PushPrePrompt() {
@@ -26,22 +27,34 @@ export default function PushPrePrompt() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    // Gate on actual plugin availability, not just "is native" — older live
-    // binaries are inside Capacitor but lack the push plugin. Showing the sheet
-    // there would burn the one-shot opt-in on a call that can only fail.
-    if (!isPushPluginAvailable()) return;
-    if (prePromptDecided()) return;
-    const profile = getProfile();
-    if (!profile?.onboardingComplete) return;
-    if (!hasSentFirstMessage()) return;
-
     let cancelled = false;
-    void (async () => {
+
+    // Re-runnable so the sheet is reactive, not mount-once: the gates below
+    // depend on signals that land after this component mounts — the first
+    // post-onboarding message (sentFirst) and, on a re-login device, the
+    // profile hydrating from Supabase. Both fire PUSH_RECHECK_EVENT, and we
+    // re-read getProfile() each time so gate 3 sees the hydrated profile.
+    const evaluate = async () => {
+      if (cancelled) return;
+      // Gate on actual plugin availability, not just "is native" — older live
+      // binaries are inside Capacitor but lack the push plugin. Showing the
+      // sheet there would burn the one-shot opt-in on a call that can only fail.
+      if (!isPushPluginAvailable()) return;
+      if (prePromptDecided()) return;
+      const profile = getProfile();
+      if (!profile?.onboardingComplete) return;
+      if (!hasSentFirstMessage()) return;
+
       const eligible = await fetchPrePromptEligibility(firstChatMood());
       if (!cancelled && eligible) setShow(true);
-    })();
+    };
+
+    void evaluate();
+    const onRecheck = () => void evaluate();
+    window.addEventListener(PUSH_RECHECK_EVENT, onRecheck);
     return () => {
       cancelled = true;
+      window.removeEventListener(PUSH_RECHECK_EVENT, onRecheck);
     };
   }, []);
 
@@ -50,15 +63,23 @@ export default function PushPrePrompt() {
   const onYes = async () => {
     if (busy) return;
     setBusy(true);
-    markPrePromptDecided();
-    await recordPromptOutcome("asked");
-    await enablePush();
+    const res = await enablePush();
+    // Burn the device's one-shot prompt only on a TERMINAL outcome: a real
+    // grant (the register route records "granted" server-side) or an explicit
+    // OS denial (enablePush records "denied"). Transient failures — no plugin
+    // yet, or a thrown error — leave both the client flag and the server
+    // prompt-state untouched, so a later session can retry instead of the
+    // opt-in being permanently lost.
+    if (res.ok || res.reason === "permission_denied") {
+      markPrePromptDecided();
+    }
     setShow(false);
   };
 
   const onNo = async () => {
     if (busy) return;
     setBusy(true);
+    // "Not now" is a terminal, user-driven dismissal — safe to decide.
     markPrePromptDecided();
     await recordPromptOutcome("dismissed");
     setShow(false);
