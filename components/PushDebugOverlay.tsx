@@ -5,13 +5,14 @@
 // live gate inputs on device plus a running log of which gate the pre-prompt's
 // check bailed on. Remove together with lib/push/debug.ts.
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getProfile, hydrateProfileFromSupabase } from "@/lib/profile";
 import { firstChatMood } from "@/lib/push/signals";
 import {
   getGateLog,
   isPushDebugEnabled,
   subscribeGateLog,
+  togglePushDebug,
   type GateLogEntry,
 } from "@/lib/push/debug";
 
@@ -56,6 +57,7 @@ export default function PushDebugOverlay() {
   const [hidden, setHidden] = useState(false);
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [log, setLog] = useState<GateLogEntry[]>([]);
+  const taps = useRef<number[]>([]);
 
   const refresh = useCallback(async () => {
     const cap = (
@@ -110,16 +112,58 @@ export default function PushDebugOverlay() {
     });
   }, []);
 
+  // Reflect the latched flag on mount.
   useEffect(() => {
-    if (!isPushDebugEnabled()) return;
-    setEnabled(true);
+    if (isPushDebugEnabled()) setEnabled(true);
+  }, []);
+
+  // While enabled, collect a snapshot and stream the gate log.
+  useEffect(() => {
+    if (!enabled) return;
+    setHidden(false);
     void refresh();
     setLog(getGateLog());
     const unsub = subscribeGateLog(() => setLog(getGateLog()));
     return unsub;
-  }, [refresh]);
+  }, [enabled, refresh]);
 
-  if (!enabled || hidden) return null;
+  // 5 taps within 2.5s on the invisible top-center zone toggle the flag. This
+  // is the only trigger reachable inside a fixed-server.url WKWebView.
+  const onTap = () => {
+    const now = Date.now();
+    const recent = [...taps.current, now].filter((t) => now - t < 2500);
+    taps.current = recent;
+    if (recent.length >= 5) {
+      taps.current = [];
+      const on = togglePushDebug();
+      setEnabled(on);
+      if (!on) {
+        setSnap(null);
+        setLog([]);
+      }
+    }
+  };
+
+  // The tap zone is ALWAYS mounted (even when disabled) so the gesture can turn
+  // diagnostics back on. It sits over dead header space and is transparent.
+  const tapZone = (
+    <div
+      onClick={onTap}
+      aria-hidden
+      style={{
+        position: "fixed",
+        top: 0,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: 110,
+        height: 56,
+        zIndex: 10000,
+        background: "transparent",
+      }}
+    />
+  );
+
+  if (!enabled || hidden) return tapZone;
 
   const rows: Array<[string, React.ReactNode]> = snap
     ? [
@@ -135,7 +179,9 @@ export default function PushDebugOverlay() {
     : [];
 
   return (
-    <div style={box} role="region" aria-label="push diagnostics">
+    <>
+      {tapZone}
+      <div style={box} role="region" aria-label="push diagnostics">
       <div
         style={{
           display: "flex",
@@ -192,6 +238,7 @@ export default function PushDebugOverlay() {
             </span>
           </div>
         ))}
-    </div>
+      </div>
+    </>
   );
 }

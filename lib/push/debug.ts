@@ -40,6 +40,21 @@ export function isPushDebugEnabled(): boolean {
   }
 }
 
+// Flip the latched flag on/off (the 5-tap gesture's target). Same localStorage
+// key isPushDebugEnabled() reads, so it's equivalent to ?pushdebug=1 / =0.
+// Returns the new state.
+export function togglePushDebug(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const on = localStorage.getItem(DEBUG_FLAG_KEY) === "1";
+    if (on) localStorage.removeItem(DEBUG_FLAG_KEY);
+    else localStorage.setItem(DEBUG_FLAG_KEY, "1");
+    return !on;
+  } catch {
+    return false;
+  }
+}
+
 // Append which gate failed (or "all_passed") with a timestamp. No-op unless the
 // flag is on.
 export function pushDebugLog(gate: string): void {
