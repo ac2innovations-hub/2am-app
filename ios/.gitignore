@@ -9,5 +9,7 @@ xcuserdata
 capacitor-cordova-ios-plugins
 
 # Generated Config files
-App/App/capacitor.config.json
+# capacitor.config.json is intentionally tracked: it carries packageClassList
+# (the native plugin registration list). Leaving it generated-only meant a
+# build without a preceding `cap sync` shipped without PushNotificationsPlugin.
 App/App/config.xml

@@ -1,0 +1,21 @@
+{
+	"appId": "app.hey2am.ios",
+	"appName": "2AM",
+	"webDir": "www",
+	"server": {
+		"url": "https://www.hey2am.app",
+		"cleartext": false,
+		"allowNavigation": [
+			"hey2am.app",
+			"www.hey2am.app",
+			"*.hey2am.app"
+		]
+	},
+	"ios": {
+		"contentInset": "always"
+	},
+	"packageClassList": [
+		"InAppReviewPlugin",
+		"PushNotificationsPlugin"
+	]
+}
