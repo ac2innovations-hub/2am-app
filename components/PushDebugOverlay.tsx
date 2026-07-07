@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getProfile, hydrateProfileFromSupabase } from "@/lib/profile";
-import { firstChatMood } from "@/lib/push/signals";
+import { firstChatMood, notifyPushRecheck } from "@/lib/push/signals";
 import {
   getGateLog,
   isPushDebugEnabled,
@@ -154,6 +154,19 @@ export default function PushDebugOverlay() {
     }
   };
 
+  // Clear ONLY the burned one-shot flag (leave sentFirst / firstMood) and nudge
+  // the pre-prompt to re-evaluate, so we can re-capture the POST/registration
+  // trace without a fresh install.
+  const resetDecided = () => {
+    try {
+      localStorage.removeItem("2am:push:decided");
+    } catch {
+      /* ignore */
+    }
+    notifyPushRecheck();
+    void refresh();
+  };
+
   // The tap zone is ALWAYS mounted (even when disabled) so the gesture can turn
   // diagnostics back on. It sits over dead header space and is transparent.
   const tapZone = (
@@ -202,6 +215,13 @@ export default function PushDebugOverlay() {
       >
         <strong>push pre-prompt diagnostics</strong>
         <span>
+          <button
+            type="button"
+            onClick={resetDecided}
+            style={{ color: "#8effa0", marginRight: 12, background: "none", border: 0 }}
+          >
+            reset decided
+          </button>
           <button
             type="button"
             onClick={() => void refresh()}
