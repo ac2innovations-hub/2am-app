@@ -9,7 +9,7 @@
  *     background.
  */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const STATIC_CACHE = `2am-static-${VERSION}`;
 const RUNTIME_CACHE = `2am-runtime-${VERSION}`;
 
