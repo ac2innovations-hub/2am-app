@@ -52,6 +52,16 @@ function ls(k: string): string | null {
   }
 }
 
+// Color a gate-log line: red for failures/errors, green for success, blue for
+// the verbatim network/permission traces, salmon for a suppressing gate.
+function logColor(gate: string): string {
+  if (/threw|HTTP [45]\d\d|registrationError/i.test(gate)) return "#ff9d9d";
+  if (gate === "all_passed" || /HTTP 2\d\d/.test(gate)) return "#8effa0";
+  if (/requestPermissions|registration event|prompt\(|register →/.test(gate))
+    return "#cfd8ff";
+  return "#ffb3b3";
+}
+
 export default function PushDebugOverlay() {
   const [enabled, setEnabled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -233,7 +243,13 @@ export default function PushDebugOverlay() {
             <span style={{ color: "#888", flexShrink: 0 }}>
               {e.at.slice(11, 23)}
             </span>
-            <span style={{ color: e.gate === "all_passed" ? "#8effa0" : "#ffb3b3" }}>
+            <span
+              style={{
+                color: logColor(e.gate),
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+              }}
+            >
               {e.gate}
             </span>
           </div>

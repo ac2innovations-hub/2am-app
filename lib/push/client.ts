@@ -7,8 +7,14 @@
 
 import { PushNotifications } from "@capacitor/push-notifications";
 import { isPushPluginAvailable } from "@/lib/isCapacitor";
+import { pushDebugLog, isPushDebugEnabled } from "@/lib/push/debug";
 
 let listenersWired = false;
+
+// TEMPORARY (debug overlay): compact error string for verbatim logging.
+function errStr(err: unknown): string {
+  return err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+}
 
 async function postToken(value: string): Promise<void> {
   try {
@@ -20,12 +26,17 @@ async function postToken(value: string): Promise<void> {
     const envHint = process.env.NEXT_PUBLIC_APNS_ENVIRONMENT;
     const environment =
       envHint === "sandbox" || envHint === "production" ? envHint : undefined;
-    await fetch("/api/push/register", {
+    const res = await fetch("/api/push/register", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ token: value, environment, timezone }),
     });
+    const body = isPushDebugEnabled()
+      ? await res.text().catch(() => "(body read failed)")
+      : "";
+    pushDebugLog(`register → HTTP ${res.status} · ${body}`);
   } catch (err) {
+    pushDebugLog(`register → threw ${errStr(err)}`);
     console.error("[push] token registration POST failed", err);
   }
 }
@@ -44,6 +55,7 @@ export async function enablePush(): Promise<{ ok: boolean; reason?: string }> {
       perm.receive === "prompt-with-rationale"
     ) {
       perm = await PushNotifications.requestPermissions();
+      pushDebugLog(`requestPermissions → ${JSON.stringify(perm)}`);
     }
     if (perm.receive !== "granted") {
       void recordPromptOutcome("denied");
@@ -53,9 +65,13 @@ export async function enablePush(): Promise<{ ok: boolean; reason?: string }> {
     if (!listenersWired) {
       listenersWired = true;
       await PushNotifications.addListener("registration", (token) => {
+        pushDebugLog(
+          `registration event: len=${token.value.length} head=${token.value.slice(0, 8)}`,
+        );
         void postToken(token.value);
       });
       await PushNotifications.addListener("registrationError", (err) => {
+        pushDebugLog(`registrationError: ${JSON.stringify(err)}`);
         console.error("[push] APNs registrationError", err);
       });
     }
@@ -72,12 +88,17 @@ export async function recordPromptOutcome(
   action: "asked" | "dismissed" | "denied",
 ): Promise<void> {
   try {
-    await fetch("/api/push/prompt", {
+    const res = await fetch("/api/push/prompt", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ action }),
     });
-  } catch {
+    const body = isPushDebugEnabled()
+      ? await res.text().catch(() => "(body read failed)")
+      : "";
+    pushDebugLog(`prompt(${action}) → HTTP ${res.status} · ${body}`);
+  } catch (err) {
+    pushDebugLog(`prompt(${action}) → threw ${errStr(err)}`);
     /* best-effort */
   }
 }
