@@ -21,7 +21,15 @@ import {
   prePromptDecided,
   PUSH_RECHECK_EVENT,
 } from "@/lib/push/signals";
-import { pushDebugLog } from "@/lib/push/debug";
+import { pushDebugLog, isPushDebugEnabled } from "@/lib/push/debug";
+
+// Kill-switch: with NEXT_PUBLIC_PUSH_PREPROMPT_DISABLED=1 the opt-in sheet is
+// hidden from everyone EXCEPT when on-device diagnostics are on (?pushdebug /
+// 5-tap), so we can still summon it and tap "yes" to trigger registration
+// post-launch. enablePush() itself is never disabled. Reverse by unsetting the
+// env var (or setting it to anything but "1") and redeploying.
+const PREPROMPT_DISABLED =
+  process.env.NEXT_PUBLIC_PUSH_PREPROMPT_DISABLED === "1";
 
 export default function PushPrePrompt() {
   const [show, setShow] = useState(false);
@@ -37,6 +45,9 @@ export default function PushPrePrompt() {
     // re-read getProfile() each time so gate 3 sees the hydrated profile.
     const evaluate = async () => {
       if (cancelled) return;
+      // Hidden for real users/reviewers; still shown under diagnostics.
+      if (PREPROMPT_DISABLED && !isPushDebugEnabled())
+        return void pushDebugLog("preprompt_disabled");
       // Gate on actual plugin availability, not just "is native" — older live
       // binaries are inside Capacitor but lack the push plugin. Showing the
       // sheet there would burn the one-shot opt-in on a call that can only fail.
