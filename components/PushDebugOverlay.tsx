@@ -17,6 +17,8 @@ import {
 } from "@/lib/push/debug";
 
 type Snapshot = {
+  buildSha: string;
+  sw: string;
   native: string;
   plugin: string;
   decided: string | null;
@@ -70,6 +72,24 @@ export default function PushDebugOverlay() {
   const taps = useRef<number[]>([]);
 
   const refresh = useCallback(async () => {
+    const rawSha = process.env.NEXT_PUBLIC_BUILD_SHA || "dev";
+    const buildSha = rawSha === "dev" ? "dev" : rawSha.slice(0, 7);
+
+    let sw = "(unsupported)";
+    try {
+      if ("serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        const ctrl = navigator.serviceWorker.controller;
+        sw =
+          `controller=${ctrl ? ctrl.state : "none"} · ` +
+          `active=${reg?.active?.state ?? "-"} · ` +
+          `waiting=${reg?.waiting ? "yes" : "no"} · ` +
+          `installing=${reg?.installing ? "yes" : "no"}`;
+      }
+    } catch {
+      sw = "(err)";
+    }
+
     const cap = (
       window as {
         Capacitor?: {
@@ -111,6 +131,8 @@ export default function PushDebugOverlay() {
     }
 
     setSnap({
+      buildSha,
+      sw,
       native,
       plugin,
       decided: ls("2am:push:decided"),
@@ -190,6 +212,8 @@ export default function PushDebugOverlay() {
 
   const rows: Array<[string, React.ReactNode]> = snap
     ? [
+        ["build sha", snap.buildSha],
+        ["service worker", snap.sw],
         ["isNativePlatform()", snap.native],
         ["isPluginAvailable(Push)", snap.plugin],
         ["2am:push:decided", String(snap.decided)],

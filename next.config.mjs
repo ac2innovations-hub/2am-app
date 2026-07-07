@@ -27,6 +27,12 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  // Expose the deployed commit to the client so the on-device debug overlay can
+  // show exactly which bundle is running. Vercel sets VERCEL_GIT_COMMIT_SHA at
+  // build time; falls back to "dev" for local builds.
+  env: {
+    NEXT_PUBLIC_BUILD_SHA: process.env.VERCEL_GIT_COMMIT_SHA || "dev",
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

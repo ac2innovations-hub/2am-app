@@ -47,7 +47,11 @@ async function postToken(value: string): Promise<void> {
  * reports not_native) outside the Capacitor app.
  */
 export async function enablePush(): Promise<{ ok: boolean; reason?: string }> {
-  if (!isPushPluginAvailable()) return { ok: false, reason: "not_native" };
+  pushDebugLog("enablePush: entered");
+  if (!isPushPluginAvailable()) {
+    pushDebugLog("enablePush: early return not_native (plugin unavailable)");
+    return { ok: false, reason: "not_native" };
+  }
   try {
     let perm = await PushNotifications.checkPermissions();
     if (
