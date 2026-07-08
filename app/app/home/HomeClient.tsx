@@ -548,11 +548,16 @@ function pregnantMilestoneCheckIn(
 
 function checkInMessage(p: LocalProfile, week: number): string {
   const name = p.name ? p.name : "you";
-  const concerns = p.concerns?.[0];
+  // The concern is the user's own first-person words; quote it so "you
+  // mentioned '...'" reads consistently instead of mixing voices. Strip a
+  // trailing period/space so the quote doesn't double-stop ("...anxious." last
+  // time.). Blank after stripping → drop the memory clause entirely.
+  const rawConcern = p.concerns?.[0];
+  const concern = rawConcern ? rawConcern.replace(/[.\s]+$/, "") : "";
 
   if (p.stage === "pregnant" && week) {
-    if (concerns) {
-      return `thinking about ${name} — last time we talked, ${concerns} was on your mind. how's that feeling today?`;
+    if (concern) {
+      return `thinking about ${name} — you mentioned "${concern}" last time. how's that feeling today?`;
     }
     if (week >= 36) {
       return `hey ${name} — you're in the home stretch 🤍 anything showing up today i can help with?`;
@@ -561,15 +566,15 @@ function checkInMessage(p: LocalProfile, week: number): string {
   }
 
   if (p.stage === "postpartum") {
-    if (concerns) {
-      return `hi ${name} — you mentioned ${concerns} last time. how's that landing today?`;
+    if (concern) {
+      return `hi ${name} — you mentioned "${concern}" last time. how's that landing today?`;
     }
     return `hi ${name} — how's your body feeling? and more importantly, how are YOU?`;
   }
 
   if (p.stage === "ttc") {
-    if (concerns) {
-      return `hey ${name} — ${concerns} was on your mind last time. want to dig into that a little?`;
+    if (concern) {
+      return `hey ${name} — you mentioned "${concern}" last time. want to dig into that a little?`;
     }
     if (p.monthsTrying !== null && p.monthsTrying >= 12) {
       return `hey ${name} — a year is a totally reasonable moment to check in with a doctor. want to talk through what to ask?`;
