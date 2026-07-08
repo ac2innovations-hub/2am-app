@@ -23,7 +23,13 @@ export default function TrackerCard({ profile }: { profile: LocalProfile }) {
     const progress = Math.min(100, Math.round((week / 40) * 100));
 
     return (
-      <section className="mx-5 mt-5 rounded-3xl border border-peach/20 bg-navy p-5 shadow-[0_0_0_1px_rgba(248,200,168,0.06)]">
+      <section
+        className="mx-5 mt-5 rounded-2xl border p-4"
+        style={{
+          backgroundColor: "rgba(248,200,168,0.06)",
+          borderColor: "rgba(248,200,168,0.18)",
+        }}
+      >
         <div className="flex items-start justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-peach/80">
@@ -77,7 +83,13 @@ export default function TrackerCard({ profile }: { profile: LocalProfile }) {
     const month = age ? getPostpartumMonth(age.months) : null;
 
     return (
-      <section className="mx-5 mt-5 rounded-3xl border border-lavender/25 bg-navy p-5 shadow-[0_0_0_1px_rgba(190,178,215,0.06)]">
+      <section
+        className="mx-5 mt-5 rounded-2xl border p-4"
+        style={{
+          backgroundColor: "rgba(190,178,215,0.06)",
+          borderColor: "rgba(190,178,215,0.18)",
+        }}
+      >
         <div className="flex items-start justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-lavender/90">
@@ -125,7 +137,13 @@ export default function TrackerCard({ profile }: { profile: LocalProfile }) {
   if (profile.stage === "ttc") {
     const ttc = ttcEncouragement(profile.monthsTrying);
     return (
-      <section className="mx-5 mt-5 rounded-3xl border border-sage/25 bg-navy p-5">
+      <section
+        className="mx-5 mt-5 rounded-2xl border p-4"
+        style={{
+          backgroundColor: "rgba(162,200,162,0.06)",
+          borderColor: "rgba(162,200,162,0.18)",
+        }}
+      >
         <div className="flex items-start justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-sage">

@@ -92,7 +92,7 @@ export function greetingFor(name: string | undefined, band: TimeBand): string {
     case "evening":
       return `good evening${who}`;
     case "night":
-      return `hey night owl${who}`;
+      return `still up${who}?`;
   }
 }
 

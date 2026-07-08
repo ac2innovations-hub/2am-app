@@ -4,16 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
-  Brain,
-  CheckCircle,
-  Lock,
-  MessageCircle,
-  Moon,
-  Settings,
-  Sprout,
-  type LucideIcon,
-} from "lucide-react";
-import {
   getProfile,
   hydrateProfileFromSupabase,
   type LocalProfile,
@@ -44,57 +34,6 @@ const MOODS: { key: string; label: string; emoji: string }[] = [
   { key: "meh", label: "meh", emoji: "😐" },
   { key: "rough", label: "rough", emoji: "😔" },
   { key: "anxious", label: "anxious", emoji: "😰" },
-];
-
-const FEATURES: {
-  icon: LucideIcon;
-  iconColor: "peach" | "coral";
-  title: string;
-  desc: string;
-  accent: "peach" | "sage" | "lavender" | "gold";
-}[] = [
-  {
-    icon: MessageCircle,
-    iconColor: "coral",
-    title: "ask anything anytime",
-    desc: "no question too weird. no topic off-limits. always judgment-free.",
-    accent: "peach",
-  },
-  {
-    icon: Brain,
-    iconColor: "peach",
-    title: "she remembers you",
-    desc: "your name, your week, your worries — myla holds the context so you never start over.",
-    accent: "lavender",
-  },
-  {
-    icon: CheckCircle,
-    iconColor: "coral",
-    title: "can i…? instant answers",
-    desc: "sushi, tylenol, hair dye — yes/no with the source, not a rabbit hole.",
-    accent: "sage",
-  },
-  {
-    icon: Lock,
-    iconColor: "peach",
-    title: "private by design",
-    desc: "no google history. no targeted ads. your questions stay yours.",
-    accent: "gold",
-  },
-  {
-    icon: Moon,
-    iconColor: "coral",
-    title: "built for 2am",
-    desc: "wide awake and scared to bother anyone? myla's up too.",
-    accent: "peach",
-  },
-  {
-    icon: Sprout,
-    iconColor: "peach",
-    title: "trying to first year",
-    desc: "cycles, trimesters, milestones — one friend for every chapter.",
-    accent: "sage",
-  },
 ];
 
 export default function HomeClient() {
@@ -153,22 +92,13 @@ export default function HomeClient() {
           <span className="text-gradient-peach font-display text-2xl font-black -ml-2 px-2 py-1">
             2am
           </span>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/app/chat"
-              aria-label="chat with myla"
-              className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
-            >
-              <MessageCircle size={19} strokeWidth={1.75} aria-hidden />
-            </Link>
-            <Link
-              href="/app/settings"
-              aria-label="settings"
-              className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
-            >
-              <Settings size={19} strokeWidth={1.75} aria-hidden />
-            </Link>
-          </div>
+          <Link
+            href="/app/settings"
+            aria-label="settings"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-semibold text-midnight active:scale-95"
+          >
+            {(profile.name ?? "m").charAt(0).toUpperCase()}
+          </Link>
         </header>
 
         <section className="px-5 pt-6">
@@ -248,55 +178,38 @@ export default function HomeClient() {
         >
           2am
         </Link>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/blog"
-            aria-label="read the blog"
-            className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
-          >
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M12 6.5C12 6.5 9.5 5 6.5 5C5.4 5 4.4 5.2 3.5 5.5V18.5C4.4 18.2 5.4 18 6.5 18C9.5 18 12 19.5 12 19.5M12 6.5C12 6.5 14.5 5 17.5 5C18.6 5 19.6 5.2 20.5 5.5V18.5C19.6 18.2 18.6 18 17.5 18C14.5 18 12 19.5 12 19.5M12 6.5V19.5"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Link>
-          <Link
-            href="/app/settings"
-            aria-label="settings"
-            className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
-          >
-            <Settings size={19} strokeWidth={1.75} aria-hidden />
-          </Link>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-semibold text-midnight">
-            {initial}
-          </div>
-        </div>
+        <Link
+          href="/app/settings"
+          aria-label="settings"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-peach-gradient font-display text-sm font-semibold text-midnight active:scale-95"
+        >
+          {initial}
+        </Link>
       </header>
 
       {/* Greeting */}
       <section className="px-5 pt-4">
-        <h1 className="text-[26px] font-semibold leading-tight text-cream">
+        <h1 className="font-display text-[25px] font-semibold leading-tight text-cream">
           {greeting}
         </h1>
         {profile.stage === "pregnant" && (
-          <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
+          <p className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-peach">
+            <span className="h-[5px] w-[5px] rounded-full bg-peach" />
             {curWeek != null ? `week ${curWeek}` : "pregnant"}
             {profile.dueDate ? ` · due ${formatDueDate(profile.dueDate)}` : ""}
           </p>
         )}
         {profile.stage === "postpartum" && (
-          <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
+          <p className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-lavender">
+            <span className="h-[5px] w-[5px] rounded-full bg-lavender" />
             {babyAge
               ? `baby is ${formatBabyAge(babyAge)}`
               : "first year · you're doing it"}
           </p>
         )}
         {profile.stage === "ttc" && (
-          <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
+          <p className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-sage">
+            <span className="h-[5px] w-[5px] rounded-full bg-sage" />
             trying to conceive
             {profile.monthsTrying !== null
               ? ` · ${profile.monthsTrying} mo in`
@@ -304,9 +217,6 @@ export default function HomeClient() {
           </p>
         )}
       </section>
-
-      {/* Tracking snapshot — stage-aware, self-updating */}
-      <TrackerCard profile={profile} />
 
       {/* Myla check-in */}
       {(() => {
@@ -322,7 +232,13 @@ export default function HomeClient() {
           );
         };
         return (
-          <section className="mx-5 mt-4 rounded-3xl bg-navy/70 p-5">
+          <section
+            className="mx-5 mt-4 border bg-navy p-5"
+            style={{
+              borderColor: "rgba(255,250,245,0.08)",
+              borderRadius: "18px",
+            }}
+          >
             <div className="flex items-start gap-3">
               <div className="mt-1">
                 <MylaAvatar size={36} />
@@ -349,18 +265,11 @@ export default function HomeClient() {
         );
       })()}
 
-      {/* Primary CTA */}
-      <div className="px-5 pt-5">
-        <button
-          onClick={startNew}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-peach-gradient py-4 text-base font-semibold text-midnight shadow-glow active:scale-[0.99]"
-        >
-          talk to myla
-        </button>
-      </div>
+      {/* Tracking snapshot — stage-aware, self-updating */}
+      <TrackerCard profile={profile} />
 
       {/* Can I…? */}
-      <div className="mx-5 mt-4">
+      <div className="mx-5 mt-5">
         <Link
           href="/app/cani"
           className="flex items-center justify-between rounded-2xl border border-cream/10 bg-navy/60 px-4 py-4"
@@ -438,74 +347,24 @@ export default function HomeClient() {
         <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.28em] text-cream/55">
           how are you feeling?
         </h2>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
           {MOODS.map((m) => (
             <button
               key={m.key}
               onClick={() => pickMood(m.key)}
-              className="flex flex-1 flex-col items-center gap-1 rounded-2xl bg-navy/50 py-3 text-2xl active:scale-95"
               aria-label={m.label}
+              className="flex items-center gap-1.5 rounded-full border border-cream/[0.14] bg-white/[0.04] px-3.5 py-2 text-[13px] text-cream/80 active:scale-95"
             >
-              <span>{m.emoji}</span>
-              <span className="text-[10px] lowercase text-cream/60">
-                {m.label}
-              </span>
+              <span className="text-[15px]">{m.emoji}</span>
+              <span className="lowercase">{m.label}</span>
             </button>
           ))}
         </div>
       </section>
 
-      {/* Features */}
-      <section className="mx-5 mt-10">
-        <div className="mb-3 flex items-end justify-between">
-          <h2 className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/55">
-            what myla can do
-          </h2>
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/35">
-            scroll
-          </span>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {FEATURES.map((f) => {
-            const Icon = f.icon;
-            return (
-            <div
-              key={f.title}
-              className={`rounded-2xl border bg-navy/50 p-4 ${
-                f.accent === "peach"
-                  ? "border-peach/20"
-                  : f.accent === "sage"
-                    ? "border-sage/25"
-                    : f.accent === "lavender"
-                      ? "border-lavender/25"
-                      : "border-gold/25"
-              }`}
-            >
-              <Icon
-                size={30}
-                strokeWidth={1.75}
-                className={f.iconColor === "coral" ? "text-coral" : "text-peach"}
-                aria-hidden
-              />
-              <div className="mt-2 text-[13px] font-medium lowercase text-cream">
-                {f.title}
-              </div>
-              <p className="mt-1 text-[11px] leading-relaxed text-cream/55">
-                {f.desc}
-              </p>
-            </div>
-            );
-          })}
-        </div>
-      </section>
-
       {/* Disclaimer */}
-      <p className="mx-5 mt-8 text-center text-[11px] leading-relaxed text-cream/45">
-        myla is a friend, not a doctor. always consult your provider
-        for medical decisions.
-      </p>
-      <p className="mx-5 mt-2 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-cream/30">
-        powered by ai
+      <p className="mx-5 mt-10 text-center font-mono text-[11px] text-cream/40">
+        myla is a friend, not a doctor.
       </p>
     </main>
   );
