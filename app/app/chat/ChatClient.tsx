@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import MylaAvatar from "@/components/MylaAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import TypingDots from "@/components/TypingDots";
@@ -333,12 +333,6 @@ export default function ChatClient() {
       setInput(q);
     }
   }, [params, onboarding]);
-
-  const showChips = useMemo(() => {
-    if (onboarding !== "done") return false;
-    const userTurns = messages.filter((m) => m.role === "user").length;
-    return userTurns >= 1 && userTurns <= 5;
-  }, [messages, onboarding]);
 
   // Parse the user's onboarding reply, save to profile, advance the state,
   // and return (a) the directive that tells Myla what to ask next and
@@ -896,12 +890,12 @@ export default function ChatClient() {
               new user mid-onboarding — is left without navigation. */}
           <button
             onClick={() => router.push("/app/home")}
-            aria-label="home"
+            aria-label="back"
             className="rounded-full p-1 text-cream/70 active:scale-95"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path
-                d="M5 12l-2 0l9 -9l9 9l-2 0M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"
+                d="M15 18l-6-6 6-6"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
@@ -914,62 +908,33 @@ export default function ChatClient() {
             <div className="text-[15px] font-medium lowercase text-cream">
               myla
             </div>
-            <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/50">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-sage" />
+            <div
+              className="flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.12em]"
+              style={{ color: "#8FCFA6" }}
+            >
+              <span
+                className="inline-block h-[5px] w-[5px] rounded-full"
+                style={{ backgroundColor: "#8FCFA6" }}
+              />
               always here
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-1">
-          {onboardingDone && (
-            <Link
-              href="/blog"
-              aria-label="read the blog"
-              className="rounded-full p-1.5 text-cream/45 transition hover:text-cream/80 active:scale-95"
-            >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path
-                  d="M12 6.5C12 6.5 9.5 5 6.5 5C5.4 5 4.4 5.2 3.5 5.5V18.5C4.4 18.2 5.4 18 6.5 18C9.5 18 12 19.5 12 19.5M12 6.5C12 6.5 14.5 5 17.5 5C18.6 5 19.6 5.2 20.5 5.5V18.5C19.6 18.2 18.6 18 17.5 18C14.5 18 12 19.5 12 19.5M12 6.5V19.5"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
-          )}
-          {onboardingDone ? (
-            <Link
-              href="/app/home"
-              aria-label="home"
-              className="text-gradient-peach font-display text-lg font-black rounded-md px-2 py-1 -mr-2 transition hover:opacity-80 active:scale-95"
-            >
-              2am
-            </Link>
-          ) : (
-            <span
-              aria-hidden
-              className="text-gradient-peach font-display text-lg font-black rounded-md px-2 py-1 -mr-2"
-            >
-              2am
-            </span>
-          )}
         </div>
       </header>
 
       {/* Disclaimer */}
       <div
         style={{
-          padding: "8px 16px",
-          borderBottom: "1px solid rgba(255,255,255,0.04)",
+          padding: "7px 16px",
+          borderTop: "1px solid rgba(255,255,255,0.07)",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
           textAlign: "center",
           fontFamily: "var(--font-dm-mono), ui-monospace, monospace",
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.2)",
+          fontSize: "9.5px",
+          color: "rgba(255,255,255,0.32)",
         }}
       >
-        myla is powered by ai — she&apos;s a well-read friend, not a doctor.
-        always check with your provider for medical decisions.
+        powered by ai — a well-read friend, not a doctor.
       </div>
 
       {/* Messages */}
@@ -987,15 +952,21 @@ export default function ChatClient() {
             </div>
           )}
           {messages.length === 0 && !sending && (
-            <div className="mt-12 flex flex-col items-center gap-3 text-center">
-              <MylaAvatar size={56} />
-              <p className="text-cream/80">
-                hey{profile?.name ? `, ${profile.name}` : ""} — what&apos;s
-                up?
+            <div className="mt-12 flex flex-col items-center gap-4 text-center">
+              <MylaAvatar size={46} />
+              <p className="font-display text-[17px] text-cream">
+                hey{profile?.name ? `, ${profile.name}` : ""} — what&apos;s up?
               </p>
-              <p className="text-sm text-cream/50">
+              <p className="text-[13px] text-cream/50">
                 ask me anything. no judgment.
               </p>
+              <div className="mt-1 w-full max-w-sm px-2">
+                <QuickChips
+                  suggestions={chipsForStage(profile?.stage ?? null)}
+                  onPick={(s) => send(s)}
+                  disabled={sending}
+                />
+              </div>
             </div>
           )}
           {retryableText && !sending && (
@@ -1016,17 +987,6 @@ export default function ChatClient() {
         </div>
       </div>
 
-      {/* Quick chips */}
-      {showChips && (
-        <div className="border-t border-cream/5 bg-midnight px-4 pt-3">
-          <QuickChips
-            suggestions={chipsForStage(profile?.stage ?? null)}
-            onPick={(s) => send(s)}
-            disabled={sending}
-          />
-        </div>
-      )}
-
       {/* Input */}
       <form
         onSubmit={(e) => {
@@ -1035,11 +995,17 @@ export default function ChatClient() {
         }}
         className="safe-bottom sticky bottom-0 z-20 border-t border-cream/5 bg-midnight/95 px-4 pt-3 backdrop-blur"
       >
-        <div className="flex items-center gap-2 rounded-full bg-navy px-4 py-2">
+        <div
+          className="flex items-center gap-2 rounded-full border px-4 py-2"
+          style={{
+            backgroundColor: "rgba(255,255,255,0.03)",
+            borderColor: "rgba(255,255,255,0.10)",
+          }}
+        >
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="ask myla anything..."
+            placeholder="message myla…"
             autoComplete="off"
             autoCapitalize="off"
             className="flex-1 bg-transparent py-2 text-[15px] text-cream placeholder:lowercase placeholder:text-cream/40 focus:outline-none"
@@ -1049,15 +1015,15 @@ export default function ChatClient() {
             type="submit"
             disabled={!canSend}
             aria-label="send"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-peach-gradient text-midnight shadow-glow transition active:scale-95 disabled:opacity-40"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-peach-gradient text-midnight shadow-glow transition active:scale-95 disabled:opacity-40"
           >
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
               <path
-                d="M3 10l14-6-6 14-2-6-6-2z"
+                d="M10 16V4M10 4l-5 5M10 4l5 5"
                 stroke="currentColor"
-                strokeWidth="1.6"
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
-                fill="currentColor"
               />
             </svg>
           </button>

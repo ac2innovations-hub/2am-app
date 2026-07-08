@@ -43,11 +43,21 @@ const config: Config = {
           "0%, 100%": { opacity: "0.2" },
           "50%": { opacity: "0.8" },
         },
+        fadeUp: {
+          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        typeBounce: {
+          "0%, 60%, 100%": { transform: "translateY(0)", opacity: "0.5" },
+          "30%": { transform: "translateY(-4px)", opacity: "1" },
+        },
       },
       animation: {
         "slide-up": "slideUp 280ms ease-out",
         "bounce-dot": "bounceDot 1.2s infinite ease-in-out",
         twinkle: "twinkle 4s ease-in-out infinite",
+        "fade-up": "fadeUp 250ms ease-out",
+        "type-bounce": "typeBounce 1.1s infinite ease-in-out",
       },
     },
   },
