@@ -51,6 +51,228 @@ html { scroll-behavior: smooth; }
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.85; }
 }
+
+/* ---- hero rebuild (2-column: headline left, interactive demo right) ---- */
+.landing-hero2 {
+  position: relative;
+  overflow: hidden;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vh, 88px) 32px 72px;
+}
+.landing-hero2::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(248, 200, 168, 0.16), transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(190, 178, 215, 0.08), transparent 55%);
+  pointer-events: none;
+}
+.landing-hero2-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .landing-hero2-grid {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 56px;
+  }
+}
+.landing-hero2-eyebrow {
+  color: var(--peach);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  margin-bottom: 20px;
+}
+.landing-hero2-h1 {
+  margin: 0 0 22px;
+  font-weight: 800;
+  font-size: clamp(40px, 5vw, 62px);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  color: var(--cream);
+}
+.landing-hero2-h1 span { color: var(--peach); }
+.landing-hero2-sub {
+  margin: 0 0 32px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: rgba(255, 250, 245, 0.68);
+  max-width: 44ch;
+}
+.landing-hero2-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.landing-hero2-ctas .landing-cta { margin-top: 0; }
+.landing-hero2-trust {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 250, 245, 0.5);
+}
+.landing-hero2-demo { min-width: 0; }
+
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes typebounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* shared mini chat bubbles (memory thread + versus) */
+.tb {
+  max-width: 92%;
+  padding: 9px 13px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+.tb.user {
+  align-self: flex-end;
+  background: rgba(248, 200, 168, 0.14);
+  border-color: rgba(248, 200, 168, 0.26);
+  color: #f2e6dc;
+  border-radius: 14px 14px 4px 14px;
+}
+.tb.myla {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.09);
+  color: #cbd4e2;
+  border-radius: 14px 14px 14px 4px;
+}
+.tb.bot {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #98a3b6;
+  border-radius: 14px 14px 14px 4px;
+}
+
+/* ---- three chapters (memory thread) ---- */
+.landing-chapters-grid { display: flex; flex-wrap: wrap; gap: 72px; }
+.landing-chapters-grid > div { flex: 1 1 380px; min-width: 300px; }
+.landing-rail { display: flex; flex-direction: column; gap: 18px; margin-top: 40px; }
+.landing-rail-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.landing-rail-row .dot {
+  flex: none; width: 10px; height: 10px; border-radius: 50%;
+  transform: translateY(-1px);
+}
+.landing-rail-row .k { font-weight: 600; font-size: 16px; color: var(--cream); }
+.landing-rail-row .v { font-size: 15px; color: #8b97ae; }
+.landing-thread { position: relative; padding-left: 34px; }
+.landing-thread-line {
+  position: absolute; left: 7px; top: 10px; bottom: 40px; width: 2px;
+  border-radius: 2px; opacity: 0.6;
+  background: linear-gradient(180deg, var(--sage), var(--peach) 50%, var(--lavender));
+}
+.landing-thread-item { position: relative; margin-bottom: 44px; }
+.landing-thread-dot {
+  position: absolute; left: -34px; top: 2px; width: 16px; height: 16px;
+  border-radius: 50%; box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.05);
+}
+.landing-thread-when {
+  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #8b97ae; margin-bottom: 12px;
+}
+.landing-thread-bubbles { display: flex; flex-direction: column; gap: 8px; max-width: 440px; }
+.landing-thread-note { font-style: italic; font-size: 15px; color: #8b97ae; margin: 8px 0 0; }
+
+/* ---- clinical review ---- */
+.landing-clinical .landing-container { text-align: center; }
+.landing-clinical-quote {
+  margin: 0 auto; max-width: 66ch; font-style: italic;
+  font-size: clamp(17px, 1.9vw, 21px); line-height: 1.66; color: #dce3ef;
+}
+.landing-clinical-cite { margin-top: 26px; font-weight: 600; font-size: 15.5px; color: var(--peach); }
+.landing-clinical-banner {
+  display: flex; align-items: center; justify-content: center; gap: 18px;
+  margin-top: 40px; font-size: 10.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #97a3b9;
+}
+.landing-clinical-banner span { width: 44px; height: 1px; background: rgba(255, 255, 255, 0.14); }
+
+/* ---- why not chatgpt (versus) ---- */
+.landing-versus-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px; margin-top: 52px; align-items: stretch;
+}
+.landing-versus-card {
+  display: flex; flex-direction: column; gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.09); background: rgba(255, 255, 255, 0.02);
+  border-radius: 22px; padding: 22px;
+}
+.landing-versus-card.is-myla {
+  border-color: rgba(248, 200, 168, 0.3); background: rgba(248, 200, 168, 0.045);
+  box-shadow: 0 20px 60px rgba(238, 155, 120, 0.08);
+}
+.landing-versus-label {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #8b97ae;
+}
+.landing-versus-card.is-myla .landing-versus-label { color: var(--peach); }
+.landing-versus-label .mark {
+  flex: none; width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #24334f, #101b33);
+  border: 1px solid rgba(248, 200, 168, 0.35); color: var(--peach);
+  font-weight: 700; font-size: 8.5px; display: flex; align-items: center; justify-content: center;
+}
+.landing-versus-kicker {
+  margin-top: auto; padding-top: 10px; font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #8b97ae;
+}
+.landing-versus-kicker.is-myla { color: var(--peach); }
+.landing-versus-points {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 28px; margin-top: 52px;
+}
+.landing-versus-points .h { font-weight: 600; font-size: 15.5px; color: var(--cream); margin-bottom: 7px; }
+.landing-versus-points .p { font-size: 14.5px; line-height: 1.6; color: #8b97ae; }
+
+/* ---- promise + founder ---- */
+.landing-promise2-grid { display: flex; flex-wrap: wrap; gap: 64px; align-items: center; }
+.landing-promise2-grid > div:first-child { flex: 1 1 460px; min-width: 300px; }
+.landing-founder { flex: 1 1 360px; min-width: 300px; display: flex; gap: 22px; align-items: flex-start; }
+.landing-founder-photo {
+  width: 88px; height: 88px; flex: none; border-radius: 50%;
+  object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.landing-founder-name { font-weight: 600; font-size: 16px; color: var(--cream); }
+.landing-founder-blurb { margin: 7px 0 0; font-size: 14.5px; line-height: 1.65; color: #8b97ae; max-width: 40ch; }
+.landing-founder-link {
+  display: inline-block; margin-top: 12px; font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--peach); text-decoration: none;
+}
+
+/* ---- closing cta ---- */
+.landing-closing { position: relative; overflow: hidden; text-align: center; }
+.landing-closing::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 120% 75% at 50% 110%, rgba(238, 155, 120, 0.3), rgba(238, 155, 120, 0.06) 45%, transparent 72%);
+}
+.landing-closing .landing-container { position: relative; }
+.landing-closing-h2 {
+  margin: 0 auto; max-width: 17ch; font-weight: 700;
+  font-size: clamp(34px, 4.6vw, 52px); line-height: 1.14;
+  letter-spacing: -0.01em; color: var(--cream);
+}
+.landing-closing-ctas {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 14px; margin-top: 40px;
+}
+.landing-closing-ctas .landing-cta { margin-top: 0; }
+.landing-closing-trust { margin-top: 24px; font-size: 14px; color: rgba(255, 250, 245, 0.55); }
+
 .landing-hero h1 {
   position: relative;
   margin: 12px 0 0;

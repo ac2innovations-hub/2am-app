@@ -1,14 +1,15 @@
 // The "meet myla" CTA goes to /app/try (the anonymous try-Myla flow, with a
 // persistent "log in" escape hatch); logged-in visitors are redirected to
-// /app/chat above. A subdued secondary email capture under the hero collects
-// testers for small-batch early access via the same /api/waitlist endpoint.
-// The bottom of the page is feedback + FAQ (not a second CTA).
+// /app/chat above. The hero carries an interactive Myla demo; the rest is
+// moments · memory · clinical review · why-not-chatgpt · promise · faq ·
+// blog · closing CTA.
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
 import AppStoreBadge from "@/components/AppStoreBadge";
+import MylaDemo from "@/components/landing/MylaDemo";
 import { createClient as createServerSupabase } from "@/lib/supabase/server";
 import "./landing.css";
 
@@ -53,28 +54,6 @@ const STARS = [
   { top: "82%", left: "14%", delay: "3.2s" },
   { top: "14%", left: "42%", delay: "2.5s" },
   { top: "28%", left: "90%", delay: "0.9s" },
-];
-
-const TTC_BUBBLES = [
-  "how long should we try before seeing a doctor?",
-  "does ovulation tracking actually work?",
-  "is it normal to feel jealous of pregnant friends?",
-];
-
-const EXP_BUBBLES = [
-  "can i eat sushi?",
-  "can i drink coffee?",
-  "can i take tylenol?",
-  "can i dye my hair?",
-  "is heartburn normal at 14 weeks?",
-  "why do i feel contractions that come and go?",
-];
-
-const MOM_BUBBLES = [
-  "do i have ppd or am i just tired?",
-  "is my baby behind on milestones?",
-  "why won’t my baby latch?",
-  "how long will this postpartum bleeding last?",
 ];
 
 export default async function Landing({
@@ -131,8 +110,8 @@ export default async function Landing({
         </nav>
       </header>
 
-      {/* hero */}
-      <header className="landing-hero">
+      {/* hero — headline left, interactive chat demo right */}
+      <header className="landing-hero2">
         <div className="landing-stars" aria-hidden>
           {STARS.map((s, i) => (
             <span
@@ -141,242 +120,46 @@ export default async function Landing({
             />
           ))}
         </div>
-        <div className="landing-container">
-          {/* The single page h1 carries the core topic for SEO/screen readers;
-              the wordmark below is the visual brand lockup, not the heading. */}
-          <h1 className="sr-only">
-            2am — the judgment-free ai friend for trying to conceive, pregnancy,
-            and new motherhood
-          </h1>
-          <span className="landing-mono">for every stage of motherhood</span>
-          <div className="landing-hero-h1">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/wordmark.svg" alt="2am" className="landing-hero-wordmark" />
+        <div className="landing-hero2-grid">
+          <div>
+            {/* sr-only h1 carries the keyword-rich topic for SEO; the visible
+                headline below is the styled display lockup. */}
+            <h1 className="sr-only">
+              2am — the judgment-free ai friend for trying to conceive,
+              pregnancy, and new motherhood
+            </h1>
+            <div className="landing-hero2-eyebrow landing-mono">
+              for trying · expecting · new moms
+            </div>
+            <div className="landing-hero2-h1">
+              it’s 2 a.m.
+              <br />
+              you’re wide awake.
+              <br />
+              <span>she’s up too.</span>
+            </div>
+            <p className="landing-hero2-sub">
+              myla is the judgment-free friend for trying, expecting, and new
+              motherhood. evidence-based, warm, and awake at whatever hour the
+              question hits.
+            </p>
+            <div className="landing-hero2-ctas">
+              <Link className="landing-cta" href="/app/try">
+                meet myla
+              </Link>
+              <AppStoreBadge />
+            </div>
+            <p className="landing-hero2-trust landing-mono">
+              free · no ads, ever · reviewed by a board-certified ob-gyn
+            </p>
           </div>
-          <p className="landing-tag">myla’s always up.</p>
-          <p className="landing-sub">
-            <span className="brand-name">2am</span> is the judgment-free friend
-            for your journey — whether you’re trying, expecting, or navigating
-            life as a new mom.
-          </p>
-          <Link className="landing-cta" href="/app/try">
-            meet myla
-          </Link>
-          <AppStoreBadge />
-          <p className="landing-cta-secondary">
-            start your <span className="brand-name">2am</span> conversation
-          </p>
-          <p className="landing-tiny landing-mono">
-            no judgment · no google history · just answers
-          </p>
-          <p
-            className="landing-tiny landing-mono"
-            style={{ color: "var(--peach)", marginTop: 12 }}
-          >
-            reviewed by a board-certified ob-gyn 💛
-          </p>
+          <div className="landing-hero2-demo">
+            <MylaDemo />
+          </div>
         </div>
       </header>
 
-      {/* problem */}
-      <section className="landing-section landing-problem">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            the 2 a.m. google search
-          </span>
-          <h2 className="landing-title">
-            it’s 2 a.m. you’re wide awake. and you have questions you don’t want
-            anyone to hear you ask.
-          </h2>
-          <p className="landing-lede">
-            every woman i’ve ever known has spiraled on webmd at midnight.
-            crowdsourced her symptoms from strangers on reddit. been too
-            embarrassed to bother her ob for the fifth time this week. myla is
-            the friend who actually knows her stuff and isn’t going anywhere.
-          </p>
-          <ul>
-            <li>“is this normal, or should i be worried?”</li>
-            <li>“i’m scared to bring this up with my doctor.”</li>
-            <li>
-              “everyone in my group chat got pregnant on the first try.”
-            </li>
-            <li>“i don’t know what to trust online.”</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* stage cards */}
-      <section className="landing-section landing-stages">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            what <span className="brand-name">2am</span> can do
-          </span>
-          <h2 className="landing-title">three chapters, one friend.</h2>
-          <p className="landing-lede">
-            myla meets you where you are, and she remembers. no starting over,
-            no re-explaining. she grows with you.
-          </p>
-
-          <div className="landing-stage-grid">
-            <article className="landing-stage-card trying">
-              <div className="emoji" aria-hidden>
-                🌱
-              </div>
-              <h3>trying</h3>
-              <p>
-                <em>
-                  “how long is too long?” “should i be tracking ovulation?” “is
-                  something wrong with us?”
-                </em>
-                {" "}— the questions you’re afraid to ask your friends who got
-                pregnant on the first try.
-              </p>
-            </article>
-
-            <article className="landing-stage-card expecting">
-              <div className="emoji" aria-hidden>
-                🤍
-              </div>
-              <h3>expecting</h3>
-              <p>
-                <em>
-                  “is this normal?” “can i eat this?” “why do i feel like
-                  this?”
-                </em>
-                {" "}— the 2 a.m. questions about your body, your baby, and
-                everything you’re too embarrassed to google.
-              </p>
-            </article>
-
-            <article className="landing-stage-card newmom">
-              <div className="emoji" aria-hidden>
-                🍼
-              </div>
-              <h3>new mom</h3>
-              <p>
-                <em>
-                  “is my baby behind?” “do i have ppd or am i just tired?”
-                  “why won’t my baby latch?”
-                </em>
-                {" "}— the postpartum questions nobody warns you about,
-                without the judgment of mom groups.
-              </p>
-            </article>
-          </div>
-          <p
-            style={{
-              fontFamily: "var(--font-outfit), system-ui, sans-serif",
-              fontSize: "16px",
-              fontStyle: "italic",
-              color: "rgba(255, 255, 255, 0.35)",
-              maxWidth: "560px",
-              margin: "32px auto 0",
-              textAlign: "center",
-            }}
-          >
-            whether you’re doing this with a partner, on your own, or with a
-            team of doctors helping you get there — myla’s here for all of it.
-          </p>
-        </div>
-      </section>
-
-      {/* how it works */}
-      <section className="landing-section landing-how">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            how <span className="brand-name">2am</span> works
-          </span>
-          <h2 className="landing-title">three steps. no forms. no judgment.</h2>
-          <div className="landing-how-grid">
-            <article className="landing-how-card">
-              <div className="landing-how-num" aria-hidden>
-                1
-              </div>
-              <h3>tell myla what’s on your mind.</h3>
-              <p>
-                whether it’s a question, a fear, or something you just need to
-                say out loud. no forms, no dropdown menus. just talk.
-              </p>
-            </article>
-            <article className="landing-how-card">
-              <div className="landing-how-num" aria-hidden>
-                2
-              </div>
-              <h3>she asks the right follow-ups.</h3>
-              <p>
-                myla doesn’t give generic answers. she asks what week you’re in,
-                what you’ve already tried, what’s actually worrying you — then
-                gives you the real answer.
-              </p>
-            </article>
-            <article className="landing-how-card">
-              <div className="landing-how-num" aria-hidden>
-                3
-              </div>
-              <h3>she remembers, so you never start over.</h3>
-              <p>
-                next time you come back, myla knows your name, your stage, and
-                what you talked about last. like a friend who actually listens.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {/* clinical endorsement */}
-      <section className="landing-section landing-endorsement">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            reviewed by a board-certified ob-gyn
-          </span>
-          <h2 className="landing-title">an independent clinical review.</h2>
-          <figure className="landing-testimonial landing-endorsement-card">
-            <blockquote>
-              “As a board-certified OB/GYN with over a decade of clinical
-              experience, I would recommend 2am to all of my patients. It does
-              an excellent job of providing patients with honest and accurate
-              medical information in a manner that is non-judgmental and allows
-              patients to make educated decisions about their care during an
-              important and vulnerable period in their lives.”
-            </blockquote>
-            <cite>Jill Palko, MD, OB-GYN</cite>
-            <div className="who">
-              a one-time independent review — not ongoing medical supervision
-            </div>
-          </figure>
-        </div>
-      </section>
-
-      {/* question bubbles */}
-      <section className="landing-section landing-bubbles">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            what women actually ask
-          </span>
-          <h2 className="landing-title">
-            the stuff we’ve all quietly typed and deleted.
-          </h2>
-          <div className="landing-bubble-cloud">
-            {TTC_BUBBLES.map((q) => (
-              <span key={q} className="landing-bubble ttc">
-                {q}
-              </span>
-            ))}
-            {EXP_BUBBLES.map((q) => (
-              <span key={q} className="landing-bubble exp">
-                {q}
-              </span>
-            ))}
-            {MOM_BUBBLES.map((q) => (
-              <span key={q} className="landing-bubble mom">
-                {q}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* testimonials */}
+      {/* built for moments like these */}
       <section className="landing-section landing-testimonials">
         <div className="landing-container">
           <span className="landing-eyebrow landing-mono">
@@ -385,6 +168,12 @@ export default async function Landing({
           <h2 className="landing-title">
             the questions you’d never ask out loud.
           </h2>
+          <p className="landing-lede">
+            every woman has spiraled on webmd at midnight, crowdsourced her
+            symptoms from strangers on reddit, or sat alone with a fear too
+            awkward to say out loud. these are real 2 a.m. moments — and what
+            happened next.
+          </p>
           <div className="landing-t-grid">
             <figure className="landing-testimonial">
               <blockquote>
@@ -393,21 +182,20 @@ export default async function Landing({
               </blockquote>
               <cite>— 3:47 am</cite>
               <div className="who">
-                myla answered in 8 seconds. no judgment. just reassurance.
+                myla answered in eight seconds. no judgment — just the actual
+                risk, which is far smaller than the fear.
               </div>
             </figure>
-
             <figure className="landing-testimonial">
               <blockquote>
                 “we’ve been trying for 14 months. is something wrong with me?”
               </blockquote>
               <cite>— 1:22 am</cite>
               <div className="who">
-                myla talked her through the numbers, the options, and reminded
-                her she’s not alone.
+                she walked through the real numbers, the real options, and the
+                sentence that mattered: you are not broken.
               </div>
             </figure>
-
             <figure className="landing-testimonial">
               <blockquote>
                 “my baby is 4 months old and i don’t feel bonded yet. am i a
@@ -415,15 +203,311 @@ export default async function Landing({
               </blockquote>
               <cite>— 2:08 am</cite>
               <div className="who">
-                myla normalized it, explained the science, and gently
-                suggested talking to her doctor.
+                she normalized it, explained the science, and suggested a
+                conversation with her doctor — for the morning, not for panic.
               </div>
             </figure>
           </div>
         </div>
       </section>
 
-      {/* from the blog */}
+      {/* three chapters, one friend — memory thread */}
+      <section className="landing-section landing-chapters">
+        <div className="landing-container landing-chapters-grid">
+          <div>
+            <span className="landing-eyebrow landing-mono">
+              three chapters, one friend
+            </span>
+            <h2 className="landing-title">
+              she remembers, so you never start over.
+            </h2>
+            <p className="landing-lede">
+              trying, expecting, new mom — myla carries the whole story. no
+              re-explaining what week you’re in, or how long it’s been, or what
+              you were scared about last time.
+            </p>
+            <div className="landing-rail">
+              <div className="landing-rail-row">
+                <span className="dot" style={{ background: "var(--sage)" }} />
+                <span className="k">trying</span>
+                <span className="v">cycles, timing, the two-week wait</span>
+              </div>
+              <div className="landing-rail-row">
+                <span className="dot" style={{ background: "var(--peach)" }} />
+                <span className="k">expecting</span>
+                <span className="v">your body, your baby, can-i-eat-this</span>
+              </div>
+              <div className="landing-rail-row">
+                <span className="dot" style={{ background: "var(--lavender)" }} />
+                <span className="k">new mom</span>
+                <span className="v">
+                  feeding, sleep, the feelings nobody warns you about
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="landing-thread">
+            <div className="landing-thread-line" aria-hidden />
+            <div className="landing-thread-item">
+              <span
+                className="landing-thread-dot"
+                style={{ background: "var(--sage)" }}
+              />
+              <div className="landing-thread-when landing-mono">
+                september · cycle 3
+              </div>
+              <div className="landing-thread-bubbles">
+                <div className="tb user">
+                  everyone in my group chat got pregnant on the first try.
+                </div>
+                <div className="tb myla">
+                  and you’re on cycle 3 — which is completely normal. 85% of
+                  couples take up to a year. want the real numbers instead of
+                  the group chat’s?
+                </div>
+              </div>
+            </div>
+            <div className="landing-thread-item">
+              <span
+                className="landing-thread-dot"
+                style={{ background: "var(--peach)" }}
+              />
+              <div className="landing-thread-when landing-mono">
+                february · just found out
+              </div>
+              <div className="landing-thread-bubbles">
+                <div className="tb user">myla. two lines.</div>
+                <div className="tb myla">
+                  ali — two lines. i’ve been hoping for this message. how are
+                  you feeling — excited, terrified, both?
+                </div>
+              </div>
+            </div>
+            <div className="landing-thread-item">
+              <span
+                className="landing-thread-dot"
+                style={{ background: "var(--lavender)" }}
+              />
+              <div className="landing-thread-when landing-mono">
+                december · 5 weeks postpartum
+              </div>
+              <div className="landing-thread-bubbles">
+                <div className="tb user">
+                  she’s here. why won’t she latch on the left side?
+                </div>
+                <div className="tb myla">
+                  she’s here 🤍 congratulations. and — the left side is almost
+                  always position, not you. want to try the football hold at
+                  the next feed?
+                </div>
+              </div>
+            </div>
+            <p className="landing-thread-note">
+              same thread, fifteen months apart. she remembers all of it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* clinical review */}
+      <section className="landing-section landing-clinical">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">
+            reviewed by a board-certified ob-gyn
+          </span>
+          <blockquote className="landing-clinical-quote">
+            “As a board-certified OB/GYN with over a decade of clinical
+            experience, I would recommend 2am to all of my patients. It does an
+            excellent job of providing patients with honest and accurate medical
+            information in a manner that is non-judgmental and allows patients to
+            make educated decisions about their care during an important and
+            vulnerable period in their lives.”
+          </blockquote>
+          <div className="landing-clinical-cite">Jill Palko, MD, OB-GYN</div>
+          <div className="landing-clinical-banner landing-mono">
+            <span aria-hidden />
+            grounded in acog · cdc · aap guidance
+            <span aria-hidden />
+          </div>
+        </div>
+      </section>
+
+      {/* why not chatgpt */}
+      <section className="landing-section landing-versus">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">the obvious question</span>
+          <h2 className="landing-title">“why not just ask chatgpt?”</h2>
+          <p className="landing-lede">
+            because a 2 a.m. question is rarely just an information question. the
+            same message, answered twice:
+          </p>
+          <div className="landing-versus-grid">
+            <div className="landing-versus-card">
+              <div className="landing-versus-label landing-mono">
+                a general chatbot
+              </div>
+              <div className="tb user">
+                my baby won’t latch and i feel like a failure
+              </div>
+              <div className="tb bot">
+                A good latch means the baby’s mouth covers most of the areola,
+                not just the nipple. Try the cross-cradle or football hold, wait
+                for a wide-open mouth, and bring the baby to you. If problems
+                persist, consider a lactation consultant.
+              </div>
+              <div className="landing-versus-kicker landing-mono">
+                correct — and it never heard “i feel like a failure.”
+              </div>
+            </div>
+            <div className="landing-versus-card is-myla">
+              <div className="landing-versus-label landing-mono">
+                <span className="mark" aria-hidden>
+                  m
+                </span>
+                myla
+              </div>
+              <div className="tb user">
+                my baby won’t latch and i feel like a failure
+              </div>
+              <div className="tb myla">
+                first — you are not a failure. i needed to say that before
+                anything else. latching is hard, and for reasons that have
+                nothing to do with you: how she’s positioned, a possible
+                tongue-tie, a latch reflex still figuring itself out.
+              </div>
+              <div className="tb myla">
+                a lactation consultant can genuinely work magic here — most of
+                this is fixable with hands-on help. and if breastfeeding ever
+                stops being the path, that’s not failure either; a fed, loved
+                baby is the whole point. how are you doing in all of it — not
+                just the feeding?
+              </div>
+              <div className="landing-versus-kicker is-myla landing-mono">
+                she answered the one you were actually asking.
+              </div>
+            </div>
+          </div>
+          <div className="landing-versus-points">
+            <div>
+              <div className="h">grounded, not averaged.</div>
+              <div className="p">
+                answers come from acog, cdc and aap guidance — not from the
+                whole internet at once.
+              </div>
+            </div>
+            <div>
+              <div className="h">she remembers.</div>
+              <div className="p">
+                your week, your history, your last scare. you never re-explain,
+                and she follows up.
+              </div>
+            </div>
+            <div>
+              <div className="h">built for 2 a.m.</div>
+              <div className="p">
+                she can tell a factual question from a scared one — and answers
+                the one you’re actually asking.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* the 2am promise + founder */}
+      <section className="landing-section landing-promise2">
+        <div className="landing-container landing-promise2-grid">
+          <div>
+            <span className="landing-eyebrow landing-mono">the 2am promise</span>
+            <h2 className="landing-title">
+              never ads. never data sales. never judgment.
+            </h2>
+            <p className="landing-lede">
+              2am exists for the questions you can’t ask anyone else — so the
+              deal has no exceptions. your most vulnerable moment will never be
+              monetized.
+            </p>
+          </div>
+          <div className="landing-founder">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/founder-ali.png"
+              alt="ali miller"
+              className="landing-founder-photo"
+            />
+            <div>
+              <div className="landing-founder-name">built by ali miller</div>
+              <p className="landing-founder-blurb">
+                one person — not a health-tech conglomerate. 2am exists because
+                the 2 a.m. spiral is real, and the options weren’t good enough.
+              </p>
+              <Link href="/about" className="landing-founder-link landing-mono">
+                the full story →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* faq */}
+      <section className="landing-section landing-faq">
+        <div className="landing-container">
+          <span className="landing-eyebrow landing-mono">
+            questions about 2am
+          </span>
+          <h2 className="landing-title">
+            what people ask before they meet myla.
+          </h2>
+          <div className="landing-faq-list">
+            <details className="landing-faq-item">
+              <summary>is 2am free?</summary>
+              <div className="landing-faq-answer">
+                yes — right now everything in 2am is free: the app, myla, all of
+                it. as 2am grows, a paid tier may come for extras. whatever
+                happens, you’ll hear it from us first — no surprise paywalls at
+                2 a.m.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>what happens to my chat history? is it private?</summary>
+              <div className="landing-faq-answer">
+                it’s yours. no ads, no data sales, nothing shared with insurers
+                or advertisers — ever. and there’s a delete-my-account button in
+                the app that permanently erases your account, profile, and every
+                conversation. permanently means permanently.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>is myla a doctor? can she diagnose me?</summary>
+              <div className="landing-faq-answer">
+                no. myla is an ai friend, not a medical provider — she doesn’t
+                diagnose or prescribe. she helps you figure out which questions
+                are worth bringing to your doctor, and whether that’s a call
+                tonight or a note for the morning.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>what if i’m in a mental health crisis at 2 a.m.?</summary>
+              <div className="landing-faq-answer">
+                myla is built to recognize when something is beyond her scope. if
+                you mention thoughts of self-harm, severe postpartum symptoms, or
+                a medical emergency, she’ll point you to a real human resource
+                right there in the chat. she’s never a substitute for real help
+                — she’s the friend who tells you to go get it.
+              </div>
+            </details>
+            <details className="landing-faq-item">
+              <summary>how do i start talking to myla?</summary>
+              <div className="landing-faq-answer">
+                she’s live now. “meet myla” opens a conversation in your browser,
+                or download the 2am app from the app store.
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* from the blog (SEO / internal links — kept off-mock) */}
       <section className="landing-section landing-blog-preview">
         <div className="landing-container">
           <span className="landing-eyebrow landing-mono">from the blog</span>
@@ -448,155 +532,24 @@ export default async function Landing({
         </div>
       </section>
 
-      {/* early-tester feedback */}
-      <section className="landing-section landing-feedback">
+      {/* closing cta */}
+      <section className="landing-section landing-closing">
         <div className="landing-container">
           <span className="landing-eyebrow landing-mono">
-            what women are saying about <span className="brand-name">2am</span>
+            it’s 2 a.m. somewhere
           </span>
-          <h2 className="landing-title">the feedback we keep hearing.</h2>
-          <div className="landing-feedback-grid">
-            <figure className="landing-feedback-card ttc">
-              <blockquote>
-                “i’ve been trying for 11 months and every other app made me
-                feel like a project. myla just talked to me. she didn’t tell
-                me to relax or try harder.”
-              </blockquote>
-              <cite>— sarah, cycle 11</cite>
-            </figure>
-            <figure className="landing-feedback-card exp">
-              <blockquote>
-                “i texted myla at 4 am about brown spotting at 8 weeks. she
-                told me what was likely and what wasn’t, and said ‘this is
-                worth a call to your OB in the morning, but it’s not an
-                emergency tonight.’ i actually went back to sleep.”
-              </blockquote>
-              <cite>— jess, 8 weeks</cite>
-            </figure>
-            <figure className="landing-feedback-card mom">
-              <blockquote>
-                “i thought i was the only one who hadn’t felt that
-                bonded-from-day-one thing. myla explained why it’s normal,
-                told me when it usually shifts, and said the part i needed to
-                hear: ‘this doesn’t mean you’re a bad mom.’”
-              </blockquote>
-              <cite>— maya, 9 weeks postpartum</cite>
-            </figure>
-          </div>
-          <p className="landing-feedback-note landing-mono">
-            names and details changed for privacy.
-          </p>
-        </div>
-      </section>
-
-      {/* the 2am promise */}
-      <section className="landing-section landing-promise">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            the <span className="brand-name">2am</span> promise
-          </span>
-          <h2 className="landing-title">what <span className="brand-name">2am</span> stands for.</h2>
-          <p className="landing-lede">
-            <span className="brand-name">2am</span> exists for the questions you
-            can&rsquo;t ask anyone else. so the deal is simple:{" "}
-            <span className="brand-name">2am</span> will never run ads, never
-            sell your data, and never judge you. no exceptions. that&rsquo;s the{" "}
-            <span className="brand-name">2am</span> difference.
-          </p>
-        </div>
-      </section>
-
-      {/* faq */}
-      <section className="landing-section landing-faq">
-        <div className="landing-container">
-          <span className="landing-eyebrow landing-mono">
-            questions about <span className="brand-name">2am</span>
-          </span>
-          <h2 className="landing-title">
-            what people ask before they meet myla.
+          <h2 className="landing-closing-h2">
+            the night is long. you don’t have to sit with it alone.
           </h2>
-          <div className="landing-faq-list">
-            <details className="landing-faq-item">
-              <summary>is <span className="brand-name">2am</span> free?</summary>
-              <div className="landing-faq-answer">
-                yes — <span className="brand-name">2am</span> is free. the core
-                experience will always be free. we may add a paid tier later for
-                things like longer memory or extra features, but the questions
-                you’d never google will always be free to ask.
-              </div>
-            </details>
-            <details className="landing-faq-item">
-              <summary>how do i start talking to myla?</summary>
-              <div className="landing-faq-answer">
-                she’s already live. tap “meet myla” at the top of this page to
-                talk in your browser right now, or download{" "}
-                <span className="brand-name">2am</span> on the app store —
-                search “2am myla.”
-              </div>
-            </details>
-            <details className="landing-faq-item">
-              <summary>how is this different from just asking chatgpt?</summary>
-              <div className="landing-faq-answer">
-                three things. one — myla is trained specifically on guidelines
-                from organizations like ACOG, the CDC, and the AAP, so the
-                answers are evidence-based rather than averaged across the
-                whole internet. two — she remembers your story, so you never
-                have to re-explain that you’re 14 weeks pregnant or that you’ve
-                been trying for 8 months. three — she’s built for the 2 a.m.
-                emotional register: warm, not clinical. she knows the
-                difference between someone asking a factual question and
-                someone asking because they’re scared.
-              </div>
-            </details>
-            <details className="landing-faq-item">
-              <summary>what happens to my chat history? is it private?</summary>
-              <div className="landing-faq-answer">
-                your conversations are yours. we don’t sell your data. we don’t
-                show you ads. we don’t share it with insurers, advertisers, or
-                anyone else. if you want, you can delete any conversation or
-                your entire history at any time.
-              </div>
-            </details>
-            <details className="landing-faq-item">
-              <summary>is myla a doctor? can she diagnose me?</summary>
-              <div className="landing-faq-answer">
-                no. myla is an ai friend, not a medical provider. she doesn’t
-                diagnose, prescribe, or replace your OB. she helps you figure
-                out which questions are worth bringing to your doctor, and
-                tells you when something needs a call tonight vs. when it can
-                wait.
-              </div>
-            </details>
-            <details className="landing-faq-item">
-              <summary>what if i’m in a mental health crisis at 2 a.m.?</summary>
-              <div className="landing-faq-answer">
-                myla is trained to recognize when something is beyond her
-                scope. if you mention thoughts of self-harm, severe postpartum
-                symptoms, or a medical emergency, she’ll tell you to reach out
-                to a real human and give you the right resource right there in
-                the chat. she’s never a substitute for real help. she’s the
-                friend who tells you to go get it.
-              </div>
-            </details>
-            <details className="landing-faq-item">
-              <summary>what devices does this work on?</summary>
-              <div className="landing-faq-answer">
-                myla works on any phone, tablet, or computer through your
-                browser at hey2am.app. the <span className="brand-name">2am</span>{" "}
-                iOS app is also available on the App Store.
-              </div>
-            </details>
-            <details className="landing-faq-item">
-              <summary>who built this?</summary>
-              <div className="landing-faq-answer">
-                ali miller, from cape coral, florida. not a health tech
-                conglomerate.{" "}
-                <Link href="/about" className="landing-faq-link">
-                  read the full story →
-                </Link>
-              </div>
-            </details>
+          <div className="landing-closing-ctas">
+            <Link className="landing-cta" href="/app/try">
+              meet myla
+            </Link>
+            <AppStoreBadge />
           </div>
+          <p className="landing-closing-trust landing-mono">
+            free · no ads, ever · reviewed by a board-certified ob-gyn
+          </p>
         </div>
       </section>
 
