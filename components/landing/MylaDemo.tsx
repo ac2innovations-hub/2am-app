@@ -10,10 +10,10 @@ type Msg = { role: "user" | "myla"; text: string };
 
 const SCRIPTS: { q: string; replies: string[] }[] = [
   {
-    q: "can i eat sushi?",
+    q: "i'm 8 weeks and spotting brown. should i panic?",
     replies: [
-      "cooked sushi? eat freely — shrimp tempura, california rolls, eel, all good. raw's more of a judgment call: the fda says skip it, but plenty of obs are fine with the occasional high-quality, low-mercury piece (salmon, tuna from a good spot). always avoid the high-mercury ones — swordfish, king mackerel, bigeye tuna, tilefish.",
-      "what stage are you in? i can tailor it. 😊",
+      "take a breath — brown at 8 weeks is common, and brown specifically is a good sign: old blood, not fresh. still, mention it to your provider today — they may want a quick check or an ultrasound, so you're not sitting with the not-knowing.",
+      "the signs that mean call right away: bright red or heavy bleeding, cramping that builds, or passing tissue — then your ob, or l&d. any cramping with it right now?",
     ],
   },
   {

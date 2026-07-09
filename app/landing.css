@@ -113,6 +113,11 @@ html { scroll-behavior: smooth; }
   margin-bottom: 20px;
 }
 .landing-hero2-ctas .landing-cta { margin-top: 0; }
+/* AppStoreBadge ships with `margin:18px auto 0` for the old centered column;
+   inside these flex CTA pairs the auto side-margins blow the gap open, so
+   neutralize them and let the pair's own gap do the spacing. */
+.landing-hero2-ctas .landing-appstore,
+.landing-closing-ctas .landing-appstore { margin: 0; }
 .landing-hero2-trust {
   font-size: 13px;
   letter-spacing: 0.02em;
