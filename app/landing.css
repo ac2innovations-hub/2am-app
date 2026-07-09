@@ -16,22 +16,7 @@ html { scroll-behavior: smooth; }
   padding: 0 24px;
 }
 
-/* hero */
-.landing-hero {
-  position: relative;
-  padding: 88px 0 96px;
-  text-align: center;
-  overflow: hidden;
-}
-.landing-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(248, 200, 168, 0.18), transparent 55%),
-    radial-gradient(circle at 80% 80%, rgba(190, 178, 215, 0.08), transparent 55%);
-  pointer-events: none;
-}
+/* hero star-field (positioned inside the relative .landing-hero2) */
 .landing-stars {
   position: absolute;
   inset: 0;
@@ -133,6 +118,25 @@ html { scroll-behavior: smooth; }
   0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
   30% { transform: translateY(-4px); opacity: 1; }
 }
+
+/* the primary "meet myla" pill — shared by hero + closing CTAs */
+.landing-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+  padding: 18px 48px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f8c8a8, #ee9b78);
+  color: var(--midnight);
+  font-weight: 600;
+  font-size: 17px;
+  box-shadow: 0 0 60px rgba(248, 200, 168, 0.25);
+  transition: transform 120ms ease;
+  text-decoration: none;
+}
+.landing-cta:active { transform: scale(0.98); }
 
 /* shared mini chat bubbles (memory thread + versus) */
 .tb {
@@ -278,64 +282,8 @@ html { scroll-behavior: smooth; }
 .landing-closing-ctas .landing-cta { margin-top: 0; }
 .landing-closing-trust { margin-top: 24px; font-size: 14px; color: rgba(255, 250, 245, 0.55); }
 
-.landing-hero h1 {
-  position: relative;
-  margin: 12px 0 0;
-  line-height: 1;
-}
-/* the wordmark SVG as the hero's brand focal point — large and centered */
-.landing-hero-wordmark {
-  display: block;
-  width: min(70vw, 420px);
-  height: auto;
-  margin: 0 auto;
-  filter: drop-shadow(0 0 60px rgba(248, 200, 168, 0.28));
-}
-.landing-tag {
-  position: relative;
-  margin-top: 20px;
-  font-style: italic;
-  font-size: 20px;
-  color: rgba(255, 250, 245, 0.9);
-}
-.landing-sub {
-  position: relative;
-  margin: 18px auto 0;
-  max-width: 36rem;
-  font-size: 18px;
-  color: rgba(255, 250, 245, 0.72);
-}
-.landing-cta {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 40px;
-  padding: 18px 48px;
-  border-radius: 9999px;
-  background: linear-gradient(135deg, #f8c8a8, #ee9b78);
-  color: var(--midnight);
-  font-weight: 600;
-  font-size: 17px;
-  box-shadow: 0 0 60px rgba(248, 200, 168, 0.25);
-  transition: transform 120ms ease;
-  text-decoration: none;
-}
-.landing-cta:active { transform: scale(0.98); }
-.landing-cta-secondary {
-  position: relative;
-  margin-top: 14px;
-  font-size: 14px;
-  color: rgba(255, 250, 245, 0.7);
-}
-.landing-tiny {
-  position: relative;
-  margin-top: 24px;
-  color: rgba(255, 250, 245, 0.42);
-}
-
 /* official Apple App Store badge — block + auto margins so it stacks
-   centered on its own line below the primary "meet myla" CTA. */
+   centered on its own line when it isn't inside a flex CTA pair. */
 .landing-appstore {
   position: relative;
   display: block;
@@ -382,159 +330,7 @@ html { scroll-behavior: smooth; }
   color: rgba(255, 250, 245, 0.7);
 }
 
-/* problem */
-.landing-problem .landing-title { max-width: 36rem; }
-.landing-problem ul {
-  margin: 28px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 14px;
-  max-width: 40rem;
-}
-.landing-problem li {
-  padding: 14px 18px;
-  border-radius: 16px;
-  background: rgba(22, 34, 54, 0.6);
-  border: 1px solid rgba(255, 250, 245, 0.05);
-  color: rgba(255, 250, 245, 0.88);
-}
-
-/* stage cards */
-.landing-stages {
-  background:
-    radial-gradient(circle at 20% 0%, rgba(162, 200, 162, 0.08), transparent 55%),
-    radial-gradient(circle at 90% 80%, rgba(248, 200, 168, 0.07), transparent 55%);
-}
-.landing-stage-grid {
-  margin-top: 40px;
-  display: grid;
-  gap: 20px;
-  grid-template-columns: 1fr;
-}
-@media (min-width: 860px) {
-  .landing-stage-grid { grid-template-columns: repeat(3, 1fr); }
-}
-.landing-stage-card {
-  padding: 28px;
-  border-radius: 28px;
-  background: var(--navy);
-  border: 1px solid rgba(248, 200, 168, 0.14);
-}
-.landing-stage-card.trying { border-color: rgba(162, 200, 162, 0.22); }
-.landing-stage-card.expecting { border-color: rgba(248, 200, 168, 0.22); }
-.landing-stage-card.newmom { border-color: rgba(190, 178, 215, 0.22); }
-.landing-stage-card .emoji {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: rgba(255, 250, 245, 0.06);
-  font-size: 22px;
-  margin-bottom: 16px;
-}
-.landing-stage-card.trying .emoji { background: rgba(162, 200, 162, 0.12); }
-.landing-stage-card.expecting .emoji { background: rgba(248, 200, 168, 0.14); }
-.landing-stage-card.newmom .emoji { background: rgba(190, 178, 215, 0.14); }
-.landing-stage-card h3 {
-  margin: 0 0 10px;
-  font-family: "DM Mono", ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--peach);
-}
-.landing-stage-card.trying h3 { color: var(--sage); }
-.landing-stage-card.newmom h3 { color: var(--lavender); }
-.landing-stage-card p {
-  margin: 0;
-  color: rgba(255, 250, 245, 0.85);
-  font-size: 15.5px;
-}
-.landing-stage-card em {
-  color: var(--cream);
-  font-style: normal;
-  font-weight: 500;
-}
-
-/* how it works */
-.landing-how {
-  background:
-    radial-gradient(circle at 80% 20%, rgba(190, 178, 215, 0.07), transparent 55%);
-}
-.landing-how-grid {
-  margin-top: 40px;
-  display: grid;
-  gap: 20px;
-  grid-template-columns: 1fr;
-}
-@media (min-width: 860px) {
-  .landing-how-grid { grid-template-columns: repeat(3, 1fr); }
-}
-.landing-how-card {
-  padding: 28px;
-  border-radius: 24px;
-  background: var(--navy);
-  border: 1px solid rgba(248, 200, 168, 0.14);
-}
-.landing-how-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 9999px;
-  margin-bottom: 18px;
-  background: linear-gradient(135deg, #f8c8a8, #ee9b78);
-  color: var(--midnight);
-  font-family: "DM Mono", ui-monospace, monospace;
-  font-size: 16px;
-  font-weight: 700;
-}
-.landing-how-card h3 {
-  margin: 0 0 10px;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--cream);
-}
-.landing-how-card p {
-  margin: 0;
-  font-size: 15.5px;
-  line-height: 1.6;
-  color: rgba(255, 250, 245, 0.7);
-}
-
-/* question bubbles */
-.landing-bubbles {
-  background:
-    radial-gradient(circle at 70% 30%, rgba(248, 200, 168, 0.06), transparent 60%);
-}
-.landing-bubble-cloud {
-  margin-top: 36px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  max-width: 60rem;
-}
-.landing-bubble {
-  padding: 12px 18px;
-  border-radius: 9999px;
-  background: rgba(22, 34, 54, 0.7);
-  border: 1px solid rgba(255, 250, 245, 0.06);
-  color: rgba(255, 250, 245, 0.85);
-  font-size: 14px;
-}
-.landing-bubble.ttc {
-  border-color: rgba(162, 200, 162, 0.28);
-  color: rgba(255, 250, 245, 0.95);
-}
-.landing-bubble.exp { border-color: rgba(248, 200, 168, 0.28); }
-.landing-bubble.mom { border-color: rgba(190, 178, 215, 0.28); }
-
-/* testimonials */
+/* built for moments — reuses the testimonial card */
 .landing-testimonials {
   background:
     radial-gradient(circle at 20% 80%, rgba(162, 200, 162, 0.06), transparent 55%);
@@ -575,29 +371,6 @@ html { scroll-behavior: smooth; }
   margin-top: 4px;
 }
 
-/* clinical endorsement — reuses the .landing-testimonial card, centered as a
-   single prominent quote */
-.landing-endorsement-card {
-  max-width: 44rem;
-  margin: 36px auto 0;
-}
-.landing-endorsement-card blockquote {
-  font-size: 17px;
-  font-style: italic;
-  line-height: 1.6;
-}
-
-/* final cta */
-.landing-final {
-  text-align: center;
-  padding: 88px 24px 120px;
-}
-.landing-final .landing-title {
-  margin: 16px auto 12px;
-  max-width: 40rem;
-}
-.landing-final .landing-lede { margin: 0 auto; }
-
 /* footer */
 .landing-footer {
   padding: 32px 24px 56px;
@@ -619,10 +392,6 @@ html { scroll-behavior: smooth; }
   font-size: 15px;
   font-style: italic;
   color: rgba(255, 250, 245, 0.7);
-}
-.landing-footer .dot {
-  margin: 0 10px;
-  color: rgba(255, 250, 245, 0.3);
 }
 .landing-footer a { color: rgba(255, 250, 245, 0.65); }
 .landing-footer-link {
@@ -725,60 +494,7 @@ html { scroll-behavior: smooth; }
 }
 .landing-blog-more:hover { color: var(--coral); }
 
-/* early-tester feedback */
-.landing-feedback {
-  background:
-    radial-gradient(circle at 80% 20%, rgba(248, 200, 168, 0.06), transparent 55%);
-}
-.landing-feedback-grid {
-  margin-top: 40px;
-  display: grid;
-  gap: 20px;
-  grid-template-columns: 1fr;
-}
-@media (min-width: 860px) {
-  .landing-feedback-grid { grid-template-columns: repeat(3, 1fr); }
-}
-.landing-feedback-card {
-  padding: 28px;
-  border-radius: 24px;
-  background: var(--navy);
-  border: 1px solid rgba(255, 250, 245, 0.06);
-}
-.landing-feedback-card.ttc { border-color: rgba(162, 200, 162, 0.28); }
-.landing-feedback-card.exp { border-color: rgba(248, 200, 168, 0.28); }
-.landing-feedback-card.mom { border-color: rgba(190, 178, 215, 0.28); }
-.landing-feedback-card blockquote {
-  margin: 0 0 18px;
-  font-size: 15.5px;
-  line-height: 1.6;
-  color: rgba(255, 250, 245, 0.92);
-}
-.landing-feedback-card cite {
-  display: block;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--peach);
-}
-.landing-feedback-card.ttc cite { color: var(--sage); }
-.landing-feedback-card.mom cite { color: var(--lavender); }
-.landing-feedback-note {
-  margin-top: 24px;
-  text-align: center;
-  color: rgba(255, 250, 245, 0.4);
-}
-
 /* faq */
-/* the 2am promise — trust statement */
-.landing-promise {
-  background:
-    radial-gradient(circle at 50% 30%, rgba(162, 200, 162, 0.08), transparent 55%);
-}
-.landing-promise .landing-lede {
-  max-width: 40rem;
-}
-
 .landing-faq {
   background:
     radial-gradient(circle at 30% 80%, rgba(190, 178, 215, 0.06), transparent 55%);
@@ -832,10 +548,3 @@ html { scroll-behavior: smooth; }
   line-height: 1.65;
   color: rgba(255, 250, 245, 0.68);
 }
-.landing-faq-link {
-  color: var(--peach);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  white-space: nowrap;
-}
-.landing-faq-link:hover { color: var(--coral); }
