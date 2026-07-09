@@ -17,24 +17,24 @@ const SCRIPTS: { q: string; replies: string[] }[] = [
     ],
   },
   {
-    q: "is heartburn normal at 14 weeks?",
+    q: "is it normal i don't feel pregnant yet?",
     replies: [
-      "very normal — and earlier than most people expect. progesterone relaxes the valve at the top of your stomach, and at 14 weeks things are getting more crowded in there.",
-      "what actually helps: smaller meals, don't lie down right after eating, prop your head up at night. if it's rough, ask your ob about tums — safe in pregnancy, with a little calcium bonus. 💛",
+      "so normal — symptoms run on wildly different timelines, and plenty of women barely feel pregnant in the first trimester. it doesn't mean anything's wrong.",
+      "the one thing worth flagging to your ob: if you'd had strong symptoms and they suddenly disappeared, mention that. but just not feeling much yet? that's well within normal. is this your first?",
     ],
   },
   {
-    q: "we've been trying for 8 months. is something wrong?",
+    q: "can i take tylenol for this headache?",
     replies: [
-      "eight months is genuinely exhausting — the hoping and the waiting, over and over. and you're still in the normal window: about 85% of couples conceive within a year, and most of the rest just needed a little help. 'something wrong' usually means 'something findable — and often treatable.'",
-      "the honest variable is age: under 35, most docs say give it a year before testing; 35+, six months. are you tracking ovulation at all, or has anything felt off? 💛",
+      "yes — tylenol (acetaminophen) is the standard for headaches in pregnancy, well-studied for decades. just stay under the max daily dose on the bottle, and check with your ob first if you've ever had liver issues.",
+      "if the headaches start coming often or getting intense, flag those to your provider — but for the occasional one, you're fine. one-off, or has this been building?",
     ],
   },
   {
-    q: "do i have ppd or am i just tired?",
+    q: "can i eat deli meat?",
     replies: [
-      "the fact that you're even asking matters. tired is universal after a baby — but ppd is different: heavier, and it lingers past those first couple weeks instead of lifting. and it doesn't always look like crying — sometimes it's numbness, rage, or feeling disconnected.",
-      "on the nights you get a real stretch of sleep, does the heaviness lift at all? either way, this is one worth saying out loud to your ob — i can help you find the words. 💛",
+      "you can — the catch is heating it until it's steaming hot right before you eat. that kills the listeria risk, which is the only real concern with deli meat in pregnancy. cold straight from the deli case is the one to skip.",
+      "same rule covers hot dogs and anything pre-sliced. craving a specific sandwich? tell me what it is and i'll tell you how to make it safe.",
     ],
   },
 ];
