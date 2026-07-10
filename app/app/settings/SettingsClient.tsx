@@ -18,6 +18,20 @@ const STAGE_LABEL: Record<string, string> = {
   ttc: "trying to conceive",
 };
 
+// The stage identity line takes its stage color (matches the home reskin).
+const STAGE_COLOR: Record<string, string> = {
+  pregnant: "text-peach",
+  postpartum: "text-lavender",
+  ttc: "text-sage",
+};
+
+// The three promises (static — framed as promises, not toggles).
+const PROMISES = [
+  "no ads, ever",
+  "never sold, never shared",
+  "no judgment, ever",
+];
+
 export default function SettingsClient() {
   const router = useRouter();
   const [profile, setProfile] = useState<LocalProfile | null>(null);
@@ -114,10 +128,12 @@ export default function SettingsClient() {
     return <div className="p-6 text-cream/60">loading…</div>;
   }
 
-  const stageLabel = profile.stage ? STAGE_LABEL[profile.stage] ?? profile.stage : "—";
+  const stageLabel = profile.stage
+    ? STAGE_LABEL[profile.stage] ?? profile.stage
+    : null;
 
   return (
-    <main className="relative min-h-svh bg-midnight pb-10">
+    <main className="relative min-h-svh bg-midnight pb-12">
       <header className="safe-top flex items-center gap-2 px-5 pb-3">
         <Link
           href="/app/home"
@@ -126,22 +142,107 @@ export default function SettingsClient() {
         >
           <ChevronLeft size={22} strokeWidth={1.75} aria-hidden />
         </Link>
-        <h1 className="font-display text-xl font-semibold text-cream">
+        <h1 className="font-display text-2xl font-semibold text-cream">
           settings
         </h1>
       </header>
 
+      {/* identity */}
       <section className="mx-5 mt-4">
-        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-[0.28em] text-cream/55">
-          account
-        </h2>
-        <dl className="divide-y divide-cream/5 overflow-hidden rounded-2xl border border-cream/10 bg-navy/60">
-          <Row label="name" value={profile.name ?? "—"} />
-          <Row label="email" value={email ?? "—"} />
-          <Row label="stage" value={stageLabel} />
-        </dl>
+        <div className="flex items-center gap-3 rounded-2xl border border-cream/10 bg-navy/60 px-4 py-3.5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-peach-gradient font-display text-lg font-semibold text-midnight">
+            {(profile.name ?? "m").charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate font-display text-[15px] font-semibold text-cream">
+              {profile.name ?? "—"}
+            </div>
+            <div className="mt-0.5 truncate text-[12.5px] text-cream/55">
+              {stageLabel && (
+                <span className={STAGE_COLOR[profile.stage!] ?? "text-cream/55"}>
+                  {stageLabel}
+                </span>
+              )}
+              {stageLabel ? " · " : ""}
+              {email ?? "—"}
+            </div>
+          </div>
+        </div>
       </section>
 
+      {/* the 2am promise */}
+      <section className="mx-5 mt-5">
+        <div
+          className="rounded-2xl border border-peach/20 p-4"
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(162,200,162,0.06), rgba(248,200,168,0.05))",
+          }}
+        >
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-peach">
+            the 2am promise
+          </div>
+          <ul className="flex flex-col gap-3">
+            {PROMISES.map((p) => (
+              <li key={p} className="flex items-center gap-3">
+                <span className="flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-full border border-sage/50 bg-sage/[0.16] text-[11px] text-sage">
+                  ✓
+                </span>
+                <span className="text-[14px] text-cream/85">{p}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 border-t border-cream/10 pt-3 text-[12.5px] italic text-cream/45">
+            these aren&rsquo;t settings you can turn off. they&rsquo;re promises.
+          </p>
+        </div>
+      </section>
+
+      {/* your data */}
+      <section className="mx-5 mt-6">
+        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-[0.28em] text-cream/55">
+          your data
+        </h2>
+        <div className="overflow-hidden rounded-2xl border border-cream/10 bg-navy/60">
+          <button
+            type="button"
+            onClick={() => {
+              setDeleteError(null);
+              setDeleteOpen(true);
+            }}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition active:scale-[0.99]"
+          >
+            <span className="text-[14.5px] text-red-300">delete everything</span>
+            <span className="text-red-300/70">›</span>
+          </button>
+        </div>
+        <p className="mt-2 px-1 text-[11px] leading-relaxed text-cream/45">
+          permanently deletes your account, profile, and conversations.
+        </p>
+      </section>
+
+      {/* about */}
+      <section className="mx-5 mt-8">
+        <p className="mb-3 text-center text-[12.5px] italic text-cream/55">
+          myla is a friend, not a doctor.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-5">
+          <Link
+            href="/privacy"
+            className="font-mono text-[10px] uppercase tracking-[0.1em] text-cream/55 transition hover:text-peach"
+          >
+            privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="font-mono text-[10px] uppercase tracking-[0.1em] text-cream/55 transition hover:text-peach"
+          >
+            terms
+          </Link>
+        </div>
+      </section>
+
+      {/* sign out */}
       <section className="mx-5 mt-6">
         <button
           type="button"
@@ -152,21 +253,10 @@ export default function SettingsClient() {
         </button>
       </section>
 
-      <section className="mx-5 mt-10">
-        <button
-          type="button"
-          onClick={() => {
-            setDeleteError(null);
-            setDeleteOpen(true);
-          }}
-          className="flex w-full items-center justify-center rounded-full border border-red-500/50 bg-red-500/10 py-3.5 text-[14px] font-semibold text-red-300 transition hover:bg-red-500/20 active:scale-[0.99]"
-        >
-          delete my account
-        </button>
-        <p className="mt-2 text-center text-[11px] leading-relaxed text-cream/45">
-          permanently deletes your account, profile, and conversations.
-        </p>
-      </section>
+      {/* version — App Store marketing version; bump per release */}
+      <p className="mt-8 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-cream/30">
+        2am · v1.2
+      </p>
 
       {deleteOpen && (
         <div
@@ -219,16 +309,5 @@ export default function SettingsClient() {
         </div>
       )}
     </main>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/45">
-        {label}
-      </span>
-      <span className="truncate text-[14px] text-cream">{value}</span>
-    </div>
   );
 }
