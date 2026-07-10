@@ -64,7 +64,7 @@ export default function AboutPage() {
 
           <div className="about-copy">
             <p>
-              2am was founded by ali miller in cape coral, florida — not by a
+              2am was founded by ali miller in fort myers, florida — not by a
               health-tech conglomerate, not by a team of mbas optimizing for ad
               revenue. by a person who saw a gap and decided to fill it.
             </p>
