@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import "../legal.css";
+import SiteNav from "@/components/site/SiteNav";
+import SiteFooter from "@/components/site/SiteFooter";
+import "../landing.css";
 
 export const metadata: Metadata = {
   title: "why 2am exists — the judgment-free friend for your journey",
@@ -27,168 +29,151 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="legal-page">
-      <div className="legal-container">
-        <Link href="/" className="legal-back">
-          ← back to home
-        </Link>
-        <Link href="/" className="legal-logo" aria-label="2am — home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wordmark.svg" alt="2am" className="legal-logo-img" />
-        </Link>
-
-        <h1 className="legal-title">why <span className="brand-name">2am</span> exists</h1>
-
-        <section className="legal-section about-prose">
-          <p>
-            every woman on this journey — trying, expecting, or navigating new
-            motherhood — has had the same moment.
-          </p>
-          <p>
-            it&apos;s late. maybe it&apos;s actually 2 a.m. you&apos;re lying in
-            bed with a question you can&apos;t shake. something you noticed,
-            something you felt, something someone said that you can&apos;t
-            stop thinking about.
-          </p>
-          <p>
-            you pick up your phone. you start to type it into google. then you
-            stop — because the last time you did that, you ended up on page
-            three of a forum from 2014 convinced something was terribly wrong.
-          </p>
-          <p>
-            you think about texting your friend. but it&apos;s late. and
-            honestly, you&apos;re not sure you want to say it out loud.
-          </p>
-          <p>so you just... sit with it. alone. wondering.</p>
-          <p>that moment is why we built <span className="brand-name">2am</span>.</p>
+    <>
+      <SiteNav />
+      <main className="about-page">
+        {/* hero */}
+        <section className="about-hero">
+          <div className="about-hero-glow" aria-hidden />
+          <div className="about-hero-inner">
+            <div className="about-eyebrow landing-mono">the story behind 2am</div>
+            <h1 className="about-h1">it was built by someone who was up too.</h1>
+            <p className="about-dek">
+              2am didn&rsquo;t come from a lab or a boardroom. it came from years
+              of lying awake with questions i couldn&rsquo;t ask anyone.
+            </p>
+          </div>
         </section>
 
-        <section className="legal-section about-prose">
-          <h2>who we are</h2>
-          <p>
-            <span className="brand-name">2am</span> was founded by ali miller in cape coral, florida. not by a
-            health tech conglomerate. not by a team of MBAs optimizing for ad
-            revenue. by a person who saw a gap and decided to fill it.
-          </p>
-          <p>
-            the gap is simple: millions of women have questions they&apos;re
-            too embarrassed, too scared, or too exhausted to ask — and the
-            options for answers aren&apos;t great. google is terrifying. mom
-            groups are judgmental. your doctor&apos;s office is closed at 2
-            am.
-          </p>
-          <p>
-            myla is the answer. she&apos;s an ai-powered friend (not a doctor,
-            not a search engine, not a forum) who&apos;s always awake, never
-            judges, and actually remembers your name, your story, and your
-            concerns.
-          </p>
-        </section>
+        {/* founder + story */}
+        <section className="about-body">
+          <div className="about-founder-row">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/founder-ali.png"
+              alt="ali miller"
+              className="about-founder-photo"
+            />
+            <div>
+              <div className="about-founder-name">ali miller</div>
+              <div className="about-founder-role landing-mono">
+                founder · still awake at 2am
+              </div>
+            </div>
+          </div>
 
-        <section className="legal-section">
-          <h2>what we believe</h2>
-          <p className="about-belief">
-            <strong>&ldquo;every question is a good question.&rdquo;</strong>
-            especially at 2 a.m. especially the ones you&apos;d never say out
-            loud.
-          </p>
-          <p className="about-belief">
-            <strong>&ldquo;judgment has no place here.&rdquo;</strong> not
-            about what you eat, how you feed your baby, how long you&apos;ve
-            been trying, or how you&apos;re feeling. ever.
-          </p>
-          <p className="about-belief">
-            <strong>&ldquo;your data is yours.&rdquo;</strong> we don&apos;t
-            sell it. we don&apos;t show you ads. we don&apos;t make money by
-            exploiting your most vulnerable moments.
-          </p>
-          <p className="about-belief">
-            <strong>
-              &ldquo;ai should make you feel less alone, not more
-              confused.&rdquo;
-            </strong>
-            myla is warm, direct, and evidence-based. she knows when to
-            reassure you and when to say &ldquo;call your doctor.&rdquo;
-          </p>
-          <p className="about-belief">
-            <strong>&ldquo;every stage matters.&rdquo;</strong> trying to
-            conceive isn&apos;t a footnote. postpartum isn&apos;t an
-            afterthought. and pregnancy isn&apos;t one-size-fits-all.
-          </p>
-        </section>
+          <div className="about-copy">
+            <p>
+              2am was founded by ali miller in cape coral, florida — not by a
+              health-tech conglomerate, not by a team of mbas optimizing for ad
+              revenue. by a person who saw a gap and decided to fill it.
+            </p>
+            <p>
+              the gap is simple: millions of women have questions they&rsquo;re
+              too embarrassed, too scared, or too exhausted to ask — and the
+              options for answers aren&rsquo;t great. google is terrifying. mom
+              groups are judgmental. your doctor&rsquo;s office is closed at 2
+              a.m.
+            </p>
+            <p>
+              myla is the answer. <strong>she&rsquo;s the friend who happens to
+              have read everything</strong> — not a doctor, not a search engine,
+              not a forum — who&rsquo;s always awake, never judges, and actually
+              remembers your name, your story, and your concerns.
+            </p>
+          </div>
 
-        <section className="legal-section about-prose">
-          <h2>what myla is (and isn&apos;t)</h2>
-          <p>
-            myla is powered by ai. she&apos;s trained on real medical
-            guidelines from organizations like ACOG, the CDC, and the AAP.
-            she&apos;s designed to be the friend you text at 2 a.m. — warm,
-            direct, judgment-free, and actually helpful.
-          </p>
-          <p>
-            she is not a doctor. she doesn&apos;t diagnose or prescribe. she
-            knows when something is beyond her scope and she&apos;ll always
-            tell you to call your provider when it matters.
-          </p>
-          <p>
-            think of her as the most well-read friend you&apos;ve ever had —
-            one who never sleeps, never judges, and never makes you feel
-            stupid for asking.
-          </p>
-        </section>
+          <blockquote className="about-pullquote">
+            &ldquo;your data is yours. we don&rsquo;t sell it, we don&rsquo;t show
+            you ads, and we never make money by exploiting your most vulnerable
+            moments.&rdquo;
+          </blockquote>
 
-        <section className="legal-section">
-          <h2>get in touch</h2>
+          <div className="about-copy">
+            <p>
+              myla is powered by ai, grounded in real clinical guidance from
+              organizations like acog, the cdc, and the aap. she&rsquo;s designed
+              to be the friend you text at 2 a.m. — warm, direct, judgment-free,
+              and actually helpful.
+            </p>
+            <p>
+              she is not a doctor. she doesn&rsquo;t diagnose or prescribe. she
+              knows when something is beyond her scope, and she&rsquo;ll always
+              tell you to call your provider when it matters. think of her as the
+              most well-read friend you&rsquo;ve ever had — one who never sleeps,
+              never judges, and never makes you feel stupid for asking.
+            </p>
+          </div>
+
           <p className="about-contact">
-            email:{" "}
+            reach me:{" "}
             <a href="mailto:ali@hey2am.app">ali@hey2am.app</a>
-          </p>
-          <p className="about-contact">
-            tiktok:{" "}
+            {" · "}
             <a
               href="https://www.tiktok.com/@hey2am.app"
               target="_blank"
               rel="noopener noreferrer"
             >
-              @hey2am.app
+              tiktok
             </a>
-          </p>
-          <p className="about-contact">
-            instagram:{" "}
+            {" · "}
             <a
               href="https://www.instagram.com/hey2amapp"
               target="_blank"
               rel="noopener noreferrer"
             >
-              @hey2amapp
+              instagram
             </a>
-          </p>
-          <p className="about-contact">
-            threads:{" "}
+            {" · "}
             <a
               href="https://www.threads.net/@hey2amapp"
               target="_blank"
               rel="noopener noreferrer"
             >
-              @hey2amapp
+              threads
             </a>
           </p>
         </section>
 
-        <footer className="legal-footer">
-          <Link href="/" className="legal-footer-brand" aria-label="2am — home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/wordmark.svg" alt="2am" className="legal-footer-wordmark" />
-          </Link>
-          built with care in florida. 💛
-          <div className="legal-footer-links">
-            <Link href="/about">about</Link>
-            <Link href="/blog">blog</Link>
-            <Link href="/privacy">privacy</Link>
-            <Link href="/terms">terms</Link>
+        {/* the promise — 3-up */}
+        <section className="about-grid-wrap">
+          <div className="about-grid">
+            <div className="about-grid-card">
+              <div className="h">never ads.</div>
+              <div className="p">
+                not now, not once there&rsquo;s scale to sell. the feed will
+                never be for sale.
+              </div>
+            </div>
+            <div className="about-grid-card">
+              <div className="h">never data sales.</div>
+              <div className="p">
+                your history is yours. it isn&rsquo;t shared with insurers,
+                advertisers, or anyone.
+              </div>
+            </div>
+            <div className="about-grid-card">
+              <div className="h">never judgment.</div>
+              <div className="p">
+                no exceptions. the whole point is a place the question isn&rsquo;t
+                too much.
+              </div>
+            </div>
           </div>
-        </footer>
-      </div>
-    </main>
+        </section>
+
+        {/* closing cta */}
+        <section className="about-closing">
+          <div className="about-closing-glow" aria-hidden />
+          <div className="about-closing-inner">
+            <h2 className="about-closing-h2">meet the friend i wish i&rsquo;d had.</h2>
+            <Link className="landing-cta" href="/app/try">
+              meet myla
+            </Link>
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

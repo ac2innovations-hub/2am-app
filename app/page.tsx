@@ -10,6 +10,8 @@ import { redirect } from "next/navigation";
 import { getRecentPosts } from "@/lib/blog/posts";
 import AppStoreBadge from "@/components/AppStoreBadge";
 import MylaDemo from "@/components/landing/MylaDemo";
+import SiteNav from "@/components/site/SiteNav";
+import SiteFooter from "@/components/site/SiteFooter";
 import { createClient as createServerSupabase } from "@/lib/supabase/server";
 import "./landing.css";
 
@@ -99,16 +101,7 @@ export default async function Landing({
   return (
     <>
       {/* top nav */}
-      <header className="landing-header">
-        <Link href="/" className="landing-navbrand" aria-label="2am — home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wordmark.svg" alt="2am" className="landing-navbrand-img" />
-        </Link>
-        <nav className="landing-topnav" aria-label="primary">
-          <Link href="/about">about</Link>
-          <Link href="/blog">blog</Link>
-        </nav>
-      </header>
+      <SiteNav />
 
       {/* hero — headline left, interactive chat demo right */}
       <header className="landing-hero2">
@@ -553,58 +546,7 @@ export default async function Landing({
         </div>
       </section>
 
-      <footer className="landing-footer">
-        <Link href="/" className="landing-footer-brand" aria-label="2am — home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wordmark.svg" alt="2am" className="landing-footer-wordmark" />
-        </Link>
-        <p className="landing-footer-signoff">
-          <span className="brand-name">2am</span> — myla’s always up.
-        </p>
-        <span className="landing-mono">hey2am.app</span>
-        <AppStoreBadge className="landing-appstore-footer" />
-        <div style={{ marginTop: 16 }}>
-          © 2026 <span className="brand-name">2am</span>. myla is an ai friend, not a medical provider.
-          {" · "}
-          <Link href="/about" className="landing-footer-link">
-            about
-          </Link>
-          {" · "}
-          <Link href="/blog" className="landing-footer-link">
-            blog
-          </Link>
-          {" · "}
-          <Link href="/privacy" className="landing-footer-link">
-            privacy
-          </Link>
-          {" · "}
-          <Link href="/terms" className="landing-footer-link">
-            terms
-          </Link>
-          {" · "}
-          <Link href="/dmca" className="landing-footer-link">
-            dmca
-          </Link>
-          {" · "}
-          <a
-            href="https://www.instagram.com/hey2amapp"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="landing-footer-link"
-          >
-            instagram
-          </a>
-          {" · "}
-          <a
-            href="https://www.tiktok.com/@hey2am.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="landing-footer-link"
-          >
-            tiktok
-          </a>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
