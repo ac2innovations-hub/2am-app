@@ -132,6 +132,10 @@ export default function BlogPostPage({ params }: Props) {
             </span>
             <span className="dot" aria-hidden />
             <span className="muted">{minutes} min read</span>
+            <span className="dot" aria-hidden />
+            <span className="muted">
+              by {AUTHOR.name} · {AUTHOR.role}
+            </span>
           </div>
 
           <h1 className="post-title">{post.title}</h1>
@@ -142,6 +146,10 @@ export default function BlogPostPage({ params }: Props) {
             className="post-body"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
+
+          <Link href="/about" className="post-author">
+            written by ali miller, founder of 2am →
+          </Link>
         </article>
 
         {/* ask myla */}

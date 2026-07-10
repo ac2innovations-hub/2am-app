@@ -861,6 +861,17 @@ html { scroll-behavior: smooth; }
 .post-body .source em { font-style: normal; }
 .post-body .source a { color: var(--peach); }
 
+/* light author byline at the end of the article → /about */
+.post-author {
+  display: inline-block;
+  margin-top: 30px;
+  font-size: 14.5px;
+  color: rgba(255, 250, 245, 0.55);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.post-author:hover { color: var(--peach); }
+
 .post-cta-wrap { max-width: 720px; margin: 0 auto; padding: 10px 32px 40px; }
 .post-cta {
   display: flex;
