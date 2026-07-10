@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AUDIENCE_LABEL, AUTHOR, POSTS, getPost } from "@/lib/blog/posts";
-import "../../legal.css";
+import {
+  AUTHOR,
+  POSTS,
+  STAGE_META,
+  getAllPosts,
+  getPost,
+  readingMinutes,
+} from "@/lib/blog/posts";
+import SiteNav from "@/components/site/SiteNav";
+import SiteFooter from "@/components/site/SiteFooter";
+import "../../landing.css";
 
 type Props = { params: { slug: string } };
 
@@ -45,6 +54,19 @@ export default function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const url = `${SITE}/blog/${post.slug}`;
+  const minutes = readingMinutes(post.content);
+  const stage = STAGE_META[post.audience];
+
+  // Related: same-stage posts first, then the rest — up to 3.
+  const related = getAllPosts()
+    .filter((p) => p.slug !== post.slug)
+    .sort(
+      (a, b) =>
+        (a.audience === post.audience ? 0 : 1) -
+        (b.audience === post.audience ? 0 : 1),
+    )
+    .slice(0, 3);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -83,7 +105,8 @@ export default function BlogPostPage({ params }: Props) {
       : null;
 
   return (
-    <main className="legal-page">
+    <>
+      <SiteNav />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -94,57 +117,81 @@ export default function BlogPostPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
-      <div className="legal-container">
-        <Link href="/blog" className="legal-back">
-          ← back to blog
-        </Link>
-        <Link href="/" className="legal-logo" aria-label="2am — home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wordmark.svg" alt="2am" className="legal-logo-img" />
-        </Link>
+      <main className="post-page">
+        <article className="post-article">
+          <Link href="/blog" className="post-back landing-mono">
+            ← all articles
+          </Link>
 
-        <h1 className="legal-title">{post.title}</h1>
-        <div className="blog-meta-row">
-          <span className="blog-tag">{AUDIENCE_LABEL[post.audience]}</span>
-          <span className="blog-byline">
-            by {AUTHOR.name}, {AUTHOR.role}
-          </span>
-        </div>
-
-        <article
-          className="blog-article"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
-
-        <aside className="blog-author">
-          <div className="blog-author-name">
-            {AUTHOR.name}, {AUTHOR.role}
+          <div className="post-meta">
+            <span
+              className="post-meta-tag"
+              style={{ color: stage.hex ?? "#8b97ae" }}
+            >
+              {stage.tag}
+            </span>
+            <span className="dot" aria-hidden />
+            <span className="muted">{minutes} min read</span>
           </div>
-          <p>{AUTHOR.bio}</p>
-        </aside>
 
-        <section className="blog-cta">
-          <p>
-            have a question you&apos;d never google? myla answers at 2 a.m.
-            with zero judgment.
-          </p>
-          <Link href="/app/auth">meet myla →</Link>
+          <h1 className="post-title">{post.title}</h1>
+          <p className="post-dek">{post.description}</p>
+          <div className="post-rule" aria-hidden />
+
+          <div
+            className="post-body"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </article>
+
+        {/* ask myla */}
+        <section className="post-cta-wrap">
+          <div className="post-cta">
+            <div className="post-cta-mark" aria-hidden>
+              m
+            </div>
+            <div className="post-cta-text">
+              <div className="post-cta-title">still have a question?</div>
+              <div className="post-cta-sub">
+                ask myla — she&rsquo;ll answer it for exactly where you are.
+              </div>
+            </div>
+            <Link href="/app/try" className="post-cta-btn">
+              ask myla
+            </Link>
+          </div>
         </section>
 
-        <footer className="legal-footer">
-          <Link href="/" className="legal-footer-brand" aria-label="2am — home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/wordmark.svg" alt="2am" className="legal-footer-wordmark" />
-          </Link>
-          built with care in florida. 💛
-          <div className="legal-footer-links">
-            <Link href="/about">about</Link>
-            <Link href="/blog">blog</Link>
-            <Link href="/privacy">privacy</Link>
-            <Link href="/terms">terms</Link>
-          </div>
-        </footer>
-      </div>
-    </main>
+        {/* keep reading */}
+        {related.length > 0 && (
+          <section className="post-related">
+            <div className="post-related-label landing-mono">keep reading</div>
+            <div className="post-related-list">
+              {related.map((r) => (
+                <Link
+                  key={r.slug}
+                  href={`/blog/${r.slug}`}
+                  className="post-related-item"
+                >
+                  <div>
+                    <div
+                      className="post-related-tag"
+                      style={{ color: STAGE_META[r.audience].hex ?? "#8b97ae" }}
+                    >
+                      {STAGE_META[r.audience].tag}
+                    </div>
+                    <div className="post-related-title">{r.title}</div>
+                  </div>
+                  <span className="chev" aria-hidden>
+                    ›
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+      <SiteFooter />
+    </>
   );
 }

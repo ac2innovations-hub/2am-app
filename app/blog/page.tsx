@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AUDIENCE_LABEL, getAllPosts } from "@/lib/blog/posts";
-import "../legal.css";
+import { getAllPosts, readingMinutes } from "@/lib/blog/posts";
+import SiteNav from "@/components/site/SiteNav";
+import SiteFooter from "@/components/site/SiteFooter";
+import BlogIndexClient from "@/components/blog/BlogIndexClient";
+import "../landing.css";
 
 export const metadata: Metadata = {
   title: "2am blog — answers for the questions you'd never google",
@@ -26,53 +28,24 @@ export const metadata: Metadata = {
   },
 };
 
+const FEATURED_SLUG = "can-i-eat-sushi-while-pregnant";
+
 export default function BlogIndexPage() {
-  const posts = getAllPosts();
+  const posts = getAllPosts().map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+    audience: p.audience,
+    readMinutes: readingMinutes(p.content),
+  }));
+
   return (
-    <main className="legal-page">
-      <div className="legal-container">
-        <Link href="/" className="legal-back">
-          ← back to home
-        </Link>
-        <Link href="/" className="legal-logo" aria-label="2am — home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wordmark.svg" alt="2am" className="legal-logo-img" />
-        </Link>
-
-        <h1 className="legal-title">the <span className="brand-name">2am</span> blog</h1>
-        <p className="legal-meta">answers for the questions you&apos;d never google</p>
-
-        <div className="blog-index-list">
-          {posts.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/blog/${p.slug}`}
-              className="blog-index-card"
-            >
-              <div className="blog-index-card-meta">
-                <span>{AUDIENCE_LABEL[p.audience]}</span>
-              </div>
-              <h2>{p.title}</h2>
-              <p>{p.description}</p>
-              <span className="blog-index-read">read →</span>
-            </Link>
-          ))}
-        </div>
-
-        <footer className="legal-footer">
-          <Link href="/" className="legal-footer-brand" aria-label="2am — home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/wordmark.svg" alt="2am" className="legal-footer-wordmark" />
-          </Link>
-          built with care in florida. 💛
-          <div className="legal-footer-links">
-            <Link href="/about">about</Link>
-            <Link href="/blog">blog</Link>
-            <Link href="/privacy">privacy</Link>
-            <Link href="/terms">terms</Link>
-          </div>
-        </footer>
-      </div>
-    </main>
+    <>
+      <SiteNav />
+      <main className="blogidx-page">
+        <BlogIndexClient posts={posts} featuredSlug={FEATURED_SLUG} />
+      </main>
+      <SiteFooter />
+    </>
   );
 }

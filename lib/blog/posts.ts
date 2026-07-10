@@ -290,3 +290,26 @@ export function getAllPosts(): BlogPost[] {
 export function getRecentPosts(limit: number): BlogPost[] {
   return getAllPosts().slice(0, limit);
 }
+
+export type StageFilter = "trying" | "pregnancy" | "postpartum";
+
+// Maps a post's audience to its blog tag label, filter key, and stage color.
+// `all`-audience posts have no stage color and show under every filter.
+export const STAGE_META: Record<
+  Audience,
+  { tag: string; filter: StageFilter | null; rgb: string | null; hex: string | null }
+> = {
+  ttc: { tag: "trying", filter: "trying", rgb: "162,200,162", hex: "#a2c8a2" },
+  pregnant: { tag: "pregnancy", filter: "pregnancy", rgb: "248,200,168", hex: "#f8c8a8" },
+  postpartum: { tag: "postpartum", filter: "postpartum", rgb: "190,178,215", hex: "#beb2d7" },
+  all: { tag: "for everyone", filter: null, rgb: null, hex: null },
+};
+
+// Estimated reading time from the post HTML (~200 wpm), min 1 minute.
+export function readingMinutes(content: string): number {
+  const words = content
+    .replace(/<[^>]+>/g, " ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
