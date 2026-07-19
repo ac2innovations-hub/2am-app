@@ -260,7 +260,8 @@ export default function PrivacyPage() {
               conversations or your entire account. when you delete your
               account, we remove your profile and conversations from our
               servers right away, and clear them from your device. anthropic
-              deletes any related api data within about 30 days on their side.
+              removes any related api data on its own schedule, within a
+              limited period under their commercial terms.
             </li>
             <li>
               <strong>opt out of emails</strong> — unsubscribe from marketing
