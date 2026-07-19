@@ -14,6 +14,7 @@ import {
   getConversation,
   setPendingAnonConversation,
 } from "@/lib/conversations";
+import { clearAllLocalData } from "@/lib/local-data";
 import type { ChatMessage as Msg } from "@/lib/supabase/types";
 
 // Anonymous "try Myla before signup" chat. Deliberately separate from the
@@ -50,6 +51,7 @@ export default function TryMylaClient() {
   const [sending, setSending] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clearOpen, setClearOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   // Logged-in users don't belong in the anon flow → send them to their chat.
@@ -177,6 +179,27 @@ export default function TryMylaClient() {
     setStarting(false);
   }, []);
 
+  // "clear chat" — the only delete affordance a visitor without an account
+  // has. The anon transcript lives solely in localStorage (it is never written
+  // to Supabase before signup), so wiping the 2am: namespace removes every
+  // trace of it from the device: the conversation, the hand-off marker that
+  // would otherwise migrate it onto a future account, and the session token.
+  // Nothing here reaches the server — there is nothing of theirs on it.
+  const clearChat = useCallback(() => {
+    clearAllLocalData();
+    setClearOpen(false);
+    setToken(null);
+    setConversationId(null);
+    setMessages([]);
+    setInput("");
+    setRemaining(null);
+    setConsented(false);
+    // Home rather than back to consent: re-consenting would mint a fresh anon
+    // token against the per-IP daily cap, and someone who just erased their
+    // chat is leaving, not restarting.
+    router.replace("/");
+  }, [router]);
+
   const budgetDone = remaining !== null && remaining <= 0;
   const canSend = input.trim().length > 0 && !sending && !budgetDone && !!token;
 
@@ -286,12 +309,21 @@ export default function TryMylaClient() {
             </div>
           </div>
         </div>
-        <Link
-          href="/app/auth"
-          className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/50 underline decoration-cream/20 underline-offset-4 hover:text-cream/80"
-        >
-          log in
-        </Link>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setClearOpen(true)}
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/50 underline decoration-cream/20 underline-offset-4 transition hover:text-cream/80"
+          >
+            clear chat
+          </button>
+          <Link
+            href="/app/auth"
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/50 underline decoration-cream/20 underline-offset-4 hover:text-cream/80"
+          >
+            log in
+          </Link>
+        </div>
       </header>
 
       {/* Messages */}
@@ -360,6 +392,48 @@ export default function TryMylaClient() {
             </button>
           </div>
         </form>
+      )}
+
+      {clearOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="clear-title"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-midnight/85 px-5 pb-8 pt-10 backdrop-blur-sm sm:items-center"
+          onClick={() => setClearOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-3xl border border-cream/10 bg-navy p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              id="clear-title"
+              className="text-[17px] font-semibold lowercase text-cream"
+            >
+              clear this conversation?
+            </h2>
+            <p className="mt-2 text-[14px] leading-relaxed text-cream/70">
+              this removes everything you typed from this device. it won&apos;t
+              be saved to an account and can&apos;t be undone.
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={clearChat}
+                className="flex w-full items-center justify-center rounded-full bg-red-500 py-3 text-[14px] font-semibold text-white shadow-glow transition active:scale-[0.99]"
+              >
+                clear it
+              </button>
+              <button
+                type="button"
+                onClick={() => setClearOpen(false)}
+                className="flex w-full items-center justify-center rounded-full border border-cream/15 py-3 text-[14px] font-medium text-cream/80 transition active:scale-[0.99]"
+              >
+                cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );

@@ -37,10 +37,17 @@ export default function AiConsentScreen({
           one quick thing before you start
         </h1>
 
+        <p className="mb-4 text-[15px] leading-relaxed text-cream/80">
+          myla is powered by anthropic&rsquo;s ai. to answer you, your messages
+          are sent to anthropic&rsquo;s api — and anthropic doesn&rsquo;t use
+          them to train their models.
+        </p>
+
         <p className="mb-5 text-[15px] leading-relaxed text-cream/80">
-          myla uses ai by anthropic to chat with you. your conversations are
-          processed by anthropic to create her responses — and never shared
-          with anyone else.
+          your chats are also stored securely so you can come back to them, and
+          handled only by the providers that run 2am (listed in our privacy
+          policy). we never sell your data or use it for ads. you can delete it
+          anytime.
         </p>
 
         <p className="mb-7 text-[14px] leading-relaxed text-cream/70">

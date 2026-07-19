@@ -22,7 +22,7 @@ export default function PrivacyPage() {
         </Link>
 
         <h1 className="legal-title">privacy policy</h1>
-        <p className="legal-meta">last updated: april 2026</p>
+        <p className="legal-meta">last updated: july 2026</p>
 
         <section className="legal-section">
           <h2>the short version</h2>
@@ -90,9 +90,18 @@ export default function PrivacyPage() {
               works on your device.
             </li>
             <li>
-              <strong>cookies</strong> — we use essential cookies only
-              (authentication, preferences). no tracking cookies. no
-              third-party advertising cookies.
+              <strong>cookies</strong> — we use essential cookies (to keep you
+              signed in and remember preferences) and one privacy-respecting
+              analytics cookie (posthog) that measures how the app is used —
+              without recording your session, selling your data, or tracking
+              you across other sites. we don&apos;t use advertising cookies.
+            </li>
+            <li>
+              <strong>a safety signal</strong> — if a conversation suggests you
+              may be going through a crisis, <span className="brand-name">2am</span>{" "}
+              records the time this happened (not the content) so myla can
+              respond with care and avoid sending an upbeat nudge at the wrong
+              moment. it&apos;s a private flag on your account, never shared.
             </li>
           </ul>
 
@@ -140,61 +149,64 @@ export default function PrivacyPage() {
 
         <section className="legal-section">
           <h2>third-party ai service</h2>
-          <ul>
-            <li>
-              myla&apos;s responses are powered by anthropic&apos;s claude ai.
-            </li>
-            <li>
-              when you send a message to myla, your conversation content —
-              including your name, your stage, and anything you share — is sent
-              to anthropic&apos;s api to generate a response.
-            </li>
-            <li>
-              anthropic does not use your conversations to train their ai
-              models.
-            </li>
-            <li>
-              anthropic&apos;s data protection practices meet or exceed the
-              protections described in this privacy policy.
-            </li>
-            <li>
-              you can read{" "}
-              <a
-                href="https://www.anthropic.com/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                anthropic&apos;s privacy policy
-              </a>
-              .
-            </li>
-            <li>
-              we do not share your data with any other third parties.
-            </li>
-          </ul>
+          <p>
+            myla&apos;s responses are powered by anthropic&apos;s claude ai.
+            when you send a message to myla, your conversation content —
+            including your name, your stage, and anything you share — is sent
+            to anthropic&apos;s api to generate a response.
+          </p>
+          <p>
+            anthropic does not use your conversations to train their ai models,
+            and retains api data only for a limited period under their
+            commercial terms. for details, see{" "}
+            <a
+              href="https://www.anthropic.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              anthropic&apos;s privacy policy
+            </a>
+            .
+          </p>
+          <p>
+            beyond anthropic, <span className="brand-name">2am</span> relies on
+            a small set of service providers to run the app (below). each
+            processes only what it needs to do its job, and none receive your
+            data to use for their own purposes. we never sell your data.
+          </p>
         </section>
 
         <section className="legal-section">
           <h2>who we share your data with</h2>
+          <p>service providers we use:</p>
           <ul>
             <li>
-              <strong>anthropic</strong> — ai responses (myla). your
-              conversation messages are processed but not stored for training.
+              <strong>anthropic</strong> — powers myla&apos;s responses
+              (receives your messages)
             </li>
             <li>
-              <strong>supabase</strong> — database &amp; authentication.
-              account data and encrypted conversations.
+              <strong>supabase</strong> — database + accounts (stores your
+              profile and conversations)
             </li>
             <li>
-              <strong>vercel</strong> — web hosting. basic request logs.
+              <strong>vercel</strong> — hosting (serves the app)
             </li>
             <li>
-              <strong>formspree</strong> — waitlist email collection. email
-              address only.
+              <strong>upstash</strong> — rate limiting to prevent abuse (an
+              anonymized id only; no message content)
             </li>
             <li>
-              <strong>resend</strong> — transactional email delivery (e.g. the
-              waitlist welcome email). email address only.
+              <strong>posthog</strong> — privacy-respecting product analytics
+              (usage counts + an anonymized id; no message content, no session
+              recording, respects do-not-track)
+            </li>
+            <li>
+              <strong>apple push (apns)</strong> — delivers notifications you
+              opt into (a device token only)
+            </li>
+            <li>
+              <strong>formspree / resend</strong> — contact form and
+              transactional email
             </li>
           </ul>
           <p>
@@ -216,7 +228,9 @@ export default function PrivacyPage() {
           <h2>data security</h2>
           <ul>
             <li>
-              all data is transmitted over encrypted connections (https/tls).
+              your conversations are encrypted in transit and encrypted at rest
+              by our database provider. (they are not end-to-end encrypted —
+              the service providers above process them to run the app.)
             </li>
             <li>passwords are hashed and never stored in plain text.</li>
             <li>
@@ -244,7 +258,9 @@ export default function PrivacyPage() {
             <li>
               <strong>delete your data</strong> — delete individual
               conversations or your entire account. when you delete your
-              account, we remove your personal data within 30 days.
+              account, we remove your profile and conversations from our
+              servers right away, and clear them from your device. anthropic
+              deletes any related api data within about 30 days on their side.
             </li>
             <li>
               <strong>opt out of emails</strong> — unsubscribe from marketing

@@ -10,6 +10,7 @@ import {
   hydrateProfileFromSupabase,
   type LocalProfile,
 } from "@/lib/profile";
+import { clearAllLocalData } from "@/lib/local-data";
 import { createClient } from "@/lib/supabase/client";
 
 const STAGE_LABEL: Record<string, string> = {
@@ -95,13 +96,11 @@ export default function SettingsClient() {
     } catch {
       // The auth row no longer exists; cookies will clear on redirect.
     }
-    clearProfile();
-    try {
-      localStorage.removeItem("2am:conversations");
-      localStorage.removeItem("2am:activeConversation");
-    } catch {
-      // ignore
-    }
+    // Delete means delete: clear the entire 2am: namespace, not just the
+    // conversation keys. Transcripts, profile, and every onboarding/push flag
+    // leave the device — otherwise "delete my account" leaves full chat
+    // history sitting in localStorage.
+    clearAllLocalData();
     router.replace("/");
     router.refresh();
   }
